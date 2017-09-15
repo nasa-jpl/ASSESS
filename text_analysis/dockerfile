@@ -1,0 +1,32 @@
+FROM ubuntu
+
+
+# install missing part of ubuntu core
+RUN apt-get update && apt-get install -y \
+    software-properties-common software-properties-common \
+    build-essential checkinstall \
+    libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev
+
+
+ADD http://python.org/ftp/python/2.7.5/Python-2.7.5.tgz  /build/Python-2.7.5.tgz
+WORKDIR /build
+RUN tar -xvf Python-2.7.5.tgz
+WORKDIR /build/Python-2.7.5
+RUN ./configure
+RUN make
+RUN checkinstall -y
+
+RUN apt-get update && apt-get install -y \
+    python-pip python-dev build-essential
+RUN pip install --upgrade pip
+
+RUN apt-get update
+RUN apt-get install build-essential chrpath libssl-dev libxft-dev -y
+RUN apt-get install libfreetype6 libfreetype6-dev libfontconfig1 libfontconfig1-dev -y
+RUN apt-get install vim -y
+
+WORKDIR /
+RUN git clone https://github.com/nasa-jpl/ASSESS.git
+WORKDIR /ASSES/text_analysis
+RUN pip install -r requirements.txt
+
