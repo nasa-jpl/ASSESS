@@ -173,7 +173,7 @@ def use_system1(sow,labmbda,n_results):
 
     # ===================== read sow =======================
 
-    sow=sow.decode('utf-8')
+    sow=sow#.decode('utf-8')
 
     # ===================== vectorize the SOW =======================
 
@@ -217,8 +217,8 @@ def use_system1(sow,labmbda,n_results):
     for i in range(n_results):
         index=ranked_docs[i]
         print similarities[index],title_all[index]
-        print all_important_terms_tf[index]
-        print all_important_terms_keywords[index]
+        # print all_important_terms_tf[index]
+        # print all_important_terms_keywords[index]
 
 def use_system2(sow,labmbda,n_results):
 
@@ -236,7 +236,7 @@ def use_system2(sow,labmbda,n_results):
 
     # ===================== read sow =======================
 
-    sow = sow.decode('utf-8')
+    sow = sow#.decode('utf-8')
 
 
     # ===================== vectorize the SOW =======================
@@ -287,7 +287,7 @@ def use_system2(sow,labmbda,n_results):
     for i in range(n_results):
         index=ranked_docs[i]
         print similarities[index] ,title_all[index]
-        print all_important_terms_tf[index]
-        print all_important_terms_keywords[index]
+        # print all_important_terms_tf[index]
+        # print all_important_terms_keywords[index]
 
 
