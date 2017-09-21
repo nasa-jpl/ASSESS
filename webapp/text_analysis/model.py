@@ -213,12 +213,17 @@ def use_system1(sow,labmbda,n_results):
     # ===================== rank the documents and print the top n =======================
 
     ranked_docs=list(reversed(np.argsort(similarities)))
-
+    results_sim=[]
+    results_title=[]
     for i in range(n_results):
         index=ranked_docs[i]
         print similarities[index],title_all[index]
+        results_sim.append(similarities[index])
+        results_title.append(title_all[index])
         # print all_important_terms_tf[index]
         # print all_important_terms_keywords[index]
+
+    return results_title,results_sim
 
 def use_system2(sow,labmbda,n_results):
 
@@ -284,10 +289,16 @@ def use_system2(sow,labmbda,n_results):
 
     ranked_docs=list(reversed(np.argsort(similarities)))
 
+    results_sim = []
+    results_title = []
     for i in range(n_results):
         index=ranked_docs[i]
         print similarities[index] ,title_all[index]
+        results_sim.append(similarities[index])
+        results_title.append(title_all[index])
         # print all_important_terms_tf[index]
         # print all_important_terms_keywords[index]
+
+    return results_title, results_sim
 
 
