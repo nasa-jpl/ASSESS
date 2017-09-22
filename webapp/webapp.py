@@ -6,7 +6,7 @@ import subprocess
 from flask import request
 
 app = Flask(__name__)
-standards_dir = 'text_analysis/standards'
+standards_dir = 'standards'
 json_output_dir = 'output'
 
 @app.route('/')
@@ -30,6 +30,7 @@ def train():
 
     texts_all = []
     title_all = []
+    scope=''
     for filename in os.listdir(json_output_dir):
         try:
             js = json.load(open(os.path.join(json_output_dir, filename)))
