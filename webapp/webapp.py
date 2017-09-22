@@ -117,14 +117,14 @@ def predict():
 
     print '\n'.join(standard_refs)
     result_title_sys1,result_sim_sys1=model.use_system1(scope, lbd_sys1, 10)
-    result_title_sys2, result_sim_sys2=model.use_system2(scope, lbd_sys2, 10)
+    # result_title_sys2, result_sim_sys2=model.use_system2(scope, lbd_sys2, 10)
 
     result={}
     result['refs']=standard_refs
     result['system1_titles']=result_title_sys1
-    result['system2_titles'] = result_title_sys2
+    # result['system2_titles'] = result_title_sys2
     result['system1_sim'] = result_sim_sys1
-    result['system2_sim'] = result_sim_sys2
+    # result['system2_sim'] = result_sim_sys2
     return json.dumps(result)
 
 
