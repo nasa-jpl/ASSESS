@@ -1,4 +1,4 @@
-cd ASSES/text_analysis  
+cd ASSESS/text_analysis  
 docker build -t assessimage .  
   
 run a docker with ports and volumns:  
