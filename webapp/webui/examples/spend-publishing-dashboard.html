@@ -1,0 +1,330 @@
+<!doctype html>
+<html class="no-js" lang="">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Your awesome app</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <!-- Place favicon.ico in the root directory -->
+
+    <link rel="stylesheet" href="//a.okfn.org/html/oki/panel/assets/css/frontend.css"/>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <script src="../js/vendor/modernizr-2.8.3.min.js"></script>
+  </head>
+  <body>
+    <!--[if lt IE 8]>
+        <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <div id="ok-panel" class="closed"><div class="container"><iframe src="//a.okfn.org/html/oki/panel/panel.html" scrolling="no"></iframe></div></div>
+
+    <nav class="navbar navbar-static-top">
+      <div class="container">
+        <div id="ok-panel-wrapper">
+          <a class="ok-ribbon" href="https://okfn.org/"><img src="//a.okfn.org/html/oki/panel/assets/images/oki-ribbon.png" alt="Open Knowledge International"></a>
+        </div>
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand has-icon" href="./">
+
+            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+
+            <span class="text">Your awesome app</span>
+          </a>
+          <span class="alpha release badge">alpha</span>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <!-- page content start -->
+
+    <div class="dashboard">
+      <div class="jumbotron">
+        <div class="container">
+          <ul class="overview">
+            <li class="counter"><span class="value"><span>1</span><span>5</span></span> <span class="label">publishers</span></li>
+            <li class="counter"><span class="value"><span>1</span><span>5</span></span> <span class="label">sources</span></li>
+            <li class="counter"><span class="value"><span>1</span><span>3</span></span> <span class="label">% valid</span></li>
+            <li class="counter"><span class="value"><span>1</span><span>3</span></span> <span class="label">% timely</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="container">
+        <section class="line-chart">
+          <div class="intro">
+            <div class="text">
+              <h2>Spend Publishing</h2>
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc cursus mauris molestie accumsan laoreet. Vestibulum elementum porta rhoncus. Vivamus sagittis urna congue sollicitudin mollis. Phasellus dictum elit sed posuere mattis. Donec egestas libero sit amet elit congue, quis placerat tellus pharetra.</p>
+            </div>
+            <div class="more">
+              <a class="btn btn-default" href="#" role="button">More</a>
+            </div>
+          </div>
+          <canvas id="lineChart" width="1140" height="300"></canvas>
+        </section>
+      </div>
+      <section class="publishers">
+        <div class="container">
+          <div class="intro">
+            <div class="text">
+              <h2>Publishers</h2>
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc cursus mauris molestie accumsan laoreet. Vestibulum elementum porta rhoncus. Vivamus sagittis urna congue sollicitudin mollis. Phasellus dictum elit sed posuere mattis. Donec egestas libero sit amet elit congue, quis placerat tellus pharetra.</p>
+            </div>
+            <div class="more">
+              <a class="btn btn-default" href="#" role="button">More</a>
+            </div>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th></th>
+                <th>Jurisdiction</th>
+                <th>Contact</th>
+                <th></th>
+                <th></th>
+                <th class="score">Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="danger">
+                <td><a href="#/publishers/xx_dept1" class="label label-default">xx_dept1</a></td>
+                <td>Department 1</td>
+                <td></td>
+                <td><a href="http://www.example.com/dept1"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
+                <td>XX</td>
+                <td>Dept1 Admin</td>
+                <td><a href="mailto:dept1-admin@example.com"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a></td>
+                <td><span class="glyphicon glyphicon-home" aria-hidden="true"></span></td>
+                <td class="score">2</td>
+              </tr>
+              <tr class="danger">
+                <td><a href="#/publishers/xx_dept2" class="label label-default">xx_dept2</a></td>
+                <td>Department 2</td>
+                <td></td>
+                <td><a href="http://www.example.com/dept2"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
+                <td>XX</td>
+                <td>Dept2 Admin</td>
+                <td><a href="mailto:dept2-admin@example.com"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a></td>
+                <td><span class="glyphicon glyphicon-home" aria-hidden="true"></span></td>
+                <td class="score">4</td>
+              </tr>
+              <tr class="warning">
+                <td><a href="#/publishers/xx_dept3" class="label label-default">xx_dept3</a></td>
+                <td>Department 3</td>
+                <td></td>
+                <td><a href="http://www.example.com/dept3"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
+                <td>XX</td>
+                <td>Dept3 Admin</td>
+                <td><a href="mailto:dept3-admin@example.com"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a></td>
+                <td><span class="glyphicon glyphicon-home" aria-hidden="true"></span></td>
+                <td class="score">6</td>
+              </tr>
+              <tr class="warning">
+                <td><a href="#/publishers/xx_dept4" class="label label-default">xx_dept4</a></td>
+                <td>Department 4</td>
+                <td></td>
+                <td><a href="http://www.example.com/dept4"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
+                <td>XX</td>
+                <td>Dept4 Admin</td>
+                <td><a href="mailto:dept4-admin@example.com"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a></td>
+                <td><span class="glyphicon glyphicon-home" aria-hidden="true"></span></td>
+                <td class="score">8</td>
+              </tr>
+              <tr class="success">
+                <td><a href="#/publishers/xx_dept5" class="label label-default">xx_dept5</a></td>
+                <td>Department 5</td>
+                <td></td>
+                <td><a href="http://www.example.com/dept5"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
+                <td>XX</td>
+                <td>Dept5 Admin</td>
+                <td><a href="mailto:dept5-admin@example.com"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a></td>
+                <td><span class="glyphicon glyphicon-home" aria-hidden="true"></span></td>
+                <td class="score">10</td>
+              </tr>
+              <tr class="danger">
+                <td><a href="#/publishers/xx_dept6" class="label label-default">xx_dept6</a></td>
+                <td>Department 6</td>
+                <td></td>
+                <td><a href="http://www.example.com/dept6"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
+                <td>XX</td>
+                <td>Dept6 Admin</td>
+                <td><a href="mailto:dept6-admin@example.com"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a></td>
+                <td><span class="glyphicon glyphicon-home" aria-hidden="true"></span></td>
+                <td class="score">2</td>
+              </tr>
+              <tr class="danger">
+                <td><a href="#/publishers/xx_dept7" class="label label-default">xx_dept7</a></td>
+                <td>Department 7</td>
+                <td></td>
+                <td><a href="http://www.example.com/dept7"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
+                <td>XX</td>
+                <td>Dept7 Admin</td>
+                <td><a href="mailto:dept7-admin@example.com"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a></td>
+                <td><span class="glyphicon glyphicon-home" aria-hidden="true"></span></td>
+                <td class="score">4</td>
+              </tr>
+              <tr class="warning">
+                <td><a href="#/publishers/xx_dept8" class="label label-default">xx_dept8</a></td>
+                <td>Department 8</td>
+                <td></td>
+                <td><a href="http://www.example.com/dept8"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
+                <td>XX</td>
+                <td>Dept8 Admin</td>
+                <td><a href="mailto:dept8-admin@example.com"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a></td>
+                <td><span class="glyphicon glyphicon-home" aria-hidden="true"></span></td>
+                <td class="score">6</td>
+              </tr>
+              <tr class="warning">
+                <td><a href="#/publishers/xx_dept9" class="label label-default">xx_dept9</a></td>
+                <td>Department 9</td>
+                <td></td>
+                <td><a href="http://www.example.com/dept9"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
+                <td>XX</td>
+                <td>Dept9 Admin</td>
+                <td><a href="mailto:dept9-admin@example.com"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a></td>
+                <td><span class="glyphicon glyphicon-home" aria-hidden="true"></span></td>
+                <td class="score">8</td>
+              </tr>
+              <tr class="success">
+                <td><a href="#/publishers/xx_dept10" class="label label-default">xx_dept10</a></td>
+                <td>Department 10</td>
+                <td></td>
+                <td><a href="http://www.example.com/dept10"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></td>
+                <td>XX</td>
+                <td>Dept10 Admin</td>
+                <td><a href="mailto:dept10-admin@example.com"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a></td>
+                <td><span class="glyphicon glyphicon-home" aria-hidden="true"></span></td>
+                <td class="score">10</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.1/Chart.min.js"></script>
+    <script>
+    var options = {
+        scaleShowGridLines : true,
+        scaleGridLineColor : "rgba(0,0,0,.05)",
+        scaleGridLineWidth : 1,
+        scaleShowHorizontalLines: true,
+        scaleShowVerticalLines: true,
+        bezierCurve : true,
+        bezierCurveTension : 0.4,
+        pointDot : true,
+        pointDotRadius : 4,
+        pointDotStrokeWidth : 1,
+        pointHitDetectionRadius : 20,
+        datasetStroke : true,
+        datasetStrokeWidth : 2,
+        datasetFill : true
+    };
+    var data = {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [
+                    {
+                        label: "Valid %",
+                        fillColor: "rgba(122, 184, 0,0.2)",
+                        strokeColor: "rgba(122, 184, 0,1)",
+                        pointColor: "rgba(122, 184, 0,1)",
+                        pointStrokeColor: "#fff",
+                        pointHighlightFill: "#fff",
+                        pointHighlightStroke: "rgba(122, 184, 0,1)",
+                        data: [35, 31, 29, 36, 46, 45, 51, 55, 61, 69, 58, 67]
+                    },
+                    {
+                        label: "Invalid %",
+                        fillColor: "rgba(119,119,119,0.2)",
+                        strokeColor: "rgba(119,119,119,1)",
+                        pointColor: "rgba(119,119,119,1)",
+                        pointStrokeColor: "#fff",
+                        pointHighlightFill: "#fff",
+                        pointHighlightStroke: "rgba(119,119,119,1)",
+                        data: [65, 69, 71, 64, 54, 55, 49, 45, 39, 31, 42, 33]
+                    }
+                ]
+            };
+    var canvas = document.getElementById("lineChart");
+    var ctx = canvas.getContext("2d");
+    new Chart(ctx).Line(data, options);
+    </script>
+
+
+
+    <!-- footer start -->
+    <footer class="site-footer">
+      <div class="container">
+        <a class="footer-logo" href="https://okfn.org/">
+          <img src="https://a.okfn.org/img/oki/landscape-white-468x122.png" alt="Open Knowledge">
+        </a>
+
+        <div class="footer-links">
+          <ul>
+            <li><a href="https://okfn.org/privacy-policy/">Privacy policy</a></li>
+            <li><a href="https://okfn.org/ip-policy/">IP policy</a></li>
+            <li><a href="https://okfn.org/cookie-policy/">Cookie policy</a></li>
+            <li><a href="https://okfn.org/terms-of-use/">Terms of use</a></li>
+          </ul>
+
+          <ul class="footer-social">
+            <li><a href="https://facebook.com/OKFNetwork">
+              <img src="https://raw.githubusercontent.com/thoughtbot/refills/master/source/images/facebook-logo-circle.png" alt="Facebook">
+              </a></li>
+            <li>
+              <a href="https://twitter.com/okfn">
+                <img src="https://raw.githubusercontent.com/thoughtbot/refills/master/source/images/twitter-logo-circle.png" alt="Twitter">
+              </a>
+            </li>
+            <li>
+              <a href="https://www.youtube.com/user/openknowledgefdn">
+                <img src="https://raw.githubusercontent.com/thoughtbot/refills/master/source/images/youtube-logo-circle.png" alt="YouTube">
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <hr>
+
+        <p>Open Knowledge Foundation is incorporated in England and Wales as a company Limited by guarantee. Company no. 05133759. Registered address: St. John’s Innovation Centre, Cowley Road, Cambridge, CB4 0WS, UK. VAT Registration no. GB 984404989.</p>
+
+      </div>
+    </footer>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../js/vendor/jquery-1.11.3.min.js"><\/script>')</script>
+    <script src="../js/vendor/bootstrap.min.js"></script>
+    <script src="../js/plugins.js"></script>
+    <script src="//a.okfn.org/html/oki/panel/assets/js/frontend.js" type="text/javascript"></script>
+    <script src="../js/main.js"></script>
+
+    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+    <script>
+      (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+      function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='https://www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+      ga('create','UA-XXXXX-X','auto');ga('send','pageview');
+    </script>
+  </body>
+</html>

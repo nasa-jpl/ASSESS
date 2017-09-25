@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+	<head>
+
+
+		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+		<script type="text/javascript" src="http://malsup.github.com/jquery.form.js"></script> 
+
+		<script type="text/javascript">
+			$(function() {
+				$('#myform').submit(function(ev) {
+					ev.preventDefault();
+					$(this).ajaxSubmit({
+						target: '#result',
+						success: function(responseText, statusText, xhr, $form) {
+							$("#result").html(responseText);
+							$('#result').show();
+						},
+						beforeSerialize: function($form, options) {
+							$("#result").html("<span class=\"glyphicon glyphicon-refresh spinning\"></span> Loading...");
+							$("#result").show();
+						},
+						error: function() {
+							$("#result").html('<div class="alert alert-danger" role="alert"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Error</div>')
+						}
+					}); 
+				});
+			})
+		</script>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Give me standards!</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Place favicon.ico in the root directory -->
+
+    <link rel="stylesheet" href="custom.css">
+    <link rel="stylesheet" href="//okfnlabs.org/ok-panel/assets/css/frontend.css"/>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/vendor/modernizr-2.8.3.min.js"></script>
+	</head>
+	<body>
+<!--[if lt IE 8]>
+        <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+    
+    <div id="ok-panel" class="closed"><iframe src="//assets.okfn.org/themes/okfn/okf-panel.html" scrolling="no"></iframe></div>
+
+    <nav class="navbar navbar-static-top">
+      <div class="container">
+        <!--<a class="ok-ribbon" href="https://okfn.org/"><img src="//okfnlabs.org/ok-panel/assets/images/ok-ribbon.png" alt="Open Knowledge"></a>-->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand has-icon" href="/">
+            
+            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+            
+            <span class="text">ASSESS</span>
+          </a>
+          <!--<span class="alpha release badge">alpha</span>-->
+        </div>
+<div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="#what" data-scroll >What is it?</a></li>
+            <li><a href="#api" data-scroll >API</a></li>
+            <li><a href="#plans" data-scroll >Plans &amp; Get Involved</a></li>
+            <li><a href="#source" data-scroll >Source Code</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+    
+    <!-- page content start -->
+
+    <div class="jumbotron inverse">
+      <div class="container">
+        <h1>Give me standards!</h1>		
+        <p>An easy to use web-based prototype to extract standard references and suggest suitable standards for documents</p>	
+        <!--<form id="myform" method="POST" enctype="multipart/form-data" action="http://givemetext.okfnlabs.org/tika/tika/form">-->
+        <form id="myform" method="POST" enctype="multipart/form-data" action="http://127.0.0.1:5000/predict">
+        <span class="btn btn-default btn-file">
+        Choose a file... <input type="file" name="file">
+        </span>				
+	    <input style="color: black;" type="submit" class="btn btn-primary" value="Get Content">
+		</form>
+		<div id="result" class="highlight" style="display:none;">
+		</div>
+      </div>
+    </div>
+    
+    <div class="container">
+      <div class="row">
+      <h2 id="what">What is it?</h2>
+
+          <p>Give Me Text is an online service for converting many complex file formats into simple text. This is useful for all sorts of things, especially in the area of document processing and indexing. Using the form above you can upload any file and see what the <a href="http://tika.apache.org/">Apache Tika</a> software behind the site makes of it. The service will even run Optical Character Recognition on image formats in order to give you text from images. The list of file formats supported is long and can be found <a href="http://tika.apache.org/1.10/formats.html">here</a>.</p>
+          
+
+      </div>
+      <div class="row">
+      
+        <hr>
+        <h2 id="api">API</h2>
+
+          <p>Behind the site is an instance of the <a href="http://wiki.apache.org/tika/TikaJAXRS">Apache Tika Server</a>, which takes the files and processes them with the Tika engine. The endpoint for the complete API is at <a href="http://givemetext.okfnlabs.org/tika">http://givemetext.okfnlabs.org/tika</a>. The endpoint for the text extraction service is at <a href="http://givemetext.okfnlabs.org/tika/tika">http://givemetext.okfnlabs.org/tika/tika</a>, but there is <a href="http://wiki.apache.org/tika/TikaJAXRS#Services">a bunch of other useful services too</a>. Check out the <a href="http://wiki.apache.org/tika/TikaJAXRS#Services">Tika Documentation</a> for full details, and don't forget the extra 'tika' in the path compared to the documentation.</p>
+          <p>Here's a simple example using curl to get text from a TIF image:</p>
+          <code>curl -T my_image.tif http:///beta.offenedaten.de:9998/tika</code><br><br>
+          <p>That command uses a <code>PUT</code> request. If you'd like to <code>POST</code>, for example using a web form, you can use <a href="http://givemetext.okfnlabs.org/tika/tika/form">http://givemetext.okfnlabs.org/tika/tika/form</a>.
+          <p>Note that there is some special advice on using OCR with the Tika server <a href="https://wiki.apache.org/tika/TikaOCR#Using_Tika_Server_and_Tesseract">here</a>.
+      </div>
+      <div class="row">
+      
+        <hr>
+        <h2 id="plans">Plans & Get Involved</h2>
+
+          <p>Current TODOs include:</p>
+          <ul>
+            <li>Enabling passing of a URL using the web form. The API should support it; see the relevant <a href="https://github.com/okfn/ideas/issues/88#issuecomment-132890617">GitHub issue</a>.</li>
+            <li>Allow the user to provide the language of the document being OCR'd (see link above regarding OCR + server) and possibly add support for more languages (the <a href="https://github.com/mattfullerton/tika-tesseract-docker/blob/master/install.sh#L14">Dockerfile currently includes English and German</a>).
+          </ul>
+      </div>
+      <div class="row">
+      
+        <hr>
+        <h2 id="source">Source Code</h2>
+
+          <p>The source code for the Tika project is available through <a href="http://svn.apache.org/viewvc/tika/trunk/">SVN</a>. The Dockerfile for creating an instance can be found on <a href="https://github.com/mattfullerton/tika-tesseract-docker">GitHub</a> as can the <a href="https://github.com/mattfullerton/TikaExamples">web frontend</a>. The arrangement of these three pieces is currently maintained by <a href="http://www.twitter.com/mattfullerton">Matt Fullerton</a> - just get in touch if you'd like to help out.</p>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="container">
+        <a class="footer-logo" href="https://okfn.org/">
+          <img src="https://bytebucket.org/okfn/assets.okfn.org/raw/88b24904b8ecded5e6d530739743162d1c5b3d93/p/okfn/img/okfn-logo-landscape-white.png" alt="Open Knowledge">
+        </a>
+    
+        <div class="footer-links">
+          <ul>
+            <li><a href="https://okfn.org/privacy-policy/">Privacy policy</a></li>
+            <li><a href="https://okfn.org/ip-policy/">IP policy</a></li>
+            <li><a href="https://okfn.org/cookie-policy/">Cookie policy</a></li>
+            <li><a href="https://okfn.org/terms-of-use/">Terms of use</a></li>
+          </ul>
+    
+          <ul class="footer-social">
+            <li><a href="https://facebook.com/OKFNetwork">
+              <img src="https://raw.githubusercontent.com/thoughtbot/refills/master/source/images/facebook-logo-circle.png" alt="Facebook">
+              </a></li>
+            <li>
+              <a href="https://twitter.com/okfn">
+                <img src="https://raw.githubusercontent.com/thoughtbot/refills/master/source/images/twitter-logo-circle.png" alt="Twitter">
+              </a>
+            </li>
+            <li>
+              <a href="https://www.youtube.com/user/openknowledgefdn">
+                <img src="https://raw.githubusercontent.com/thoughtbot/refills/master/source/images/youtube-logo-circle.png" alt="YouTube">
+              </a>
+            </li>
+          </ul>
+        </div>
+        
+        <hr>
+    
+        <p>Open Knowledge Foundation is incorporated in England and Wales as a company Limited by guarantee. Company no. 05133759. Registered address: St. John’s Innovation Centre, Cowley Road, Cambridge, CB4 0WS, UK. VAT Registration no. GB 984404989.</p>
+        
+      </div>
+    </footer>
+
+<script src="js/vendor/bootstrap.min.js"></script>
+    <script src="js/plugins.js"></script>
+    <script src="//okfnlabs.org/ok-panel/assets/js/frontend.js" type="text/javascript"></script>
+    <script src="js/main.js"></script>
+
+  </body>
+</html>
