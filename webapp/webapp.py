@@ -4,8 +4,11 @@ import os
 import json
 import subprocess
 from flask import request
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
+
 standards_dir = 'standards'
 json_output_dir = 'output'
 
@@ -22,8 +25,9 @@ def train():
 
     for filename in os.listdir(standards_dir):
         print filename
-        bashCommand = "java -cp standards_extraction/lib/tika-app-1.16.jar:standards_extraction/bin StandardsExtractor "+\
-                      os.path.join(standards_dir,filename)+" 0.75 >"+os.path.join(json_output_dir,filename+'.json')
+        pathname_in = os.path.join(standards_dir, filename)
+        pathname_out = os.path.join(json_output_dir,filename+'.json')
+        bashCommand = "java -cp standards_extraction/lib/tika-app-1.16.jar:standards_extraction/bin StandardsExtractor \"" + pathname_in + "\" 0.75 > \"" + pathname_out + "\""
         print subprocess.check_output(['bash','-c', bashCommand])
 
     # read the json and extract the scopes
@@ -55,8 +59,8 @@ def predict():
 
     scope = ''
 
-    lbd_sys1=float(request.args.get('lbd_sys1',''))
-    lbd_sys2 = float(request.args.get('lbd_sys2',''))
+    lbd_sys1 = float(request.args.get('lbd_sys1', 0.5))
+    lbd_sys2 = float(request.args.get('lbd_sys2', 0.5))
 
 
     if request.method == 'GET':
@@ -102,11 +106,10 @@ def predict():
         bashCommand = "java -cp standards_extraction/lib/tika-app-1.16.jar:standards_extraction/bin StandardsExtractor " + \
                       filename + " 0.75 > "+filename+".json"
         output = subprocess.check_output(['bash', '-c', bashCommand])
-        print output
 
         standard_refs = []
         try:
-            js = json.load(open('sow.json'))
+            js = json.load(open(filename+".json"))
             scope = js['scope']
         except:
             return 'no scope available!'
