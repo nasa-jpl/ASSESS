@@ -1,0 +1,5 @@
+webapp/standards/*
+
+*.pyc
+
+.DS_Store
