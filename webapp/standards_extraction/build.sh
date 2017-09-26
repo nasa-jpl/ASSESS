@@ -3,11 +3,13 @@
 # Script     : build.sh
 # Usage      : ./build.sh /path/to/input
 # Author     : Giuseppe Totaro
-# Date       : 08/28/2017 [MM-DD-YYYY]
+# Date       : 09/26/2017 [MM-DD-YYYY]
 # Last Edited: 
 # Description: This scripts compiles all .java files. 
 # Notes      : 
 #
+
+export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8
 
 if [ ! -e lib/tika-app-1.16.jar ]
 then

@@ -4,6 +4,7 @@ RUN apt-get update -y
 RUN apt-get install libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev -y
 RUN apt-get install build-essential checkinstall -y
 RUN apt-get install wget -y
+RUN apt-get install openjdk-8-jdk
 RUN wget https://www.python.org/ftp/python/2.7.10/Python-2.7.10.tgz
 RUN tar -xvf Python-2.7.10.tgz
 WORKDIR ./Python-2.7.10
