@@ -21,4 +21,4 @@ WORKDIR /ASSESS/webapp/standards_extraction
 RUN ./build.sh
 WORKDIR /ASSESS/webapp
 RUN pip install -r requirements.txt
-
+RUN python -m textblob.download_corpora
