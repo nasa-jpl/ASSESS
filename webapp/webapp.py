@@ -24,6 +24,10 @@ def toplevel_static(folder, filename):
     cache_timeout = app.get_send_file_max_age(filename)
     return send_from_directory(app.static_folder, filename, cache_timeout=cache_timeout)
 
+@app.route('/<path:filename>')
+def public(filename):
+    return send_from_directory('webui/', filename)
+
 @app.route('/train')
 def train():
 
@@ -139,4 +143,4 @@ def predict():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", port=5000)
