@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, send_from_directory, safe_join
 from text_analysis import model
 import os
 import json
@@ -7,15 +7,22 @@ from flask import request
 from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
+app.static_folder = "webui"
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 standards_dir = 'standards'
 json_output_dir = 'output'
 
 @app.route('/')
-def hello_world():
-    return 'ASSESS app is online now!'
+def index():
+    #return 'ASSESS app is online now!'
+    return send_from_directory('webui/', 'index.html')
 
+@app.route('/<any(css, js, img, fonts, sound):folder>/<path:filename>')
+def toplevel_static(folder, filename):
+    filename = safe_join(folder, filename)
+    cache_timeout = app.get_send_file_max_age(filename)
+    return send_from_directory(app.static_folder, filename, cache_timeout=cache_timeout)
 
 @app.route('/train')
 def train():

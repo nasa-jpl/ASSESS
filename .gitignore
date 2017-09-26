@@ -2,4 +2,7 @@ webapp/standards/*
 
 *.pyc
 
+*.class
+
 .DS_Store
+.idea
