@@ -8,6 +8,10 @@ Clone this repository and then build the docker image from the main folder of AS
 
 Run the docker container as follows:
 
-> docker run -p 5000:5000 -it assessimage  
+> docker run -p 5000:5000 -it assessimage bash
+
+Start the web application as follows:
+
+> python webapp.py
 
 Open `http://0.0.0.0:5000` with your web browser and then upload a SoW to extract standard references and suitable standards.
