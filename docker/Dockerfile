@@ -16,6 +16,6 @@ RUN apt-get install git -y
 
 WORKDIR /
 RUN git clone https://github.com/nasa-jpl/ASSESS.git
-WORKDIR /ASSESS/webapp/text_analysis
+WORKDIR /ASSESS/webapp
 RUN pip install -r requirements.txt
 
