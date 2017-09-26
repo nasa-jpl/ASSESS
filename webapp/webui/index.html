@@ -13,7 +13,24 @@
 					$(this).ajaxSubmit({
 						target: '#result',
 						success: function(responseText, statusText, xhr, $form) {
-							$("#result").html(responseText);
+							//$("#result").html(responseText);
+							var json = JSON.parse(responseText);
+
+                            var ul_refs = $('<ul>');
+							var references = "<ul>";
+							$(json.refs).each(function(index, item) {
+                                ul_refs.append($(document.createElement('li')).text(item));
+                            });
+
+                            var ul_standards = $('<ul>');
+                            var i = 0;
+                            $(json.system1_titles).each(function(index, item) {
+                                ul_standards.append($(document.createElement('li')).text(item + " (score: " + $(json.system1_sim)[i] + ")"));
+                                i++;
+                            });
+
+							$("#result").html("Standard References:\n" + ul_refs.html() + "\nSuitable Standards:\n" + ul_standards.html());
+
 							$('#result').show();
 						},
 						beforeSerialize: function($form, options) {
@@ -83,13 +100,15 @@
         <h1>Give me standards!</h1>		
         <p>An easy to use web-based prototype to extract standard references and suggest suitable standards for documents</p>	
         <!--<form id="myform" method="POST" enctype="multipart/form-data" action="http://givemetext.okfnlabs.org/tika/tika/form">-->
-        <form id="myform" method="POST" enctype="multipart/form-data" action="http://127.0.0.1:5000/predict">
+        <form id="myform" method="POST" enctype="multipart/form-data" action="http://0.0.0.0:5000/predict">
         <span class="btn btn-default btn-file">
         Choose a file... <input type="file" name="file">
         </span>				
 	    <input style="color: black;" type="submit" class="btn btn-primary" value="Get Content">
 		</form>
 		<div id="result" class="highlight" style="display:none;">
+            <div id="references">References</div>
+            <div id="standards">Standards</div>
 		</div>
       </div>
     </div>
