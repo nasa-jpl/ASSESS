@@ -7,7 +7,18 @@
 		<script type="text/javascript" src="http://malsup.github.com/jquery.form.js"></script>
 
 		<script type="text/javascript">
-			$(function() {
+		    $(document).ready(function() {
+			//$(function() {
+			    $('#choose-file').change(function (ev) {
+			        var pathname = $('#choose-file').val();
+			        if (pathname) {
+                        var filename = pathname.substring(Math.max(pathname.lastIndexOf('\\'), pathname.lastIndexOf('/')) + 1);
+                        alert("A new file has been selected: " + filename);
+                        $('#filename').html(filename);
+                        $('#filename').show();
+			        }
+			    });
+
 				$('#myform').submit(function(ev) {
 					ev.preventDefault();
 					$(this).ajaxSubmit({
@@ -97,9 +108,10 @@
         <!--<form id="myform" method="POST" enctype="multipart/form-data" action="http://givemetext.okfnlabs.org/tika/tika/form">-->
         <form id="myform" method="POST" enctype="multipart/form-data" action="http://0.0.0.0:5000/predict">
         <span class="btn btn-default btn-file">
-        Choose a file... <input type="file" name="file">
+        Choose a file... <input id="choose-file" type="file" name="file">
         </span>
 	    <input style="color: black;" type="submit" class="btn btn-primary" value="Get Standards">
+        <div id="filename" style="display: none;"></div>
 		</form>
 		<div id="result" class="highlight" style="display:none;">
             <div id="references">References</div>
