@@ -29,11 +29,11 @@
 div#result {
       font-size: 90%;
     line-height: 1.2em;
-    font-family: "Courier 10 Pitch", Courier, monospace; 
-    white-space: pre; 
-    white-space: pre-wrap; 
-    white-space: -moz-pre-wrap; 
-    white-space: -o-pre-wrap; 
+    font-family: "Courier 10 Pitch", Courier, monospace;
+    white-space: pre;
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -o-pre-wrap;
 
     height:1%;
     width: auto;
@@ -41,6 +41,10 @@ div#result {
     clear: both;
     color: #000000;
     padding: 1em 1em;
+}
+
+h3#result {
+  color: #65b139;
 }
 
 .glyphicon.spinning {
@@ -56,4 +60,24 @@ div#result {
 @-webkit-keyframes spin2 {
     from { -webkit-transform: rotate(0deg);}
     to { -webkit-transform: rotate(360deg);}
+}
+
+.navbar-brand .text::before {
+  content: none !important;
+}
+
+a {
+  color: darkblue !important;
+}
+
+.nav > li > a {
+  color: #414141 !important;
+}
+
+.jumbotron.inverse {
+  background-color: darkblue !important;
+}
+
+.jumbotron.inverse .btn {
+  color: darkblue !important;
 }
