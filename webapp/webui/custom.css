@@ -44,11 +44,12 @@ div#result {
 }
 
 #result h3 {
-  color: #65b139;
+  color: darkblue;
 }
 
 #result li span {
-  color: #69b93b;
+  color: #65b139;
+  font-weight: bold;
 }
 
 .glyphicon.spinning {

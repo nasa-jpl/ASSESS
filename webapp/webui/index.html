@@ -25,7 +25,7 @@
                             var ul_standards = $('<ul>');
                             var i = 0;
                             $(json.system1_titles).each(function(index, item) {
-                                ul_standards.append($(document.createElement('li')).text("<span>" + $(json.system1_sim)[i].toFixed(3) + "</span>  " + item));
+                                ul_standards.append($(document.createElement('li')).text("&lt;span title="Score"&gt;" + $(json.system1_sim)[i].toFixed(3) + "&lt;/span&gt;  " + item));
                                 i++;
                             });
 
