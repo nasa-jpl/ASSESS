@@ -25,11 +25,11 @@
                             var ul_standards = $('<ul>');
                             var i = 0;
                             $(json.system1_titles).each(function(index, item) {
-                                ul_standards.append($(document.createElement('li')).text($(json.system1_sim)[i].toFixed(3) + "  " + item));
+                                ul_standards.append($(document.createElement('li')).text("<span>" + $(json.system1_sim)[i].toFixed(3) + "</span>  " + item));
                                 i++;
                             });
 
-							$("#result").html("<h3>Standards Referenced in the Document</h3><ul>\n" + ul_refs.html() + "\n</ul><h3>Standards that may be suitable for inclusion in the Document</h3><ul>\n" + ul_standards.html() + "\n</ul>");
+							$("#result").html("<h3>Standards Referenced in the Document</h3><ul>\n" + ul_refs.html() + "\n</ul><h3>Standards Recommended for the Document</h3><ul>\n" + ul_standards.html() + "\n</ul>");
 
 							$('#result').show();
 						},

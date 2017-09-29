@@ -43,8 +43,12 @@ div#result {
     padding: 1em 1em;
 }
 
-h3#result {
+#result h3 {
   color: #65b139;
+}
+
+#result li span {
+  color: #69b93b;
 }
 
 .glyphicon.spinning {
