@@ -136,13 +136,13 @@
           <a href="http://tika.apache.org/">Apache Tika</a> and <a href="http://scikit-learn.org/">Machine Learning</a>
           in Python, which takes the files and processes them in order to extract standard references and suitable
           standards. The endpoint of the API for the extraction of standards (both referred and recommended) is at
-          <a>http://0.0.0.0:5000/predict/</a>.</p>
+          <a>http://assess.dyndns.org/predict/</a>.</p>
 
           <p>Here are examples using <texttt>curl</texttt> to get standards from plain-text and PDF file respectively.</p>
 
-          <code>curl -X GET http://memex-assess.dyndns.org/predict?text=battery%20rechargeable</code>
+          <code>curl -X GET http://assess.dyndns.org/predict?text=battery%20rechargeable</code>
           <br><br>
-          <code>curl -X POST -F "file=@/path/to/file.pdf"  http://memex-assess.dyndns.org/predict</code>
+          <code>curl -X POST -F "file=@/path/to/file.pdf"  http://assess.dyndns.org/predict</code>
 
       </div>
       <div class="row">
