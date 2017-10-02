@@ -106,7 +106,7 @@
         <h1>Give Me Standards!</h1>
         <p>An easy to use web-based prototype to extract standard references from a document, and suggest suitable standards that should be included in the document.</p>
         <!--<form id="myform" method="POST" enctype="multipart/form-data" action="http://givemetext.okfnlabs.org/tika/tika/form">-->
-        <form id="myform" method="POST" enctype="multipart/form-data" action="http://0.0.0.0:5000/predict">
+        <form id="myform" method="POST" enctype="multipart/form-data" action="/predict">
         <span class="btn btn-default btn-file">
         Choose a file... <input id="choose-file" type="file" name="file">
         </span>
@@ -140,9 +140,9 @@
 
           <p>Here are examples using <texttt>curl</texttt> to get standards from plain-text and PDF file respectively.</p>
 
-          <code>curl -X GET http://0.0.0.0:5000/predict?text=battery%20rechargeable</code>
+          <code>curl -X GET http://memex-assess.dyndns.org/predict?text=battery%20rechargeable</code>
           <br><br>
-          <code>curl -X POST -F "file=@/path/to/file.pdf"  http://0.0.0.0:5000/predict</code>
+          <code>curl -X POST -F "file=@/path/to/file.pdf"  http://memex-assess.dyndns.org/predict</code>
 
       </div>
       <div class="row">
