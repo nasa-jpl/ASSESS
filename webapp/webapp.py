@@ -114,8 +114,7 @@ def predict():
             filename=file.filename
             file.save(filename)
 
-        bashCommand = "java -cp standards_extraction/lib/tika-app-1.16.jar:standards_extraction/bin StandardsExtractor " + \
-                      filename + " 0.75 > "+filename+".json"
+        bashCommand = "java -cp standards_extraction/lib/tika-app-1.16.jar:standards_extraction/bin StandardsExtractor \"" + filename + "\" 0.75 > \"" + filename + ".json\""
         output = subprocess.check_output(['bash', '-c', bashCommand])
 
         standard_refs = []
