@@ -17,6 +17,7 @@ import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.ocr.TesseractOCRConfig;
 import org.apache.tika.parser.pdf.PDFParserConfig;
 import org.apache.tika.sax.BodyContentHandler;
+import org.apache.tika.sax.RomanNumeral;
 import org.apache.tika.sax.StandardsExtractingContentHandler;
 import org.apache.tika.sax.StandardsExtractionExample;
 
@@ -28,7 +29,8 @@ import org.apache.tika.sax.StandardsExtractionExample;
  */
 public class StandardsExtractor {
 	public static final String SCOPE = "scope";
-	private static final String REGEX_SCOPE = "(?<index>(\\d\\.?)+)\\p{Blank}+(SCOPE|Scope)";
+	private static final String REGEX_ROMAN_NUMERALS = "(CM|CD|D?C{1,3})|(XC|XL|L?X{1,3})|(IX|IV|V?I{1,3})";
+	private static final String REGEX_SCOPE = "(?<index>((\\d+|(" + REGEX_ROMAN_NUMERALS + ")+)\\.?)+)\\p{Blank}+(SCOPE|Scope)";
 
 	public static void main(String[] args) {
 		if (args.length < 2) {
@@ -120,14 +122,34 @@ public class StandardsExtractor {
 			String[] parts = index.split("\\.");
 			
 			do {
+//				if (parts.length > 0) {
+//					int partsLength = parts.length;
+//					int subindex = Integer.parseInt(parts[--partsLength]);
+//					while (subindex++ == 0 && partsLength > 0) {
+//						subindex = Integer.parseInt(parts[--partsLength]);
+//					}
+//					parts[partsLength] = Integer.toString(subindex);
+//					index = String.join(".", parts) + endsWithDot;
+//				}
+				
 				if (parts.length > 0) {
-//					int subindex = Integer.parseInt(parts[parts.length-1]) + 1;
 					int partsLength = parts.length;
-					int subindex = Integer.parseInt(parts[--partsLength]);
-					while (subindex++ == 0 && partsLength > 0) {
-						subindex = Integer.parseInt(parts[--partsLength]);
-					}
-					parts[partsLength] = Integer.toString(subindex);
+					int subIndex = 0;
+					RomanNumeral romanNumeral = null;
+					boolean roman = false;
+					
+					do {
+						String subindexString = parts[--partsLength];
+						try {
+							romanNumeral = new RomanNumeral(subindexString);
+							subIndex = romanNumeral.toInt();
+							roman = true;
+						} catch (NumberFormatException e) {
+							subIndex = Integer.parseInt(subindexString);
+						}
+					} while (subIndex++ == 0 && partsLength > 0);
+					
+					parts[partsLength] = (roman) ? new RomanNumeral(subIndex).toString() : Integer.toString(subIndex);
 					index = String.join(".", parts) + endsWithDot;
 				}
 				
