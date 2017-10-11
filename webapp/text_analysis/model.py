@@ -9,6 +9,9 @@ def ne_rank(text_tf_1,text_tf_2,tfidftransformer_1,vocab_map_1,vocab_map_2):
     ranks = {}
     g = nx.Graph()
     indices = text_tf_2.indices
+
+    # use 1-gram tf-transformer to find the ids of each gram in the bigram. (Trick!)
+    # then use both 1-grams from the bigram to create two nodes and an edge.
     for i in indices:
         ind = tfidftransformer_1.transform([vocab_map_2[i]])[0].indices
         # spl case when both words are the same
@@ -98,9 +101,10 @@ def build_system2(texts_all,title_all):
 
     # ===================== create the model =======================
 
-
+    # pos tags to retain in the graph
     poss=['JJ','NN','RB']
     texts_all_new=[]
+    # remove the unwanted pos tags from the texts
     for text in texts_all:
         text_new=[]
         t = nltk.pos_tag(nltk.word_tokenize(text))
@@ -111,7 +115,7 @@ def build_system2(texts_all,title_all):
         text_new=' '.join(text_new)
         texts_all_new.append(text_new)
 
-
+    # vectorize to create 1-grams and 2-grams
     tfidftransformer_1=TfidfVectorizer(ngram_range=(1,1))
     tfidftransformer_2=TfidfVectorizer(ngram_range=(2,2))
 
@@ -121,6 +125,7 @@ def build_system2(texts_all,title_all):
 
     tfidftransformer_1.fit(texts_all_new)
 
+    # create id to word mapping
     vocab_map_2 = {v: k for k, v in tfidftransformer_2.vocabulary_.iteritems()}
     vocab_map_1 = {v: k for k, v in tfidftransformer_1.vocabulary_.iteritems()}
 
@@ -248,6 +253,10 @@ def use_system2(sow,labmbda,n_results):
 
     sow_tf1=tfidftransformer_1.transform([sow])[0]
     sow_tf2=tfidftransformer_2.transform([sow])[0]
+
+    if len(sow_tf1.indices) == 0 or len(sow_tf2.indices) == 0:
+        print 'sow is not large enough for this system. Please, try System 1'
+        return [],[]
 
     sow_final_vec=ne_rank(sow_tf1,sow_tf2,tfidftransformer_1,vocab_map_1,vocab_map_2)
 
