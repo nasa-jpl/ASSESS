@@ -1,5 +1,15 @@
 package org.apache.tika.sax;
 
+/**
+ * An object of type RomanNumeral is an integer between 1 and 3999.  It can
+ * be constructed either from an integer or from a string that represents
+ * a Roman numeral in this range.  The function toString() will return a
+ * standardized Roman numeral representation of the number.  The function
+ * toInt() will return the number as a value of type int.
+ * 
+ * Reference: http://math.hws.edu/eck/cs124/javanotes3/c9/ex-9-3-answer.html
+ *
+ */
 public class RomanNumeral {
 
 	private final int num;   // The number represented by this Roman numeral.
@@ -8,6 +18,13 @@ public class RomanNumeral {
 
 	private static String[] letters = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
 
+	/**
+	 * Creates the Roman number with the int value specified
+	 * by the parameter.  Throws a {@link NumberFormatException} if arabic is
+	 * not in the range 1 to 3999 inclusive.
+	 * 
+	 * @param arabic int value to create the Roman number
+	 */
 	public RomanNumeral(int arabic) {
 		if (arabic < 1) {
 			throw new NumberFormatException("Value of RomanNumeral must be positive.");
@@ -18,7 +35,14 @@ public class RomanNumeral {
 		num = arabic;
 	}
 
-
+	/**
+	 * Creates the Roman number with the given representation.
+	 * For example, RomanNumeral("xvii") is 17.  If the parameter is not a
+	 * legal Roman numeral, a {@link NumberFormatException} is thrown.  Both upper and
+	 * lower case letters are allowed.
+	 * 
+	 * @param roman representation of the Roman number
+	 */
 	public RomanNumeral(String roman) {
 		if (roman.length() == 0) {
 			throw new NumberFormatException("An empty string does not define a Roman numeral.");
@@ -71,9 +95,15 @@ public class RomanNumeral {
 
 	} // end constructor
 
+	/**
+	 * Finds the integer value of letter considered as a Roman numeral. 
+	 * Returns -1 if letter is not a legal Roman numeral.  The letter must be 
+	 * upper case.
+	 * 
+	 * @param letter considered as a Roman numeral
+	 * @return the integer value of letter considered as a Roman numeral
+	 */
 	private int letterToNumber(char letter) {
-		// Find the integer value of letter considered as a Roman numeral.  Return
-		// -1 if letter is not a legal Roman numeral.  The letter must be upper case.
 		switch (letter) {
 			case 'I':
 				return 1;
@@ -94,8 +124,12 @@ public class RomanNumeral {
 		}
 	}
 
+	/**
+	 * Returns the standard representation of this Roman numeral.
+	 * 
+	 * @return the standard representation of this Roman numeral
+	 */
 	public String toString() {
-		// Return the standard representation of this Roman numeral.
 		String roman = "";  // The roman numeral.
 		int N = num;        // N represents the part of num that still has
 		//   to be converted to Roman numeral representation.
@@ -108,8 +142,12 @@ public class RomanNumeral {
 		return roman;
 	}
 
+	/**
+	 * Returns the value of this Roman numeral as an int.
+	 * 
+	 * @return the value of this Roman numeral as an int
+	 */
 	public int toInt() {
-		// Return the value of this Roman numeral as an int.
 		return num;
 	}
 }
