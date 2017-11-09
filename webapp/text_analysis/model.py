@@ -66,7 +66,8 @@ def ne_rank(text_tf_1,text_tf_2,tfidftransformer_1,vocab_map_1,vocab_map_2):
         final_vec[word] = rank
     return final_vec
 
-def build_system1(texts_all,title_all,n):
+
+def build_system1(texts_all,title_all,n=2):
 
 
 
@@ -86,6 +87,7 @@ def build_system1(texts_all,title_all,n):
             x=np.array(text_tf).flatten()[x]
             avg=np.mean(x)
             phrases_dict[phrase]=avg
+        # a list of dictionaries with {phase:score}
         master_phrases_vectors.append(phrases_dict)
 
 
@@ -96,8 +98,8 @@ def build_system1(texts_all,title_all,n):
     use.savemodel(title_all,'title_all_1')
     use.savemodel(tfidftransformer,'tfidftransformer_1')
 
-def build_system2(texts_all,title_all):
 
+def build_system2(texts_all,title_all):
 
     # ===================== create the model =======================
 
@@ -139,6 +141,9 @@ def build_system2(texts_all,title_all):
 
         # put a check for no text. see that the titles are aligned
         if len(text_tf_1.indices)==0 or len(text_tf_2.indices)==0:
+            master_phrases_vectors.append({})
+            master_nerank_vectors.append({})
+            title_all_new.append(title)
             continue
 
         final_vec=ne_rank(text_tf_1,text_tf_2,tfidftransformer_1,vocab_map_1,vocab_map_2)
