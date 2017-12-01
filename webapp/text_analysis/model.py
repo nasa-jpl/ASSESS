@@ -223,7 +223,7 @@ def use_system1(sow,labmbda,n_results):
     for i in range(n_results):
         index=ranked_docs[i]
         # print similarities[index]
-        results_sim.append(similarities[index])
+        results_sim.append(format(100*similarities[index],'.2f'))
         results_index.append(index)
         # print all_important_terms_tf[index]
         # print all_important_terms_keywords[index]
@@ -302,7 +302,7 @@ def use_system2(sow,labmbda,n_results):
     for i in range(n_results):
         index=ranked_docs[i]
         # print similarities[index]
-        results_sim.append(similarities[index])
+        results_sim.append(format(100*similarities[index],'.2f'))
         results_index.append(index)
         # print all_important_terms_tf[index]
         # print all_important_terms_keywords[index]
