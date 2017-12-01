@@ -67,7 +67,7 @@ def ne_rank(text_tf_1,text_tf_2,tfidftransformer_1,vocab_map_1,vocab_map_2):
     return final_vec
 
 
-def build_system1(texts_all,title_all,n=2):
+def build_system1(texts_all,n=2):
 
 
 
@@ -95,11 +95,10 @@ def build_system1(texts_all,title_all,n=2):
 
     use.savemodel(master_phrases_vectors,'master_phrases_vectors_1')
     use.savemodel(texts_all_tf,'texts_all_tf_1')
-    use.savemodel(title_all,'title_all_1')
     use.savemodel(tfidftransformer,'tfidftransformer_1')
 
 
-def build_system2(texts_all,title_all):
+def build_system2(texts_all):
 
     # ===================== create the model =======================
 
@@ -135,15 +134,14 @@ def build_system2(texts_all,title_all):
 
     master_phrases_vectors=[]
     master_nerank_vectors=[]
-    title_all_new=[]
 
-    for title,text,text_tf_1,text_tf_2 in zip(title_all,texts_all,texts_all_tf_1,texts_all_tf_2):
+    for text,text_tf_1,text_tf_2 in zip(texts_all,texts_all_tf_1,texts_all_tf_2):
 
         # put a check for no text. see that the titles are aligned
         if len(text_tf_1.indices)==0 or len(text_tf_2.indices)==0:
             master_phrases_vectors.append({})
             master_nerank_vectors.append({})
-            title_all_new.append(title)
+
             continue
 
         final_vec=ne_rank(text_tf_1,text_tf_2,tfidftransformer_1,vocab_map_1,vocab_map_2)
@@ -157,14 +155,12 @@ def build_system2(texts_all,title_all):
             phrases_dict[phrase] = avg
         master_phrases_vectors.append(phrases_dict)
         master_nerank_vectors.append(final_vec)
-        title_all_new.append(title)
 
-    title_all=title_all_new
+
 
     # ===================== save the model =================
 
     use.savemodel(master_phrases_vectors, 'master_phrases_vectors_2')
-    use.savemodel(title_all, 'title_all_2')
     use.savemodel(tfidftransformer_1,'tfidftransformer_1_2')
     use.savemodel(tfidftransformer_2,'tfidftransformer_2_2')
     use.savemodel(master_nerank_vectors,'master_nerank_vectors_2')
@@ -176,7 +172,6 @@ def use_system1(sow,labmbda,n_results):
 
     master_phrases_vectors=use.loadmodel('master_phrases_vectors_1')
     texts_all_tf=use.loadmodel('texts_all_tf_1')
-    title_all=use.loadmodel('title_all_1')
     tfidftransformer=use.loadmodel('tfidftransformer_1')
 
     vocab_map = {v: k for k, v in tfidftransformer.vocabulary_.iteritems()}
@@ -224,16 +219,16 @@ def use_system1(sow,labmbda,n_results):
 
     ranked_docs=list(reversed(np.argsort(similarities)))
     results_sim=[]
-    results_title=[]
+    results_index=[]
     for i in range(n_results):
         index=ranked_docs[i]
-        print similarities[index],title_all[index]
+        # print similarities[index]
         results_sim.append(similarities[index])
-        results_title.append(title_all[index])
+        results_index.append(index)
         # print all_important_terms_tf[index]
         # print all_important_terms_keywords[index]
 
-    return results_title,results_sim
+    return results_index,results_sim
 
 def use_system2(sow,labmbda,n_results):
 
@@ -241,7 +236,6 @@ def use_system2(sow,labmbda,n_results):
     # ===================== read the model =================
 
     master_phrases_vectors = use.loadmodel('master_phrases_vectors_2')
-    title_all = use.loadmodel('title_all_2')
     tfidftransformer_1 = use.loadmodel('tfidftransformer_1_2')
     tfidftransformer_2 = use.loadmodel('tfidftransformer_2_2')
     master_nerank_vectors=use.loadmodel('master_nerank_vectors_2')
@@ -304,15 +298,15 @@ def use_system2(sow,labmbda,n_results):
     ranked_docs=list(reversed(np.argsort(similarities)))
 
     results_sim = []
-    results_title = []
+    results_index = []
     for i in range(n_results):
         index=ranked_docs[i]
-        print similarities[index] ,title_all[index]
+        # print similarities[index]
         results_sim.append(similarities[index])
-        results_title.append(title_all[index])
+        results_index.append(index)
         # print all_important_terms_tf[index]
         # print all_important_terms_keywords[index]
 
-    return results_title, results_sim
+    return results_index, results_sim
 
 
