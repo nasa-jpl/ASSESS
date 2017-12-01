@@ -29,6 +29,7 @@ import org.apache.tika.sax.StandardsExtractionExample;
  */
 public class StandardsExtractor {
 	public static final String SCOPE = "scope";
+	public static final String TEXT = "text";
 	private static final String REGEX_ROMAN_NUMERALS = "(CM|CD|D?C{1,3})|(XC|XL|L?X{1,3})|(IX|IV|V?I{1,3})";
 	private static final String REGEX_SCOPE = "(?<index>((\\d+|(" + REGEX_ROMAN_NUMERALS + ")+)\\.?)+)\\p{Blank}+(SCOPE|Scope)";
 
@@ -170,6 +171,7 @@ public class StandardsExtractor {
 		}
 		
 		metadata.add(SCOPE, scope);
+		metadata.add(TEXT, text);
 		
 		return metadata;
 	}
