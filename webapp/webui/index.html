@@ -2,14 +2,12 @@
 <html>
 	<head>
 
-
 		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
 		<script type="text/javascript" src="http://malsup.github.com/jquery.form.js"></script>
 
 		<script type="text/javascript">
 		    $(document).ready(function() {
-			//$(function() {
-			    $('#choose-file').change(function (ev) {
+			    $('body').on('change', '#choose-file', function(ev) {
 			        var pathname = $('#choose-file').val();
 			        if (pathname) {
                         var filename = pathname.substring(Math.max(pathname.lastIndexOf('\\'), pathname.lastIndexOf('/')) + 1);
@@ -17,6 +15,23 @@
                         $('#filename').html(filename);
                         $('#filename').show();
 			        }
+			    });
+
+			    $('#submit-text').click(function(ev) {
+			        var clicks = $(this).data('clicks');
+			        if (!clicks) {
+			            $('#submit-text').html("upload your document");
+			            $('#myform').attr({"method": "GET"});
+			            $('#input-text').html("<textarea id=\"texttobeprocessed\" name=\"text\"></textarea>");
+			            $('#filename').hide();
+			        } else {
+			            $('#submit-text').html("submit your text");
+			            $('#myform').attr({"method": "POST"});
+			            $('#input-text').html("Choose a file... <input id=\"choose-file\" type=\"file\" name=\"file\">");
+			        }
+
+			        $("#result").hide();
+			        $(this).data("clicks", !clicks);
 			    });
 
 				$('#myform').submit(function(ev) {
@@ -35,8 +50,16 @@
 
                             var ul_standards = $('<ul>');
                             var i = 0;
+                            //$(json.system1_titles).each(function(index, item) {
+                            //    ul_standards.append($(document.createElement('li')).html("<span title='Score'>" + $(json.system1_sim)[i].toFixed(3) + "</span>  " + item));
+                            //    i++;
+                            //});
                             $(json.system1_titles).each(function(index, item) {
-                                ul_standards.append($(document.createElement('li')).html("<span title='Score'>" + $(json.system1_sim)[i].toFixed(3) + "</span>  " + item));
+                                var recommended_standard = "<span title='Score'>" + $(json.system1_sim)[i].toFixed(3) + "</span>  ";
+                                recommended_standard += " [<a href=\"" + "$(json.system1_links)[i]" + "\" target=\"_blank\">" + "public link" + "</a>] ";
+                                recommended_standard += "<a id=\"rc_" + i + "\" class=\"titles\">" + item + "</a>";
+                                recommended_standard += "<div id=\"abstract_rc_" + i + "\" class=\"abstracts\" style=\"display: none;\">" + "$(json.system1_abstracts)[i]" + "</div>";
+                                ul_standards.append($(document.createElement('li')).html(recommended_standard));
                                 i++;
                             });
 
@@ -52,6 +75,16 @@
 							$("#result").html('<div class="alert alert-danger" role="alert"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Error</div>')
 						}
 					});
+				});
+
+				$('body').on('click', '.titles', function(ev) {
+				    var abstract = $('#abstract_' + ev.target.id);
+				    if (abstract.is(":visible")) {
+				        abstract.fadeOut();
+				    } else {
+				        abstract.fadeIn();
+				    }
+
 				});
 			})
 		</script>
@@ -85,7 +118,7 @@
           <a class="navbar-brand" href="/">
 
             <span class="text">ASSESS</span>
-							<span>Automatic Semantic Search Engine for Suitable Standards</span>
+            <span>Automatic Semantic Search Engine for Suitable Standards</span>
           </a>
           <!--<span class="alpha release badge">alpha</span>-->
         </div>
@@ -107,10 +140,11 @@
         <p>An easy to use web-based prototype to extract standard references from a document, and suggest suitable standards that should be included in the document.</p>
         <!--<form id="myform" method="POST" enctype="multipart/form-data" action="http://givemetext.okfnlabs.org/tika/tika/form">-->
         <form id="myform" method="POST" enctype="multipart/form-data" action="/predict">
-        <span class="btn btn-default btn-file">
+        <span id="input-text" class="btn btn-default btn-file">
         Choose a file... <input id="choose-file" type="file" name="file">
         </span>
 	    <input style="color: black;" type="submit" class="btn btn-primary" value="Get Standards">
+        &nbsp;or <a id="submit-text">submit your text</a>
         <div id="filename" style="display: none;"></div>
 		</form>
 		<div id="result" class="highlight" style="display:none;">
@@ -125,7 +159,7 @@
       <h2 id="what">What is it?</h2>
 
           <p>Give Me Standards is an online service that accepts a relevant document as input. These documents are likely to be Statements of Work, Requests for Quotes or Proposal, and other documents that will contain a listing of standards that are required to be adhered to during the course of the work to be done.</p>
-					<p>Once the document is chosen and the Get Standards button is clicked, a listing of standards referred to in the document will be returned, as well as a listing of recommended standards that should also be considered for inclusion.
+          <p>Once the document is chosen and the Get Standards button is clicked, a listing of standards referred to in the document will be returned, as well as a listing of recommended standards that should also be considered for inclusion.
 
       </div>
       <div class="row">

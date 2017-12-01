@@ -90,7 +90,7 @@ def predict():
 
         standard_refs = []
         try:
-            js = json.load(open('sow.json'))
+            js = json.load(open(filename+'.json'))
             scope = js['scope']
         except:
             print 'no scope available!'
