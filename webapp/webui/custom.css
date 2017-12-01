@@ -26,8 +26,12 @@
   border-radius: 4px;
 }
 
+.abstracts {
+    border: 1px solid #000000;
+}
+
 div#result {
-      font-size: 90%;
+    font-size: 90%;
     line-height: 1.2em;
     font-family: "Courier 10 Pitch", Courier, monospace;
     white-space: pre;
