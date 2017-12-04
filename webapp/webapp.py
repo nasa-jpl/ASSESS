@@ -14,7 +14,7 @@ cors = CORS(app, resources={r"/*": {"origins": "*"}})
 standards_dir = 'standards'
 json_output_dir = 'output'
 ieee_standards='IEEE-standards_rev1.csv'
-global df_ieee
+df_ieee = None
 
 @app.route('/')
 def index():
