@@ -22,28 +22,26 @@
 			        if (!clicks) {
 			            $('#submit-text').html("upload your document");
 			            $('#myform').attr({"method": "GET"});
-			            $('#input-text').html("<textarea id=\"texttobeprocessed\" name=\"text\"></textarea>");
+			            $('#input-text').html("<textarea id=\"texttobeprocessed\" name=\"text\" rows=\"1\" class=\"form-control\" placeholder=\"Write your text here...\"></textarea>");
 			            $('#filename').hide();
 			        } else {
 			            $('#submit-text').html("submit your text");
 			            $('#myform').attr({"method": "POST"});
-			            $('#input-text').html("Choose a file... <input id=\"choose-file\" type=\"file\" name=\"file\">");
+			            $('#input-text').html("<span class=\"btn btn-default btn-file\">Choose a file... <input id=\"choose-file\" type=\"file\" name=\"file\"></span>");
 			        }
 
 			        $("#result").hide();
 			        $(this).data("clicks", !clicks);
 			    });
 
-				$('#myform').submit(function(ev) {
+				$('body').on('submit', '#myform', function(ev) {
 					ev.preventDefault();
 					$(this).ajaxSubmit({
 						target: '#result',
 						success: function(responseText, statusText, xhr, $form) {
-							//$("#result").html(responseText);
 							var json = JSON.parse(responseText);
 
                             var ul_refs = $('<ul>');
-							var references = "<ul>";
 							$(json.refs).each(function(index, item) {
                                 ul_refs.append($(document.createElement('li')).text(item));
                             });
@@ -55,10 +53,11 @@
                             //    i++;
                             //});
                             $(json.system1_titles).each(function(index, item) {
-                                var recommended_standard = "<span title='Score'>" + $(json.system1_sim)[i].toFixed(3) + "</span>  ";
-                                recommended_standard += " [<a href=\"" + "$(json.system1_links)[i]" + "\" target=\"_blank\">" + "public link" + "</a>] ";
+                                var sim = $(json.system1_sim)[i].length < 5 ? "0" + $(json.system1_sim)[i] : $(json.system1_sim)[i];
+                                var recommended_standard = "<span title='Score'>" + sim + "</span>  ";
+                                recommended_standard += " [<a href=\"" + $(json.system1_links)[i] + "\" target=\"_blank\">" + "public link" + "</a>] ";
                                 recommended_standard += "<a id=\"rc_" + i + "\" class=\"titles\">" + item + "</a>";
-                                recommended_standard += "<div id=\"abstract_rc_" + i + "\" class=\"abstracts\" style=\"display: none;\">" + "$(json.system1_abstracts)[i]" + "</div>";
+                                recommended_standard += "<div id=\"abstract_rc_" + i + "\" class=\"card\" style=\"display: none;\"><h4 class=\"card-header\">Abstract</h4><div class=\"card-body\">" + $(json.system1_abstracts)[i] + "</div></div>";
                                 ul_standards.append($(document.createElement('li')).html(recommended_standard));
                                 i++;
                             });
@@ -140,8 +139,8 @@
         <p>An easy to use web-based prototype to extract standard references from a document, and suggest suitable standards that should be included in the document.</p>
         <!--<form id="myform" method="POST" enctype="multipart/form-data" action="http://givemetext.okfnlabs.org/tika/tika/form">-->
         <form id="myform" method="POST" enctype="multipart/form-data" action="/predict">
-        <span id="input-text" class="btn btn-default btn-file">
-        Choose a file... <input id="choose-file" type="file" name="file">
+        <span id="input-text">
+          <span class="btn btn-default btn-file">Choose a file... <input id="choose-file" type="file" name="file"></span>
         </span>
 	    <input style="color: black;" type="submit" class="btn btn-primary" value="Get Standards">
         &nbsp;or <a id="submit-text">submit your text</a>

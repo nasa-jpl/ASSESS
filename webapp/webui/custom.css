@@ -1,22 +1,23 @@
-    .btn-file {
-        position: relative;
-        overflow: hidden;
-    }
-    .btn-file input[type=file] {
-        position: absolute;
-        top: 0;
-        right: 0;
-        min-width: 100%;
-        min-height: 100%;
-        font-size: 100px;
-        text-align: right;
-        filter: alpha(opacity=0);
-        opacity: 0;
-        outline: none;
-        background: white;
-        cursor: inherit;
-        display: block;
-    }
+.btn-file {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-file input[type=file] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 100%;
+  min-height: 100%;
+  font-size: 100px;
+  text-align: right;
+  filter: alpha(opacity=0);
+  opacity: 0;
+  outline: none;
+  background: white;
+  cursor: inherit;
+  display: block;
+}
 
 .highlight {
   padding: 9px 9px;
@@ -24,10 +25,6 @@
   background-color: #f7f7f9;
   border: 1px solid #e1e1e8;
   border-radius: 4px;
-}
-
-.abstracts {
-    border: 1px solid #000000;
 }
 
 div#result {
@@ -77,6 +74,39 @@ div#result {
 
 a {
   color: darkblue !important;
+}
+
+a#submit-text {
+  color: #ffffff !important;
+  text-decoration: underline !important;
+}
+
+a:hover#submit-text {
+    color: #69b93b !important;
+}
+
+textarea {
+  color: #000000 !important;
+}
+
+textarea.form-control::placeholder {
+    font-weight: 300;
+    color: #000000 !important;
+}
+
+.card {
+    /* Add shadows to create the "card" effect */
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    border-radius: 5px;
+    border: 1px solid #65b139;
+    padding: 1em;
+    margin: 1em 0;
+}
+
+/* On mouse-over, add a deeper shadow */
+.card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
 }
 
 .nav > li > a {
