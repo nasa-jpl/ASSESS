@@ -47,8 +47,8 @@ def train():
 
     # read the ieee standards into a pandas dataframe
 
-    df_ieee = pd.read_csv(os.path.join(standards_dir, 'IEEE-standards_rev1.csv'), index_col=0)
-
+    df_ieee = pd.read_csv(os.path.join(standards_dir, 'iso_ieee.csv'), index_col=0)
+    df_ieee=df_ieee.reset_index()
     # read the json and extract the scopes
 
     # texts_all = []
@@ -81,7 +81,7 @@ def train():
         if texts_pu == 'nan':
             texts_pu = ''
 
-        texts_all.append((texts_ab + texts_sc + texts_pu).decode('utf-8'))
+        texts_all.append((texts_ab + texts_sc + texts_pu).decode('utf-8','ignore'))
 
     # build models for system 1 and system 2
 
@@ -100,8 +100,8 @@ def predict():
     scope = ''
     standard_refs = []
 
-    lbd_sys1 = float(request.args.get('lbd_sys1', 0.5))
-    # lbd_sys2 = float(request.args.get('lbd_sys2', 0.5))
+    lbd_sys1 = float(request.args.get('lbd_sys1', 1))
+    lbd_sys2 = float(request.args.get('lbd_sys2', 1))
 
 
     if request.method == 'GET':
@@ -158,23 +158,18 @@ def predict():
 
     print '\n'.join(standard_refs)
     result_index_sys1,result_sim_sys1=model.use_system1(scope, lbd_sys1, 10)
-    # result_index_sys2, result_sim_sys2=model.use_system2(scope, lbd_sys2, 10)
+    # result_index_sys1, result_sim_sys1=model.use_system2(scope, lbd_sys2, 10)
 
     result={}
     result['refs']=standard_refs
-    result['system1_titles'] = list(df_ieee.ix[result_index_sys1]['Publication Title'])
-    result['system1_abstracts'] = list(df_ieee.ix[result_index_sys1]['abstract_new'])
+    result['system1_titles'] = [str(x).decode('utf-8','ignore') for x in list(df_ieee.ix[result_index_sys1]['Publication Title'])]
+    result['system1_abstracts'] = [str(x).decode('utf-8','ignore') for x in list(df_ieee.ix[result_index_sys1]['abstract_new'])]
     result['system1_links'] = list(df_ieee.ix[result_index_sys1]['PDF Link'])
     result['system1_sim'] = result_sim_sys1
-
-    # result['refs'] = standard_refs
-    # result['system2_titles'] = list(df_ieee.ix[result_index_sys2]['Publication Title'])
-    # result['system2_abstracts'] = list(df_ieee.ix[result_index_sys2]['abstract_new'])
-    # result['system2_links'] = list(df_ieee.ix[result_index_sys2]['PDF Link'])
-    # result['system2_sim'] = result_sim_sys2
 
     return json.dumps(result)
 
 
 if __name__ == "__main__":
+    train()
     app.run(host="0.0.0.0", port=5000)
