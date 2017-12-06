@@ -14,7 +14,7 @@ cors = CORS(app, resources={r"/*": {"origins": "*"}})
 standards_dir = 'standards'
 json_output_dir = 'output'
 ieee_standards='IEEE-standards_rev1.csv'
-df_ieee = None
+df_ieee = pd.read_csv(os.path.join(standards_dir, 'IEEE-standards_rev1.csv'), index_col=0)
 
 @app.route('/')
 def index():
