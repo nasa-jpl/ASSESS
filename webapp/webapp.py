@@ -109,7 +109,7 @@ def predict():
         text=request.args.get('text','')
         filename='temp_text'
         file=open(filename,'w')
-        file.write(text)
+        file.write(text.encode('utf-8','ignore'))
         file.flush()
         file.close()
         scope=text
