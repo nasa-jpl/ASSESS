@@ -48,13 +48,10 @@
 
                             var ul_standards = $('<ul>');
                             var i = 0;
-                            //$(json.system1_titles).each(function(index, item) {
-                            //    ul_standards.append($(document.createElement('li')).html("<span title='Score'>" + $(json.system1_sim)[i].toFixed(3) + "</span>  " + item));
-                            //    i++;
-                            //});
+
                             $(json.system1_titles).each(function(index, item) {
                                 var sim = $(json.system1_sim)[i].length < 5 ? "0" + $(json.system1_sim)[i] : $(json.system1_sim)[i];
-                                var recommended_standard = "<span title='Score'>" + sim + "</span>  ";
+                                var recommended_standard = "<span title='Score'>" + sim + "%</span>  ";
                                 recommended_standard += " [<a href=\"" + $(json.system1_links)[i] + "\" target=\"_blank\">" + "public link" + "</a>] ";
                                 recommended_standard += "<a id=\"rc_" + i + "\" class=\"titles\">" + item + "</a>";
                                 recommended_standard += "<div id=\"abstract_rc_" + i + "\" class=\"card\" style=\"display: none;\"><h4 class=\"card-header\">Abstract</h4><div class=\"card-body\">" + $(json.system1_abstracts)[i] + "</div></div>";
