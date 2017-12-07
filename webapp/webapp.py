@@ -49,6 +49,7 @@ def train():
 
     df_ieee = pd.read_csv(os.path.join(standards_dir, 'iso_ieee.csv'), index_col=0)
     df_ieee=df_ieee.reset_index()
+    df_ieee=df_ieee.fillna('')
     # read the json and extract the scopes
 
     # texts_all = []
@@ -65,23 +66,19 @@ def train():
 
     # get all the text from abstract
 
-    texts_abs = list(df_ieee['abstract_new'])
-    texts_scp = list(df_ieee['scope_new'])
-    texts_pur = list(df_ieee['purpose_new'])
+
+    texts_abs = list(df_ieee['Abstract'])
+    texts_scp = list(df_ieee['Scope'])
+    texts_pur = list(df_ieee['Purpose'])
+    texts_int = list(df_ieee['Introduction'])
     texts_all= []
 
     for i in range(len(texts_abs)):
-        texts_ab = str(texts_abs[i])
-        if texts_ab == 'nan':
-            texts_ab = ''
-        texts_sc = str(texts_scp[i])
-        if texts_sc == 'nan':
-            texts_sc = ''
-        texts_pu = str(texts_pur[i])
-        if texts_pu == 'nan':
-            texts_pu = ''
+        if texts_int[i][:12]=='Introduction':
+            texts_int[i]=texts_int[i][12:]
+        texts_all.append((texts_abs[i] + texts_scp[i] + texts_pur[i]+texts_int[i]).decode('utf-8','ignore'))
 
-        texts_all.append((texts_ab + texts_sc + texts_pu).decode('utf-8','ignore'))
+    df_ieee['Introduction']=texts_int
 
     # build models for system 1 and system 2
 
@@ -162,9 +159,15 @@ def predict():
 
     result={}
     result['refs']=standard_refs
-    result['system1_titles'] = [str(x).decode('utf-8','ignore') for x in list(df_ieee.ix[result_index_sys1]['Publication Title'])]
-    result['system1_abstracts'] = [str(x).decode('utf-8','ignore') for x in list(df_ieee.ix[result_index_sys1]['abstract_new'])]
-    result['system1_links'] = list(df_ieee.ix[result_index_sys1]['PDF Link'])
+    result['system1_titles'] = [str(x).decode('utf-8','ignore')+' '+str(y).decode('utf-8','ignore') for x,y in zip(list(df_ieee.ix[result_index_sys1]['Id']),list(df_ieee.ix[result_index_sys1]['Title']))]
+    result['system1_abstracts'] = [str(x).decode('utf-8','ignore') for x in list(df_ieee.ix[result_index_sys1]['Abstract'])]
+    result['system1_purposes'] = [str(x).decode('utf-8', 'ignore') for x in
+                                   list(df_ieee.ix[result_index_sys1]['Purpose'])]
+    result['system1_introductions'] = [str(x).decode('utf-8', 'ignore') for x in
+                                   list(df_ieee.ix[result_index_sys1]['Introduction'])]
+    result['system1_scopes'] = [str(x).decode('utf-8', 'ignore') for x in
+                                   list(df_ieee.ix[result_index_sys1]['Scope'])]
+    result['system1_links'] = list(df_ieee.ix[result_index_sys1]['Link'])
     result['system1_sim'] = result_sim_sys1
 
     return json.dumps(result)
