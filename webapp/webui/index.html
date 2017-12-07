@@ -50,11 +50,27 @@
                             var i = 0;
 
                             $(json.system1_titles).each(function(index, item) {
+                                var section_title = "Abstract";
+                                var section_text = "No text is available!";
+                                if ($(json.system1_scopes)[i].length > 0) {
+                                    section_title = "Scope";
+                                    section_text = $(json.system1_scopes)[i];
+                                } else if ($(json.system1_abstracts)[i].length > 0) {
+                                    section_title = "Abstract";
+                                    section_text = $(json.system1_abstracts)[i];
+                                } else if ($(json.system1_purposes)[i].length > 0) {
+                                    section_title = "Purpose";
+                                    section_text = $(json.system1_purposes)[i];
+                                } else if ($(json.system1_introductions)[i].length > 0) {
+                                    section_title = "Introduction";
+                                    section_text = $(json.system1_introductions)[i];
+                                }
+
                                 var sim = $(json.system1_sim)[i].length < 5 ? "0" + $(json.system1_sim)[i] : $(json.system1_sim)[i];
                                 var recommended_standard = "<span title='Score'>" + sim + "%</span>  ";
                                 recommended_standard += " [<a href=\"" + $(json.system1_links)[i] + "\" target=\"_blank\">" + "public link" + "</a>] ";
                                 recommended_standard += "<a id=\"rc_" + i + "\" class=\"titles\">" + item + "</a>";
-                                recommended_standard += "<div id=\"abstract_rc_" + i + "\" class=\"card\" style=\"display: none;\"><h4 class=\"card-header\">Abstract</h4><div class=\"card-body\">" + $(json.system1_abstracts)[i] + "</div></div>";
+                                recommended_standard += "<div id=\"abstract_rc_" + i + "\" class=\"card\" style=\"display: none;\"><h4 class=\"card-header\">" + section_title + "</h4><div class=\"card-body\">" + section_text + "</div></div>";
                                 ul_standards.append($(document.createElement('li')).html(recommended_standard));
                                 i++;
                             });
