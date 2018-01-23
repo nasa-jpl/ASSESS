@@ -8,7 +8,9 @@
 ## Description
 
 **_As a_** \<type of user\> 
+
 **_I want to_** \<some goal\> 
+
 **_so that_** \<some reason\>
 
 ## Acceptance Criteria
@@ -16,7 +18,9 @@
 ### Acceptance Criterion 1
 
 **_Given_** \<some context\>
+
 **_When_** \<some action is carried out\>
+
 **_Then_** \<a particular set of observable consequences should obtain\>
 
 ### Notes
