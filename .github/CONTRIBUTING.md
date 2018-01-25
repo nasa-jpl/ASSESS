@@ -23,3 +23,7 @@ On [GitHub](https://zube.io/blog/agile-project-management-workflow-for-github-is
 Some issues can represent open questions (i.e., a matter not yet decided). In this case, you should not follow the aforementioned issue template, but you should just use the _question_ label to identify a GitHub issue as an open question.
 
 You can see [the open issues of the ASSESS project](https://github.com/nasa-jpl/ASSESS/issues).
+
+Any issue related to a specific feature can be marked with labels named as the components of the system as depicted in the following diagram.
+
+![Overview Diagram](https://github.com/nasa-jpl/ASSESS/blob/master/doc/assess_overview.png)
