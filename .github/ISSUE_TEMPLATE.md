@@ -23,6 +23,6 @@
 
 **_Then_** \<a particular set of observable consequences should obtain\>
 
-### Notes
+## Notes
 
 \<Notes about the user story\>
