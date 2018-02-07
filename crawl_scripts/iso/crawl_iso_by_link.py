@@ -172,3 +172,6 @@ for index, rows in df.iterrows():
 
 
 df_gt.to_csv('gt_iso_fetched.csv',columns=['SoW','title','Standards','introduction','scope','id'])
+
+
+
