@@ -2,6 +2,18 @@ from selenium import webdriver
 from selenium.common import exceptions
 
 import csv
+import argparse
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# construct the argument parse and parse the arguments
+ap = argparse.ArgumentParser()
+ap.add_argument("-f", "--fields", required=False, help="comma-separated list of ISO fields to be collected")
+args = vars(ap.parse_args())
+
+fields = args["fields"].split(",") if args["fields"] else []
 
 # Create a new instance of Firefox driver.
 driver = webdriver.Firefox()
@@ -15,11 +27,9 @@ css_selectors = ["datatable-ics", "datatable-ics-children", "datatable-ics-proje
 
 def get_ics(url):
     driver.get(url)
-    print driver.title
     for selector in css_selectors:
         try:
             ics_table = driver.find_element_by_id(selector)
-            print(selector)
             break
         except exceptions.NoSuchElementException as ex:
            print(ex.message)
@@ -27,12 +37,16 @@ def get_ics(url):
     ics_table_id = ics_table.get_attribute("id")
 
     if ics_table_id != "datatable-ics-projects":
-        urls = convert_to_list(ics_table.find_elements_by_css_selector("tbody tr td.sorting_1 a"))
-        for url in urls:
-            get_ics(url);
+        links = ics_table.find_elements_by_css_selector("tbody tr td.sorting_1 a")
+        urls = {link.text: link.get_attribute("href") for link in links}
+        for key, url in urls.iteritems():
+            if ics_table_id != "datatable-ics" or not fields or key in fields:
+                logger.info("Processing field/group/subgroup " + key)
+                get_ics(url)
     else:
+        ics_value = driver.find_element_by_css_selector("div.heading-condensed h2 strong").text
         ics_rows = ics_table.find_elements_by_css_selector("tbody tr")
-        standards = get_standards(ics_rows)
+        standards = get_standards(ics_rows, ics_value)
         with open('standards.csv', 'a') as csvfile:
             filewriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             for standard in standards:
@@ -41,15 +55,7 @@ def get_ics(url):
     return;
 
 
-def convert_to_list(links):
-    urls = []
-    for link in links:
-        urls.append(link.get_attribute("href"))
-
-    return urls
-
-
-def get_standards(ics_rows):
+def get_standards(ics_rows, ics_value):
     standards = []
     for row in ics_rows:
         if row.get_attribute("ng-show") == "wChecked":
@@ -64,7 +70,7 @@ def get_standards(ics_rows):
         tc_url = tc.get_attribute("href")
         tc_text = tc.text
 
-        standards.append([ics_text, ics_url, stage_text, stage_url, tc_text, tc_url])
+        standards.append([ics_value,ics_text, ics_url, stage_text, stage_url, tc_text, tc_url])
 
     return standards;
 
