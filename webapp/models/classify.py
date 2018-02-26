@@ -16,5 +16,8 @@ class Classify(object):
         logger.info("Classifying text...")
         pass
 
-
-
+    def shuffle(self):
+        """Randomize text to test for semantic information."""
+        logger.info("Runninng against shuffled text ...")
+        #shuffled_text = random.shuffle(self.text)
+        #return shuffled_text
