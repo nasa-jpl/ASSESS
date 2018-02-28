@@ -7,13 +7,14 @@ import nltk
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 import utils as use
+import os
 
 global unsup_method
 unsup_method=''
 
 # TODO: test with atleat one example
 
-def unsup_train(dataset, dataset_name, vectorizer, data_fields=[], support_fields=[], unsup_meth=NearestNeighbors()):
+def unsup_train(dataset, dataset_name, vectorizer, data_fields=[], support_fields=[], unsup_meth=NearestNeighbors(), force_train=False):
     """trains an unsupervised model. Pickles the model and other necessary info related to data samples.
 
 
@@ -34,33 +35,41 @@ def unsup_train(dataset, dataset_name, vectorizer, data_fields=[], support_field
 
         unsup_meth : sklearn unsupervised method or some an implementation with sklearn interface
 
+        force_train : if 'True' then it trains the model even if a model is available, and replaces the old model with the new one
+
     """
 
-    global unsup_method
+    # check if the model is already available
 
-    if unsup_method=='':
-        unsup_method=unsup_meth
+    ifmodel=os.path.exists('model_'+dataset_name+'_'+str(vectorizer)+str(unsup_meth)) # todo: .pkl extention!!
 
-    # ============ Extract data and support data. Create a view for just the support data. =============
+    if not ifmodel or force_train:
 
-    # dataset=pd.DataFrame()
-    data_fields_view=dataset[data_fields]
-    # merge all the data fields
-    data=data_fields_view.apply(lambda x: ' '.join(x), axis=1)
-    support_fields_view=dataset[support_fields]
+        global unsup_method
 
-    # ============ vectorize data =============
+        if unsup_method=='':
+            unsup_method=unsup_meth
 
-    vectors = vectorizer.fit_transform(data.values)
+        # ============ Extract data and support data. Create a view for just the support data. =============
 
-    # ============ train model =============
+        # dataset=pd.DataFrame()
+        data_fields_view=dataset[data_fields]
+        # merge all the data fields
+        data=data_fields_view.apply(lambda x: ' '.join(x), axis=1)
+        support_fields_view=dataset[support_fields]
 
-    model=unsup_meth.fit(vectors)
+        # ============ vectorize data =============
 
-    # ============ save the model and support data =============
+        vectors = vectorizer.fit_transform(data.values)
 
-    use.savemodel(model,'model_'+dataset_name+'_'+str(vectorizer)+str(unsup_meth))
-    use.savemodel(support_fields_view,'support_'+dataset_name+'_'+str(vectorizer)+str(unsup_meth))
+        # ============ train model =============
+
+        model=unsup_meth.fit(vectors)
+
+        # ============ save the model and support data =============
+
+        use.savemodel(model,'model_'+dataset_name+'_'+str(vectorizer)+str(unsup_meth))
+        use.savemodel(support_fields_view,'support_'+dataset_name+'_'+str(vectorizer)+str(unsup_meth))
 
 
 
@@ -83,6 +92,7 @@ def unsup_predict(textdata, dataset_name, vectorizer, unsup_meth=NearestNeighbor
 
             unsup_meth : sklearn unsupervised method or some an implementation with sklearn interface
 
+
             Returns
             ----------
             result : pandas dataframe
@@ -93,6 +103,8 @@ def unsup_predict(textdata, dataset_name, vectorizer, unsup_meth=NearestNeighbor
 
     if unsup_method=='':
         unsup_method=unsup_meth
+
+
 
     # ============ vectorize data =============
 
