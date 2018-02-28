@@ -33,10 +33,7 @@ class DemoClass(Trainer):
         x = len(self.data)
         return x
 
-class Regression(Trainer):
-    pass
-
-class Word2Vec(Trainer):
+class LogisticRegression(Trainer):
     pass
 
 class SupportVectorMachine(Trainer):
@@ -45,5 +42,6 @@ class SupportVectorMachine(Trainer):
 class KNearest(Trainer):
     pass
 
-class TFIDF(Trainer):
+class RandomForrest(Trainer):
     pass
+
