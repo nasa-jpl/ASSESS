@@ -5,9 +5,9 @@ from sklearn.metrics.pairwise import cosine_similarity
 import networkx as nx
 import nltk
 import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
 import utils as use
 import os
+
 
 global unsup_method
 unsup_method=''
@@ -72,10 +72,6 @@ def unsup_train(dataset, dataset_name, vectorizer, data_fields=[], support_field
         use.savemodel(support_fields_view,'support_'+dataset_name+'_'+str(vectorizer)+str(unsup_meth))
 
 
-
-
-
-
 def unsup_predict(textdata, dataset_name, vectorizer, unsup_meth=NearestNeighbors()):
     """predicts the nearest data samples from the model (to the given data sample) and
         relevant info about each sample.
@@ -122,18 +118,3 @@ def unsup_predict(textdata, dataset_name, vectorizer, unsup_meth=NearestNeighbor
     # ============ extract/return/print view for the nearest neighbours from the support data =============
     results=support_fields_view[k_neighbours] # TODO : correct the syntax.
     return results
-
-
-
-def vectorizer_tf_idf():
-    vectorizer = TfidfVectorizer(ngram_range=(1, 2))
-    return vectorizer
-
-
-def vectorizer_methodology_used():
-    """Implement your own"""
-    vectorizer=''
-    return vectorizer
-
-
-

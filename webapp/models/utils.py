@@ -1,6 +1,9 @@
 import dill
 from textblob import TextBlob
 import math
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+
 x=float('nan')
 math.isnan(x)
 
@@ -35,3 +38,15 @@ def noun_tokenize(x):
     blob = TextBlob(x)
     phrases = blob.noun_phrases
     return phrases
+
+def vectorizer_tf_idf():
+    vectorizer = TfidfVectorizer(ngram_range=(1, 2))
+    return vectorizer
+
+def vectorizer_methodology_used():
+    """Implement your own"""
+    vectorizer=''
+    return vectorizer
+
+def normalize():
+    pass
