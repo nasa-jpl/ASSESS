@@ -3,13 +3,17 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from bs4 import BeautifulSoup
-import argparse
 
-import exceptions
+from selenium.webdriver import DesiredCapabilities
+
+import argparse
+import logging
 import json
 import datetime
 import traceback
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -21,14 +25,17 @@ input_file = args['input']
 output_file = args['output']
 
 phantomjs_exec_path='/usr/local/bin/phantomjs'
+# driver = webdriver.PhantomJS(executable_path=phantomjs_exec_path)
 
 # Create a new instance of Firefox driver.
-driver = webdriver.Firefox()
+# driver = webdriver.Firefox()
 
 
 def get_standard_info(url):
     standard = {}
 
+    # driver = webdriver.Firefox()
+    driver = webdriver.Remote(command_executor='http://localhost:4444/wd/hub', desired_capabilities=DesiredCapabilities.FIREFOX)
     driver.get(url)
 
     try:
@@ -40,6 +47,7 @@ def get_standard_info(url):
         try:
             preview_url = heading.find_element_by_css_selector("a").get_attribute("href")
         except:
+            logger.warn("No preview has been found within " + url)
             pass
 
         par_description = driver.find_elements_by_css_selector("div.col-md-7 div[itemprop='description'] p")
@@ -54,12 +62,14 @@ def get_standard_info(url):
         try:
             publication_date = rows[1].find_element_by_tag_name("span").text
         except:
+            logger.warn("No publication date has been found within " + url)
             pass
         edition = rows[2].text
         number_of_pages = ""
         try:
             number_of_pages = rows[3].text
         except:
+            logger.warn("No number of pages has been found within " + url)
             pass
 
         tc = general_info.find_element_by_css_selector("div.clearfix")
@@ -81,7 +91,7 @@ def get_standard_info(url):
 
         #stage = driver.find_element_by_xpath('//li[@class="active"]/a/span[@class="stage-code"]').text
 
-        sections_list = get_preview(preview_url)
+        sections_list = get_preview(driver, preview_url)
 
         standard['datetime'] = str(datetime.datetime.utcnow()).split('.')[0]
         standard['url'] = url
@@ -104,12 +114,14 @@ def get_standard_info(url):
 
     except:
         error = traceback.format_exc()
-        print("Error occurred while crawling " + url + " - Message: " + error)
+        logger.error("Error occurred while crawling " + url + " - Message: " + error)
+
+    driver.quit()
 
     return standard
 
 
-def get_preview(url):
+def get_preview(driver, url):
     sections_list = []
 
     try:
@@ -122,7 +134,13 @@ def get_preview(url):
             section_name = section.find_element_by_class_name("sts-sec-title").text
             section_text = section.text
             sections_list.append({'name': section_name, 'text': section_text})
+
+        # close_buttons = driver.find_elements_by_xpath('//span[@class="v-tabsheet-caption-close"]')
+        # for button in close_buttons:
+        #     if button.text:
+        #         button.click()
     except:
+        logger.warn("No preview section has been found within " + url)
         pass
 
     return sections_list
@@ -131,7 +149,8 @@ def get_preview(url):
 df = pd.read_csv(input_file, header=None)
 
 # urls are expected to be in the second column
-urls=set(df[2])
+# urls=set(df[2])
+urls=set(df[0])
 
 with open(output_file,'w') as tempwrite:
     tempwrite=open(output_file, 'w')
@@ -141,17 +160,15 @@ with open(output_file,'w') as tempwrite:
     first_row=True
 
     for url in list(urls):
-        print("Processing " + url)
+        logger.info("Processing " + url)
         standard = get_standard_info(url)
         if standard:
             # standards_list.append(standard)
             if not first_row:
                 tempwrite.write(",")
             tempwrite.write(json.dumps(standard, indent=True))
+            tempwrite.flush()
             first_row=False
 
-    # TODO Write json iteratively
-    # json_list = json.dumps(standards_list, indent=True)
-    # tempwrite.write(json_list)
     tempwrite.write("]")
     tempwrite.close()
