@@ -27,11 +27,11 @@ output_file = args['output']
 def get_standard_info(url):
     standard = {}
 
-    driver = webdriver.Remote(command_executor='http://localhost:4444/wd/hub',
-                              desired_capabilities=DesiredCapabilities.CHROME)
-    driver.get(url)
-
     try:
+        driver = webdriver.Remote(command_executor='http://localhost:4444/wd/hub',
+                                  desired_capabilities=DesiredCapabilities.CHROME)
+        driver.get(url)
+
         heading = driver.find_element_by_css_selector("div.heading-condensed")
         id = heading.find_element_by_id("itemReference").text
         title = heading.find_element_by_css_selector("h3[itemprop='description']").text
@@ -105,12 +105,12 @@ def get_standard_info(url):
             'sections': sections_list
         }
 
+        driver.quit()
+        # driver.close()
+
     except:
         error = traceback.format_exc()
         logger.error("Error occurred while crawling " + url + " - Message: " + error)
-
-    driver.quit()
-    # driver.close()
 
     return standard
 
@@ -120,7 +120,7 @@ def get_preview(driver, url):
 
     try:
         driver.get(url)
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME,"sts-standard")))
+        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME,"sts-standard")))
 
         sections_all = driver.find_elements_by_xpath('//div[@class="sts-standard"]/div[@class="sts-section"]')
 
