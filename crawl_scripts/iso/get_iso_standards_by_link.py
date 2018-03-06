@@ -24,18 +24,11 @@ args = vars(ap.parse_args())
 input_file = args['input']
 output_file = args['output']
 
-phantomjs_exec_path='/usr/local/bin/phantomjs'
-# driver = webdriver.PhantomJS(executable_path=phantomjs_exec_path)
-
-# Create a new instance of Firefox driver.
-# driver = webdriver.Firefox()
-
-
 def get_standard_info(url):
     standard = {}
 
-    # driver = webdriver.Firefox()
-    driver = webdriver.Remote(command_executor='http://localhost:4444/wd/hub', desired_capabilities=DesiredCapabilities.FIREFOX)
+    driver = webdriver.Remote(command_executor='http://localhost:4444/wd/hub',
+                              desired_capabilities=DesiredCapabilities.CHROME)
     driver.get(url)
 
     try:
@@ -117,6 +110,7 @@ def get_standard_info(url):
         logger.error("Error occurred while crawling " + url + " - Message: " + error)
 
     driver.quit()
+    # driver.close()
 
     return standard
 
