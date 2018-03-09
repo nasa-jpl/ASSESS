@@ -75,10 +75,11 @@ def get_standard_info(url):
         ics_list = []
 
         for ics in ics_all:
-            ics_a = ics.find_element_by_xpath('//div[@class="entry-name entry-block"]').find_element_by_tag_name("a")
+            # ics_a = ics.find_element_by_xpath('//div[@class="entry-name entry-block"]').find_element_by_tag_name("a")
+            ics_a = ics.find_element_by_xpath('.//div[@class="entry-name entry-block"]/a')
             ics_name = ics_a.text
             ics_url = ics_a.get_attribute("href")
-            ics_title = tc.find_element_by_css_selector("div.entry-title").text
+            ics_title = ics.find_element_by_css_selector("div.entry-title").text
 
             ics_list.append({'name': ics_name, 'url': ics_url, 'title': ics_title})
 
