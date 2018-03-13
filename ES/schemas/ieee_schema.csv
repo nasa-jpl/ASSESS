@@ -1,0 +1,12 @@
+,global,local,desc
+0,standard_id,DOI,
+1,title,Publication Title,
+2,publisher,Publisher,
+3,url,PDF Link,
+4,publication_date,derived,Date Added To Xplore
+5,number_of_pages,derived,
+6,abstract,Abstract,
+7,purpose,Purpose,
+8,scope,Scope,
+9,keywords,derived,
+10,crawl_datetime,derived,
