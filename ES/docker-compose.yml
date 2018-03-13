@@ -1,0 +1,20 @@
+
+# https://www.itzgeek.com/how-tos/linux/ubuntu-how-tos/how-to-run-elk-stack-on-docker-container.html
+
+version: "2.0"
+
+services:
+
+  elasticsearch:
+    image: elasticsearch:latest
+    ports:
+      - "9200:9200"
+    volumes:
+      - ./ES:/usr/share/elasticsearch/data
+
+  kibana:
+    image: kibana:latest
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
