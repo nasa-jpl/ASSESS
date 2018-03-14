@@ -21,7 +21,7 @@ import string
 
 
 # Using csv instead of ES index for now.
-path = ""
+path = "/Users/vishall/prog/extras/delete/"
 df = pd.read_csv('../standards/IEEE-standards_rev1.csv', encoding = "ISO-8859-1")
 #df.columns = [c.replace(' ', '_') for c in df.columns]
 training = df.Abstract
@@ -39,7 +39,10 @@ X, y = [], []
 
 """This is where you customize your tokenizer and seperate labels and text"""
 for item in df.itertuples():
-    if pd.isnull(item.abstract_new) or pd.isnull(item.Category) or len(item.abstract_new) < 2:
+    if pd.isnull(item.Abstract) or pd.isnull(item.Category) or len(item.Abstract) < 2:
+        continue
+    categoryList = ["networks", "cybersecurity", "design", "software", "system", "interfaces", "network", "data", "radio", "devices", "circuit", "equipment", "management", "wireless", "interface", "radioactive"]
+    if item.Category.lower() not in categoryList:
         continue
     text = str(item.Abstract) + str(item.Scope) + str(item.Purpose)
     print(text)
@@ -49,13 +52,12 @@ for item in df.itertuples():
     for word in text_no_stop_words_punct:
         wordList.append(word)
     X.append(wordList)
-    print(item.Category)
-    y.append(item.Category)
+    y.append(item.Category.lower())
 
     print("*START*")
     print(wordList)
     print("====")
-    print(item.Category)
+    print(item.Category.lower())
     print("*END*")
 
 X, y = np.array(X), np.array(y)
@@ -183,3 +185,32 @@ scores = sorted(unsorted_scores, key=lambda x: -x[1])
 print(tabulate(scores, floatfmt=".4f", headers=("model", 'score')))
 plt.figure(figsize=(15, 6))
 sns.barplot(x=[name for name, _ in scores], y=[score for _, score in scores])
+
+def benchmark(model, X, y, n):
+    test_size = 1 - (n / float(len(y)))
+    scores = []
+    for train, test in StratifiedShuffleSplit(y, n_iter=5, test_size=test_size):
+        X_train, X_test = X[train], X[test]
+        y_train, y_test = y[train], y[test]
+        scores.append(accuracy_score(model.fit(X_train, y_train).predict(X_test), y_test))
+    return np.mean(scores)
+
+train_sizes = [15]
+table = []
+for name, model in all_models:
+    for n in train_sizes:
+        table.append({'model': name,
+                      'accuracy': benchmark(model, X, y, n),
+                      'train_size': n})
+df = pd.DataFrame(table)
+
+plt.figure(figsize=(15, 6))
+fig = sns.pointplot(x='train_size', y='accuracy', hue='model',
+                    data=df[df.model.map(lambda x: x in ["mult_nb", "svc_tfidf", "w2v_tfidf",
+                                                         "glove_small_tfidf", "glove_big_tfidf",
+                                                        ])])
+sns.set_context("notebook", font_scale=1.5)
+fig.set(ylabel="accuracy")
+fig.set(xlabel="labeled training examples")
+fig.set(title="R8 benchmark")
+fig.set(ylabel="accuracy")
