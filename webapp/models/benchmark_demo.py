@@ -22,9 +22,9 @@ import string
 
 # Using csv instead of ES index for now.
 df = pd.read_csv('../standards/IEEE-standards_rev1.csv', encoding = "ISO-8859-1")
-df.columns = [c.replace(' ', '_') for c in df.columns]
-training = df.abstract_new
-frames =  [df.abstract_new, df.scope_new, df.purpose_new]
+#df.columns = [c.replace(' ', '_') for c in df.columns]
+training = df.Abstract
+frames =  [df.Abstract, df.Scope, df.Purpose]
 training = pd.concat(frames)
 labels = df.Category
 stop = set(stopwords.words('english'))
@@ -40,7 +40,7 @@ X, y = [], []
 for item in df.itertuples():
     if pd.isnull(item.abstract_new) or pd.isnull(item.Category) or len(item.abstract_new) < 2:
         continue
-    text = str(item.abstract_new) + str(item.scope_new) + str(item.purpose_new)
+    text = str(item.Abstract) + str(item.Scope) + str(item.Purpose)
     print(text)
     words = word_tokenize(text)
     text_no_stop_words_punct = [t for t in words if t not in stop and t not in string.punctuation]
@@ -53,7 +53,7 @@ for item in df.itertuples():
 
     print("*START*")
     print(wordList)
-    print("============")
+    print("====")
     print(item.Category)
     print("*END*")
 
