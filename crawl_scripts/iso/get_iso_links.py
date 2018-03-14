@@ -47,7 +47,7 @@ def preorder_visit(node, prefix, filewriter):
     if str(node.code).startswith("ISO"):
         code = "0." + str(prefix) + "." + str(node.code)
 
-    filewriter.writerow([code, node.url, node.field])
+    filewriter.writerow([code.encode('ascii', errors='replace'), node.url, node.field.encode('ascii', errors='replace')])
 
     prefix = str(node.code)
 
