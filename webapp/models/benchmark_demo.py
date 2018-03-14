@@ -21,6 +21,7 @@ import string
 
 
 # Using csv instead of ES index for now.
+path = ""
 df = pd.read_csv('../standards/IEEE-standards_rev1.csv', encoding = "ISO-8859-1")
 #df.columns = [c.replace(' ', '_') for c in df.columns]
 training = df.Abstract
@@ -157,7 +158,6 @@ etree_glove_big = Pipeline([("glove vectorizer", MeanEmbeddingVectorizer(glove_b
                             ("extra trees", ExtraTreesClassifier(n_estimators=200))])
 etree_glove_big_tfidf = Pipeline([("glove vectorizer", TfidfEmbeddingVectorizer(glove_big)),
                                   ("extra trees", ExtraTreesClassifier(n_estimators=200))])
-
 etree_w2v = Pipeline([("word2vec vectorizer", MeanEmbeddingVectorizer(w2v)),
                       ("extra trees", ExtraTreesClassifier(n_estimators=200))])
 etree_w2v_tfidf = Pipeline([("word2vec vectorizer", TfidfEmbeddingVectorizer(w2v)),
