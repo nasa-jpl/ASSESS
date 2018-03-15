@@ -1,0 +1,12 @@
+,global,local,desc
+0,standard_id,id,
+1,title,title,
+2,publisher,"ISO",
+3,url,url,
+4,publication_date,publication_date,
+5,number_of_pages,number_of_pages,
+6,abstract,derived,
+7,purpose,derived,
+8,scope,derived,
+9,keywords,,
+10,crawl_datetime,datetime,
