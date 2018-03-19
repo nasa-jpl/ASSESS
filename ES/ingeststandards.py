@@ -1,8 +1,6 @@
 import pandas as pd
 import sys
 
-from keras.backend import switch
-
 reload(sys)
 sys.setdefaultencoding('UTF8')
 import traceback
