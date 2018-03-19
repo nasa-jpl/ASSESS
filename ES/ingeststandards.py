@@ -1,6 +1,8 @@
 import pandas as pd
-from pandas.io.tests.parser import index_col
 import sys
+
+from keras.backend import switch
+
 reload(sys)
 sys.setdefaultencoding('UTF8')
 import traceback
@@ -19,6 +21,74 @@ def iso():
     local_blacklist = []
 
     int_fields = ['Year', 'number_of_pages']
+
+    schemafile = 'iso_schema.csv'
+
+    schema = pd.read_csv('schemas/' + schemafile, index_col=0)
+    global_to_local = {}
+
+    for index, row in schema.iterrows():
+        global_to_local[row['global']] = row['local']
+
+    json_input = "../webapp/standards/iso_flat.json"
+    with open(json_input, 'r') as input:
+        catalogue = json.load(input)
+
+    uid = 0
+
+    for standard in catalogue:
+
+        row = {}
+
+        for global_field in global_to_local.keys():
+            local_field = global_to_local[global_field]
+            value = ''
+            if local_field == "derived":
+                if global_field == "publisher":
+                    value = "ISO"
+                elif global_field == "introduction":
+                    value = get_section("introduction", standard["section_titles"], standard["sections"])
+                elif global_field == "scope":
+                    value = get_section("scope", standard["section_titles"], standard["sections"])
+                elif global_field == "purpose":
+                    value = get_section("purpose", standard["section_titles"], standard["sections"])
+                elif global_field == "publication_date":
+                    value = standard["publication_date"][:7] + '-01'
+                elif global_field == "crawl_datetime":
+                    value = standard["datetime"][:10]
+            else:
+                value = standard[local_field]
+
+            row[global_field] = value
+
+        for global_field in set(all_global_fields) - set(global_to_local.keys()):
+            value = 'N/A'
+            row[global_field] = value
+
+        for field in row.keys():
+            if checknan(row[field]):
+                if field in int_fields:
+                    row[field]=0
+                else:
+                    row[field]='N/A'
+            else:
+                # correct the utf
+               if isinstance(row[field], basestring):
+                    row[field]=row[field].decode('utf-8',errors='ignore')
+
+        uid += 1
+
+        yield str(uid) + '_iso', row
+
+
+def get_section(pattern, titles, sections):
+    value = ''
+
+    for i, title in enumerate(titles):
+        if pattern in str(title).lower():
+            value = sections[i]
+
+    return value
 
 
 def ieee():
@@ -121,7 +191,9 @@ from elasticsearch import Elasticsearch
 es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
 index='assess_standards'
 
-for uid, doc in ieee():
+
+# for uid, doc in ieee():
+for uid, doc in iso():
     res=''
     try:
         res = es.index(index=index, doc_type='standard', id=uid, body=doc)
@@ -130,5 +202,4 @@ for uid, doc in ieee():
         print res
         print doc
         raise Exception('read it and solve it!')
-
 
