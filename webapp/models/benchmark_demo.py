@@ -19,11 +19,11 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 import string
 import pylab
-import pickle
 from functools import wraps
 import errno
 import os
 import signal
+import dill as pickle
 
 class TimeoutError(Exception):
     pass
@@ -49,13 +49,12 @@ def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
 
 # Using csv instead of ES index for now.
 path = "/Users/vishall/prog/extras/delete/"
-
 df = pd.read_json("../../iso_flat.json")
-
 # Convert to Tuples
 df.ics = df.ics.transform(lambda x: tuple(x))
+df.sections = df.sections.transform(lambda x: x[1:])
 # In order to run this you need Tuples.
-df = df[df.groupby('ics').sections.transform(len) > 100]
+df = df[df.groupby('ics').sections.transform(len) > 10]
 labels = df.ics
 stop = set(stopwords.words('english'))
 all_stops = stop | set(string.punctuation)
@@ -72,7 +71,8 @@ for item in df.itertuples():
     if not item.ics or not item.sections or len(item.sections) < 1 or len(' '.join(item.sections)) < 10:
         continue
     text = item.sections
-    text = ' '.join(text)
+    # Include the title. check how many standards have scope.
+    text = item.description + ' ' + ' '.join(text)
     words = word_tokenize(text)
     text_no_stop_words_punct = [t for t in words if t not in stop and t not in string.punctuation]
     wordList = []
@@ -83,11 +83,11 @@ for item in df.itertuples():
     print(field)
     y.append(field)
 
-    print("*START*")
+    print("### START: Input text ###")
     print(wordList)
-    print("====")
+    print("========================")
     print(field)
-    print("*END*")
+    print("### END ###")
 
 X, y = np.array(X), np.array(y)
 print ("total examples %s" % len(y))
@@ -228,8 +228,10 @@ def benchmark(model, X, y, n):
     return np.mean(scores)
 
 for name, model in all_models:
+    print(("Saving model...%s") % (name))
     filename = 'trained_models/%s.sav' % (name)
     pickle.dump(model, open(filename, 'wb'))
+
 
 train_sizes = [20, 40, 80]
 table = []
@@ -253,4 +255,3 @@ fig.set(xlabel="labeled training examples")
 fig.set(title="Supervised learning benchmark")
 fig.set(ylabel="accuracy")
 pylab.show()
-
