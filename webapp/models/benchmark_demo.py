@@ -26,7 +26,7 @@ import signal
 import dill as pickle
 
 
-# This is a timeout function we can use later.
+# We can use later for decorating functions with a timeout.
 class TimeoutError(Exception):
     pass
 
@@ -48,7 +48,6 @@ def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
     return decorator
 
 
-
 class MeanEmbeddingVectorizer(object):
     def __init__(self, word2vec):
         self.word2vec = word2vec
@@ -68,7 +67,6 @@ class MeanEmbeddingVectorizer(object):
         ])
 
 
-# and a tf-idf version of the same
 class TfidfEmbeddingVectorizer(object):
     def __init__(self, word2vec):
         self.word2vec = word2vec
