@@ -18,16 +18,45 @@ from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 import string
+import pylab
+import pickle
+from functools import wraps
+import errno
+import os
+import signal
+
+class TimeoutError(Exception):
+    pass
+
+def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
+    def decorator(func):
+        def _handle_timeout(signum, frame):
+            raise TimeoutError(error_message)
+
+        def wrapper(*args, **kwargs):
+            signal.signal(signal.SIGALRM, _handle_timeout)
+            signal.alarm(seconds)
+            try:
+                result = func(*args, **kwargs)
+            finally:
+                signal.alarm(0)
+            return result
+
+        return wraps(func)(wrapper)
+
+    return decorator
 
 
 # Using csv instead of ES index for now.
 path = "/Users/vishall/prog/extras/delete/"
-df = pd.read_csv('../standards/IEEE-standards_rev1.csv', encoding = "ISO-8859-1")
-#df.columns = [c.replace(' ', '_') for c in df.columns]
-training = df.Abstract
-frames =  [df.Abstract, df.Scope, df.Purpose]
-training = pd.concat(frames)
-labels = df.Category
+
+df = pd.read_json("../../iso_flat.json")
+
+# Convert to Tuples
+df.ics = df.ics.transform(lambda x: tuple(x))
+# In order to run this you need Tuples.
+df = df[df.groupby('ics').sections.transform(len) > 100]
+labels = df.ics
 stop = set(stopwords.words('english'))
 all_stops = stop | set(string.punctuation)
 
@@ -37,27 +66,27 @@ encoding="utf-8"
 
 X, y = [], []
 
-"""This is where you customize your tokenizer and seperate labels and text"""
 for item in df.itertuples():
-    if pd.isnull(item.Abstract) or pd.isnull(item.Category) or len(item.Abstract) < 2:
+    """This is where you customize your tokenizer and seperate labels and text,
+    defining your Xs and Ys"""
+    if not item.ics or not item.sections or len(item.sections) < 1 or len(' '.join(item.sections)) < 10:
         continue
-    categoryList = ["networks", "cybersecurity", "design", "software", "system", "interfaces", "network", "data", "radio", "devices", "circuit", "equipment", "management", "wireless", "interface", "radioactive"]
-    if item.Category.lower() not in categoryList:
-        continue
-    text = str(item.Abstract) + str(item.Scope) + str(item.Purpose)
-    print(text)
+    text = item.sections
+    text = ' '.join(text)
     words = word_tokenize(text)
     text_no_stop_words_punct = [t for t in words if t not in stop and t not in string.punctuation]
     wordList = []
     for word in text_no_stop_words_punct:
         wordList.append(word)
     X.append(wordList)
-    y.append(item.Category.lower())
+    field = item.ics[0].split('.')[0]
+    print(field)
+    y.append(field)
 
     print("*START*")
     print(wordList)
     print("====")
-    print(item.Category.lower())
+    print(field)
     print("*END*")
 
 X, y = np.array(X), np.array(y)
@@ -165,10 +194,10 @@ etree_w2v = Pipeline([("word2vec vectorizer", MeanEmbeddingVectorizer(w2v)),
 etree_w2v_tfidf = Pipeline([("word2vec vectorizer", TfidfEmbeddingVectorizer(w2v)),
                             ("extra trees", ExtraTreesClassifier(n_estimators=200))])
 all_models = [
-    ("mult_nb", mult_nb),
-    ("mult_nb_tfidf", mult_nb_tfidf),
-    ("bern_nb", bern_nb),
-    ("bern_nb_tfidf", bern_nb_tfidf),
+    ("bayes_mult_nb", mult_nb),
+    ("bayes_mult_nb_tfidf", mult_nb_tfidf),
+    ("bayes_bern_nb", bern_nb),
+    ("bayes_bern_nb_tfidf", bern_nb_tfidf),
     ("svc", svc),
     ("svc_tfidf", svc_tfidf),
     ("w2v", etree_w2v),
@@ -183,27 +212,36 @@ all_models = [
 unsorted_scores = [(name, cross_val_score(model, X, y, cv=5).mean()) for name, model in all_models]
 scores = sorted(unsorted_scores, key=lambda x: -x[1])
 print(tabulate(scores, floatfmt=".4f", headers=("model", 'score')))
-plt.figure(figsize=(15, 6))
-sns.barplot(x=[name for name, _ in scores], y=[score for _, score in scores])
+# *Show preliminary data
+#plt.figure(figsize=(15, 6))
+#sns.barplot(x=[name for name, _ in scores], y=[score for _, score in scores])
+#pylab.show()
 
 def benchmark(model, X, y, n):
     test_size = 1 - (n / float(len(y)))
     scores = []
     for train, test in StratifiedShuffleSplit(y, n_iter=5, test_size=test_size):
+        print('.', end='')
         X_train, X_test = X[train], X[test]
         y_train, y_test = y[train], y[test]
         scores.append(accuracy_score(model.fit(X_train, y_train).predict(X_test), y_test))
     return np.mean(scores)
 
-train_sizes = [15]
+for name, model in all_models:
+    filename = 'trained_models/%s.sav' % (name)
+    pickle.dump(model, open(filename, 'wb'))
+
+train_sizes = [20, 40, 80]
 table = []
+
 for name, model in all_models:
     for n in train_sizes:
+        print("TRAINING")
         table.append({'model': name,
                       'accuracy': benchmark(model, X, y, n),
                       'train_size': n})
-df = pd.DataFrame(table)
 
+df = pd.DataFrame(table)
 plt.figure(figsize=(15, 6))
 fig = sns.pointplot(x='train_size', y='accuracy', hue='model',
                     data=df[df.model.map(lambda x: x in ["mult_nb", "svc_tfidf", "w2v_tfidf",
@@ -212,5 +250,7 @@ fig = sns.pointplot(x='train_size', y='accuracy', hue='model',
 sns.set_context("notebook", font_scale=1.5)
 fig.set(ylabel="accuracy")
 fig.set(xlabel="labeled training examples")
-fig.set(title="R8 benchmark")
+fig.set(title="Supervised learning benchmark")
 fig.set(ylabel="accuracy")
+pylab.show()
+
