@@ -79,9 +79,6 @@ class TfidfEmbeddingVectorizer(object):
     def fit(self, X, y):
         tfidf = TfidfVectorizer(analyzer=lambda x: x)
         tfidf.fit(X)
-        # if a word was never seen - it must be at least as infrequent
-        # as any of the known words - so the default idf is the max of
-        # known idf's
         max_idf = max(tfidf.idf_)
         self.word2weight = defaultdict(
             lambda: max_idf,
@@ -132,11 +129,11 @@ for item in df.itertuples():
     wordList = []
     for word in text_no_stop_words_punct:
         wordList.append(word)
+    field = item.ics[0].split('.')[0:3]
+    field = ".".join(field)
     X.append(wordList)
-    field = item.ics[0].split('.')[0]
-    print(field)
     y.append(field)
-
+    print(field)
     print("### START: Input text ###")
     print(wordList)
     print("========================")
@@ -171,8 +168,6 @@ with open(GLOVE_840B_300D_PATH, "rb") as infile:
 # Train word2vec
 model = Word2Vec(X, size=100, window=5, min_count=5, workers=2)
 w2v = {w: vec for w, vec in zip(model.wv.index2word, model.wv.syn0)}
-
-
 
 mult_nb = Pipeline([("count_vectorizer", CountVectorizer(analyzer=lambda x: x)), ("multinomial nb", MultinomialNB())])
 bern_nb = Pipeline([("count_vectorizer", CountVectorizer(analyzer=lambda x: x)), ("bernoulli nb", BernoulliNB())])
@@ -234,13 +229,13 @@ for name, model in all_models:
     filename = 'trained_models/%s.sav' % (name)
     pickle.dump(model, open(filename, 'wb'))
 
-
-train_sizes = [20, 40, 80]
+# Training sizes- make sure they're scaled to the data
+train_sizes = [20, 200, 400, 800, 1600, 3200, 6400, 8200, 12000, 15000]
 table = []
 
 for name, model in all_models:
     for n in train_sizes:
-        print("TRAINING")
+        print("Increasing training size... %d" % (n))
         table.append({'model': name,
                       'accuracy': benchmark(model, X, y, n),
                       'train_size': n})
@@ -248,12 +243,13 @@ for name, model in all_models:
 df = pd.DataFrame(table)
 plt.figure(figsize=(15, 6))
 fig = sns.pointplot(x='train_size', y='accuracy', hue='model',
-                    data=df[df.model.map(lambda x: x in ["mult_nb", "svc_tfidf", "w2v_tfidf",
-                                                         "glove_small_tfidf", "glove_big_tfidf",
+                    data=df[df.model.map(lambda x: x in ["bayes_mult_nb", "bayes_mult_nb_tfidf", "bayes_bern_nb",
+                                                         "bayes_bern_nb_tfidf", "svc", "svc_tfidf", "w2v", "w2v_tfidf",
+                                                         "glove_small", "glove_small_tfidf", "glove_big", "glove_big_tfidf",
                                                         ])])
 sns.set_context("notebook", font_scale=1.5)
 fig.set(ylabel="accuracy")
 fig.set(xlabel="labeled training examples")
-fig.set(title="Supervised learning benchmark")
+fig.set(title="ASSESS Machine learning benchmark")
 fig.set(ylabel="accuracy")
 pylab.show()
