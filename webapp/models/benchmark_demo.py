@@ -225,7 +225,7 @@ def benchmark(model, X, y, n):
     return np.mean(scores)
 
 # Training sizes- make sure they're scaled to the data
-train_sizes = [800, 1600, 3200, 6400, 8200, 12500, 15000]
+train_sizes = [800, 1600, 3200, 6400, 9200, 13200]
 table = []
 
 for name, model in all_models:
@@ -239,6 +239,7 @@ for name, model in all_models:
         pickle.dump(model, open(filename, 'wb'))
 print("Graphing results...")
 df = pd.DataFrame(table)
+df.to_pickle("trained_mod/stats.pkl")
 plt.figure(figsize=(15, 6))
 fig = sns.pointplot(x='train_size', y='accuracy', hue='model',
                     data=df[df.model.map(lambda x: x in ["bayes_mult_nb", "bayes_mult_nb_tfidf", "bayes_bern_nb",
