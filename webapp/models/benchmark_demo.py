@@ -48,7 +48,7 @@ def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
     return decorator
 
 
-class MeanEmbeddingVectorizer(object):
+class MeanEmbedVectorizer(object):
     def __init__(self, word2vec):
         self.word2vec = word2vec
         if len(word2vec) > 0:
@@ -67,7 +67,7 @@ class MeanEmbeddingVectorizer(object):
         ])
 
 
-class TfidfEmbeddingVectorizer(object):
+class TfidfEmbedVectorizer(object):
     def __init__(self, word2vec):
         self.word2vec = word2vec
         self.word2weight = None
@@ -99,7 +99,7 @@ TODO:
 Clean up this section into it's own pre-processing function.
 """
 # Using csv instead of ES index for now.
-path = "/Users/vishall/prog/extras/delete/"
+path = "YOUR_GLOVE_PATH"
 df = pd.read_json("../../iso_flat.json")
 # Convert to tuples in order to use the groupby function.
 df.ics = df.ics.transform(lambda x: tuple(x))
@@ -169,40 +169,40 @@ with open(GLOVE_840B_300D_PATH, "rb") as infile:
 model = Word2Vec(X, size=100, window=5, min_count=5, workers=2)
 w2v = {w: vec for w, vec in zip(model.wv.index2word, model.wv.syn0)}
 
-mult_nb = Pipeline([("count_vectorizer", CountVectorizer(analyzer=lambda x: x)), ("multinomial nb", MultinomialNB())])
-bern_nb = Pipeline([("count_vectorizer", CountVectorizer(analyzer=lambda x: x)), ("bernoulli nb", BernoulliNB())])
-mult_nb_tfidf = Pipeline(
+bayes_mult_nb = Pipeline([("count_vectorizer", CountVectorizer(analyzer=lambda x: x)), ("multinomial nb", MultinomialNB())])
+bayes_bern_nb = Pipeline([("count_vectorizer", CountVectorizer(analyzer=lambda x: x)), ("bernoulli nb", BernoulliNB())])
+bayes_mult_nb_tfidf = Pipeline(
     [("tfidf_vectorizer", TfidfVectorizer(analyzer=lambda x: x)), ("multinomial nb", MultinomialNB())])
-bern_nb_tfidf = Pipeline([("tfidf_vectorizer", TfidfVectorizer(analyzer=lambda x: x)), ("bernoulli nb", BernoulliNB())])
+bayes_bern_nb_tfidf = Pipeline([("tfidf_vectorizer", TfidfVectorizer(analyzer=lambda x: x)), ("bernoulli nb", BernoulliNB())])
 svc = Pipeline([("count_vectorizer", CountVectorizer(analyzer=lambda x: x)), ("linear svc", SVC(kernel="linear"))])
 svc_tfidf = Pipeline(
     [("tfidf_vectorizer", TfidfVectorizer(analyzer=lambda x: x)), ("linear svc", SVC(kernel="linear"))])
 # Extra Trees classifier is like random forrest
-etree_glove_small = Pipeline([("glove vectorizer", MeanEmbeddingVectorizer(glove_small)),
+glove_sm = Pipeline([("glove vectorizer", MeanEmbedVectorizer(glove_small)),
                               ("extra trees", ExtraTreesClassifier(n_estimators=200))])
-etree_glove_small_tfidf = Pipeline([("glove vectorizer", TfidfEmbeddingVectorizer(glove_small)),
+glove_sm_tfidf = Pipeline([("glove vectorizer", TfidfEmbedVectorizer(glove_small)),
                                     ("extra trees", ExtraTreesClassifier(n_estimators=200))])
-etree_glove_big = Pipeline([("glove vectorizer", MeanEmbeddingVectorizer(glove_big)),
+glove_big = Pipeline([("glove vectorizer", MeanEmbedVectorizer(glove_big)),
                             ("extra trees", ExtraTreesClassifier(n_estimators=200))])
-etree_glove_big_tfidf = Pipeline([("glove vectorizer", TfidfEmbeddingVectorizer(glove_big)),
+glove_big_tfidf = Pipeline([("glove vectorizer", TfidfEmbedVectorizer(glove_big)),
                                   ("extra trees", ExtraTreesClassifier(n_estimators=200))])
-etree_w2v = Pipeline([("word2vec vectorizer", MeanEmbeddingVectorizer(w2v)),
+etc_w2v = Pipeline([("word2vec vectorizer", MeanEmbedVectorizer(w2v)),
                       ("extra trees", ExtraTreesClassifier(n_estimators=200))])
-etree_w2v_tfidf = Pipeline([("word2vec vectorizer", TfidfEmbeddingVectorizer(w2v)),
+w2v_tfidf = Pipeline([("word2vec vectorizer", TfidfEmbedVectorizer(w2v)),
                             ("extra trees", ExtraTreesClassifier(n_estimators=200))])
 all_models = [
-    ("bayes_mult_nb", mult_nb),
-    ("bayes_mult_nb_tfidf", mult_nb_tfidf),
-    ("bayes_bern_nb", bern_nb),
-    ("bayes_bern_nb_tfidf", bern_nb_tfidf),
+    ("bayes_mult_nb", bayes_mult_nb),
+    ("bayes_mult_nb_tfidf", bayes_mult_nb_tfidf),
+    ("bayes_bern_nb", bayes_bern_nb),
+    ("bayes_bern_nb_tfidf", bayes_bern_nb_tfidf),
     ("svc", svc),
     ("svc_tfidf", svc_tfidf),
-    ("w2v", etree_w2v),
-    ("w2v_tfidf", etree_w2v_tfidf),
-    ("glove_small", etree_glove_small),
-    ("glove_small_tfidf", etree_glove_small_tfidf),
-    ("glove_big", etree_glove_big),
-    ("glove_big_tfidf", etree_glove_big_tfidf),
+    ("w2v", etc_w2v),
+    ("w2v_tfidf", w2v_tfidf),
+    ("glove_small", glove_small),
+    ("glove_small_tfidf", glove_small_tfidf),
+    ("glove_big", glove_big),
+    ("glove_big_tfidf", glove_big_tfidf),
 
 ]
 
@@ -224,22 +224,20 @@ def benchmark(model, X, y, n):
         scores.append(accuracy_score(model.fit(X_train, y_train).predict(X_test), y_test))
     return np.mean(scores)
 
-for name, model in all_models:
-    print(("Saving model...%s") % (name))
-    filename = 'trained_models/%s.sav' % (name)
-    pickle.dump(model, open(filename, 'wb'))
-
 # Training sizes- make sure they're scaled to the data
-train_sizes = [20, 200, 400, 800, 1600, 3200, 6400, 8200, 12000, 15000]
+train_sizes = [800, 1600, 3200, 6400, 8200, 12500, 15000]
 table = []
 
 for name, model in all_models:
     for n in train_sizes:
-        print("Increasing training size... %d" % (n))
+        print("Training.")
         table.append({'model': name,
                       'accuracy': benchmark(model, X, y, n),
                       'train_size': n})
-
+        print(("Saving model...%s") % (name))
+        filename = 'trained_models/%s_%d.sav' % (name, n)
+        pickle.dump(model, open(filename, 'wb'))
+print("Graphing results...")
 df = pd.DataFrame(table)
 plt.figure(figsize=(15, 6))
 fig = sns.pointplot(x='train_size', y='accuracy', hue='model',
