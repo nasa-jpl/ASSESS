@@ -22,20 +22,18 @@ import yaml
 import logging
 import os, sys
 
+logger = logging.getLogger(__file__)
 
 with open('config.yaml', 'r') as f:
     config = yaml.load(f)
-
 iso_path = config['data']
 GLOVE_6B_50D_PATH = config['glove_small']
 GLOVE_840B_300D_PATH = config['glove_big']
 model_path = config['model_path']
 stats = config['stats']
 
-logger = logging.getLogger(__file__)
-
 ready = [os.path.exists(p) for p in [iso_path, GLOVE_6B_50D_PATH, GLOVE_840B_300D_PATH, model_path, stats]]
-
+encoding = "utf-8"
 if all(ready):
     logger.info("All paths exist. Cleaning data set...")
 else:
@@ -44,32 +42,18 @@ else:
 
 df = open(iso_path)
 X, y = processes.transform(df)
-encoding = "utf-8"
 
 logger.info("Total examples %s" % len(y))
+
 with open(GLOVE_6B_50D_PATH, "rb") as lines:
     wvec = {line.split()[0].decode(encoding): np.array(line.split()[1:], dtype=np.float32)
             for line in lines}
 
 glove_small = {}
-all_words = set(w for words in X for w in words)
-with open(GLOVE_6B_50D_PATH, "rb") as infile:
-    for line in infile:
-        parts = line.split()
-        word = parts[0].decode(encoding)
-        if (word in all_words):
-            nums = np.array(parts[1:], dtype=np.float32)
-            glove_small[word] = nums
-
 glove_big = {}
-with open(GLOVE_840B_300D_PATH, "rb") as infile:
-    for line in infile:
-        parts = line.split()
-        word = parts[0].decode(encoding)
-        if word in all_words:
-            nums = np.array(parts[1:], dtype=np.float32)
-            glove_big[word] = nums
 
+processes.glove_training(GLOVE_840B_300D_PATH, X)
+processes.glove_training(GLOVE_6B_50D_PATH, X)
 # Train word2vec
 model = Word2Vec(X, size=100, window=5, min_count=5, workers=2)
 w2v = {w: vec for w, vec in zip(model.wv.index2word, model.wv.syn0)}
@@ -79,8 +63,7 @@ w2v = {w: vec for w, vec in zip(model.wv.index2word, model.wv.syn0)}
 bayes_mult_nb = Pipeline([
                             ("count_vectorizer",
                             CountVectorizer(analyzer=lambda x: x)),
-                            ("multinomial nb",
-                            MultinomialNB())
+                            ("multinomial nb", MultinomialNB())
                 ])
 
 """ The bayes_bern_nb pipeline is a count vectorizer using TF along with a bernoulli bayesian model """
@@ -94,16 +77,14 @@ bayes_bern_nb = Pipeline([
 bayes_mult_nb_tfidf = Pipeline([
                                 ("tfidf_vectorizer",
                                 TfidfVectorizer(analyzer=lambda x: x)),
-                                ("multinomial nb",
-                                MultinomialNB())
+                                ("multinomial nb", MultinomialNB())
      ])
 
 """ The bayes_bern_nb_tfidf pipeline is using TF-IDF along with a bernoulli bayesian model. """
 bayes_bern_nb_tfidf = Pipeline([
                                     ("tfidf_vectorizer",
                                     TfidfVectorizer(analyzer=lambda x: x)),
-                                    ("bernoulli nb",
-                                     BernoulliNB())
+                                    ("bernoulli nb", BernoulliNB())
                     ])
 
 """ The svc pipeline is a count vectorizer along with a linear support vector classifier. """
@@ -123,39 +104,34 @@ svc_tfidf = Pipeline([
 glove_small = Pipeline([
                             ("glove vectorizer",
                             MeanEmbedVectorizer(glove_small)),
-                            ("extra trees",
-                            ExtraTreesClassifier(n_estimators=200))
+                            ("extra trees", ExtraTreesClassifier(n_estimators=200))
             ])
 
 """ The glove_small_tfidf pipeline uses the GLOVE vectorization on a 60D textfile. """
 glove_small_tfidf = Pipeline([
                                 ("glove vectorizer",
                                 TfidfEmbedVectorizer(glove_small)),
-                                ("extra trees",
-                                ExtraTreesClassifier(n_estimators=200))
+                                ("extra trees", ExtraTreesClassifier(n_estimators=200))
                     ])
 
 """ The glove_big pipeline uses the GLOVE vectorization on a 180D textfile. """
 glove_big = Pipeline([
                         ("glove vectorizer",
                         MeanEmbedVectorizer(glove_big)),
-                        ("extra trees",
-                        ExtraTreesClassifier(n_estimators=200))
+                        ("extra trees", ExtraTreesClassifier(n_estimators=200))
             ])
 """ The glove_big_tfidf pipeline uses the GLOVE vectorization on a 180D textfile. """
 glove_big_tfidf = Pipeline([
                             ("glove vectorizer",
                             TfidfEmbedVectorizer(glove_big)),
-                            ("extra trees",
-                            ExtraTreesClassifier(n_estimators=200))
+                            ("extra trees", ExtraTreesClassifier(n_estimators=200))
                 ])
 
 """ The etc_w2v pipeline uses... """
 etc_w2v = Pipeline([
                     ("word2vec vectorizer",
                      MeanEmbedVectorizer(w2v)),
-                    ("extra trees",
-                    ExtraTreesClassifier(n_estimators=200))
+                    ("extra trees", ExtraTreesClassifier(n_estimators=200))
         ])
 
 """ The w2v_tfidf pipeline uses... """

@@ -45,7 +45,7 @@ def transform(df):
         print("========================")
         print(field)
         print("* END *")
-    return np.array(X), np.array(y)
+    return (np.array(X), np.array(y))
 
 def benchmark(model, X, y, n):
     """
@@ -59,6 +59,16 @@ def benchmark(model, X, y, n):
         y_train, y_test = y[train], y[test]
         scores.append(accuracy_score(model.fit(X_train, y_train).predict(X_test), y_test))
     return np.mean(scores)
+
+def glove_training(path, X, encoding="utf-8"):
+    all_words = set(w for words in X for w in words)
+    with open(path, "rb") as infile:
+        for line in infile:
+            parts = line.split()
+            word = parts[0].decode(encoding)
+            if word in all_words:
+                nums = np.array(parts[1:], dtype=np.float32)
+                path[word] = nums
 
 def plot(df):
     """Graph results from the pickled scores"""
