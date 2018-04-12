@@ -1,5 +1,3 @@
-from gensim.models.word2vec import Word2Vec
-import pandas as pd
 import numpy as np
 
 

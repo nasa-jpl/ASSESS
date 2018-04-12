@@ -14,22 +14,14 @@ from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 from sklearn.cross_validation import cross_val_score
 from sklearn.cross_validation import StratifiedShuffleSplit
-from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 import string
 import pylab
-from functools import wraps
-import errno
-import os
-import signal
 import dill as pickle
-from vectorizer import MeanEmbedVectorizer, TfidfVectorizer
+from vectorizers import MeanEmbedVectorizer, TfidfVectorizer
 
-"""
-TODO:
-Clean up this section into it's own pre-processing function.
-"""
+
 # Using csv instead of ES index for now.
 path = "YOUR_GLOVE_PATH"
 df = pd.read_json("../../iso_flat.json")
