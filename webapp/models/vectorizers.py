@@ -1,7 +1,6 @@
 import numpy as np
 
 
-
 class MeanEmbedVectorizer(object):
     def __init__(self, word2vec):
         self.word2vec = word2vec
