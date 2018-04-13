@@ -1,5 +1,6 @@
 from tabulate import tabulate
 import numpy as np
+import pandas as pd
 from gensim.models.word2vec import Word2Vec
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -24,6 +25,41 @@ import os, sys
 
 
 logger = logging.getLogger(__file__)
+
+
+with open('config.yaml', 'r') as f:
+    config = yaml.load(f)
+iso_path = config['data']
+GLOVE_6B_50D_PATH = config['glove_small']
+GLOVE_840B_300D_PATH = config['glove_big']
+model_path = config['model_path']
+stats = config['stats']
+
+ready = [os.path.exists(p) for p in [iso_path, GLOVE_6B_50D_PATH, GLOVE_840B_300D_PATH, model_path, stats]]
+encoding = "utf-8"
+if all(ready):
+    logger.info("All paths exist. Cleaning data set...")
+else:
+    logger.error("* A config path wasn't found... Check your config.yaml settings. Exiting. *")
+    sys.exit(0)
+
+df = pd.read_json(iso_path)
+X, y = processes.transform(df)
+
+logger.info("Total examples %s" % len(y))
+
+with open(GLOVE_6B_50D_PATH, "rb") as lines:
+    wvec = {line.split()[0].decode(encoding): np.array(line.split()[1:], dtype=np.float32)
+            for line in lines}
+
+glove_small = {}
+glove_big = {}
+
+processes.glove_training(GLOVE_840B_300D_PATH, X)
+processes.glove_training(GLOVE_6B_50D_PATH, X)
+# Train word2vec
+model = Word2Vec(X, size=100, window=5, min_count=5, workers=2)
+w2v = {w: vec for w, vec in zip(model.wv.index2word, model.wv.syn0)}
 
 """ The bayes_mult_nb pipeline is a count vectorizer using TF along with a multinomial bayesian model. """
 bayes_mult_nb = Pipeline([
@@ -123,40 +159,6 @@ all_models = [
 
 ]
 
-with open('config.yaml', 'r') as f:
-    config = yaml.load(f)
-iso_path = config['data']
-GLOVE_6B_50D_PATH = config['glove_small']
-GLOVE_840B_300D_PATH = config['glove_big']
-model_path = config['model_path']
-stats = config['stats']
-
-ready = [os.path.exists(p) for p in [iso_path, GLOVE_6B_50D_PATH, GLOVE_840B_300D_PATH, model_path, stats]]
-encoding = "utf-8"
-if all(ready):
-    logger.info("All paths exist. Cleaning data set...")
-else:
-    logger.error("* A config path wasn't found... Check your config.yaml settings. Exiting. *")
-    sys.exit(0)
-
-df = open(iso_path)
-X, y = processes.transform(df)
-
-logger.info("Total examples %s" % len(y))
-
-with open(GLOVE_6B_50D_PATH, "rb") as lines:
-    wvec = {line.split()[0].decode(encoding): np.array(line.split()[1:], dtype=np.float32)
-            for line in lines}
-
-glove_small = {}
-glove_big = {}
-
-processes.glove_training(GLOVE_840B_300D_PATH, X)
-processes.glove_training(GLOVE_6B_50D_PATH, X)
-# Train word2vec
-model = Word2Vec(X, size=100, window=5, min_count=5, workers=2)
-w2v = {w: vec for w, vec in zip(model.wv.index2word, model.wv.syn0)}
-
 unsorted_scores = [(name, cross_val_score(model, X, y, cv=5).mean()) for name, model in all_models]
 scores = sorted(unsorted_scores, key=lambda x: -x[1])
 logger.debug(tabulate(scores, floatfmt=".4f", headers=("model", 'score')))
@@ -178,5 +180,6 @@ for name, model in all_models:
         print(("Saving model...%s") % (name))
         filename = '%s/%s_%d.sav' % (model_path, name, n)
         pickle.dump(model, open(filename, 'wb'))
-
+df = pd.DataFrame(table)
+df.to_pickle("%s/stats.pkl" % (stats))
 logger.debug("Training Complete.")

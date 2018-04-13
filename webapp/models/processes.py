@@ -24,12 +24,12 @@ def transform(df):
     for item in df.itertuples():
         """This is where you customize your tokenizer and seprate labels and text,
         defining your Xs and Ys"""
-        if "foreword" == item.sections[0].split()[0].lower():
-            item.sections = item.sections[1:]
-        if not item.ics or not item.sections or len(' '.join(item.sections)) < 10:
+        if item.sections and "foreword" == item.sections[0].split()[0].lower():
+            section = item.sections[1:]
+        if not item.ics or not section or len(' '.join(section)) < 10:
             continue
         # TODO: Make these parameters for input
-        text = item.title + ' ' + ' '.join(item.sections)
+        text = item.title + ' ' + ' '.join(section)
         words = word_tokenize(text)
         text_no_stop_words_punct = [t for t in words if t not in stop and t not in string.punctuation]
         wordList = []

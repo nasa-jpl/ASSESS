@@ -1,5 +1,5 @@
-data: '../../iso_flat.json'
-glove_small: 'glove.6B.50d.txt'
-glove_big: 'glove.840B.300d.txt'
-model_path: ./trained_models/
-stats: ./trained_models/stats.pkl
+data: '/Users/vishall/prog/ASSESS/iso_flat.json'
+glove_small: '/Users/vishall/prog/extras/delete/glove.6B.50d.txt'
+glove_big: '/Users/vishall/prog/extras/delete/glove.840B.300d.txt'
+model_path: trained_models/
+stats: trained_models/
