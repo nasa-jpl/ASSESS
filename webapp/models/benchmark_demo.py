@@ -14,7 +14,8 @@ from vectorizers import MeanEmbedVectorizer, TfidfEmbedVectorizer
 import processes
 import yaml
 import logging
-import os, sys
+import os
+import sys
 try:
     from nltk.corpus import stopwords
 except ImportError:
@@ -56,88 +57,76 @@ w2v_model = Word2Vec(X, size=100, window=5, min_count=5, workers=2)
 w2v = {w: vec for w, vec in zip(w2v_model.wv.index2word, w2v_model.wv.syn0)}
 
 """The bayes_mult_nb pipeline uses a count vectorizer with TF along with a multinomial bayesian model. """
-mult_nb  = Pipeline([
-                        ("count_vectorizer",
-                        CountVectorizer(analyzer=lambda x: x)),
+mult_nb = Pipeline([
+                        ("count_vectorizer", CountVectorizer(analyzer=lambda x: x)),
                         ("multinomial nb", MultinomialNB())
                 ])
 
 """The bayes_bern_nb pipeline is a count vectorizer with TF along with a bernoulli bayesian model """
 bern_nb = Pipeline([
-                        ("count_vectorizer",
-                        CountVectorizer(analyzer=lambda x: x)),
+                        ("count_vectorizer", CountVectorizer(analyzer=lambda x: x)),
                         ("bernoulli nb", BernoulliNB())
                 ])
 
 """The bayes_mult_nb_tfidf pipeline is using TF-IDF along with a a multinomial bayesian model. """
 mult_nb_tfidf = Pipeline([
-                            ("tfidf_vectorizer",
-                            TfidfVectorizer(analyzer=lambda x: x)),
+                            ("tfidf_vectorizer", TfidfVectorizer(analyzer=lambda x: x)),
                             ("multinomial nb", MultinomialNB())
      ])
 
 """The bayes_bern_nb_tfidf pipeline is using TF-IDF along with a bernoulli bayesian model. """
-bern_nb_tfidf= Pipeline([
-                            ("tfidf_vectorizer",
-                            TfidfVectorizer(analyzer=lambda x: x)),
+bern_nb_tfidf = Pipeline([
+                            ("tfidf_vectorizer", TfidfVectorizer(analyzer=lambda x: x)),
                             ("bernoulli nb", BernoulliNB())
                     ])
 
 """The svc pipeline is a count vectorizer along with a linear support vector classifier. """
 svc = Pipeline([
-                    ("count_vectorizer",
-                    CountVectorizer(analyzer=lambda x: x)),
+                    ("count_vectorizer", CountVectorizer(analyzer=lambda x: x)),
                     ("linear svc", SVC(kernel="linear"))
         ])
 
 """The svc_tfidf pipeline is a TF-IDF vectorizer along with a linear support vector classifier. """
 svc_tfidf = Pipeline([
-                        ("tfidf_vectorizer",
-                        TfidfVectorizer(analyzer=lambda x: x)),
+                        ("tfidf_vectorizer", TfidfVectorizer(analyzer=lambda x: x)),
                         ("linear svc", SVC(kernel="linear"))
             ])
 
 """The glove_small pipeline uses the glove vectorization on a 60D textfile. """
 etree_glove_small = Pipeline([
-                                ("glove vectorizer",
-                                MeanEmbedVectorizer(glove_small)),
+                                ("glove vectorizer", MeanEmbedVectorizer(glove_small)),
                                 ("extra trees", ExtraTreesClassifier(n_estimators=200))
             ])
 
 """The glove_small_tfidf pipeline uses the glove vectorization on a 50D textfile. """
 etree_glove_small_tfidf = Pipeline([
-                                        ("glove vectorizer",
-                                        TfidfEmbedVectorizer(glove_small)),
+                                        ("glove vectorizer", TfidfEmbedVectorizer(glove_small)),
                                         ("extra trees", ExtraTreesClassifier(n_estimators=200))
                         ])
 
 """The glove_big pipeline uses the glove vectorization and a 300D textfile. """
 etree_glove_big = Pipeline([
-                                ("glove vectorizer",
-                                MeanEmbedVectorizer(glove_big)),
+                                ("glove vectorizer", MeanEmbedVectorizer(glove_big)),
                                 ("extra trees", ExtraTreesClassifier(n_estimators=200))
                 ])
 
 """he glove_big_tfidf pipeline uses the glove vectorization and a 300D textfile. """
 etree_glove_big_tfidf = Pipeline([
-                                    ("glove vectorizer",
-                                    TfidfEmbedVectorizer(glove_big)),
+                                    ("glove vectorizer", TfidfEmbedVectorizer(glove_big)),
                                     ("extra trees", ExtraTreesClassifier(n_estimators=200))
                         ])
 
 """The etc_w2v pipeline uses mean embedding on a w2v classifier and a RFDT Classifier. """
 etree_w2v = Pipeline([
-                        ("word2vec vectorizer",
-                         MeanEmbedVectorizer(w2v)),
+                        ("word2vec vectorizer", MeanEmbedVectorizer(w2v)),
                         ("extra trees", ExtraTreesClassifier(n_estimators=200))
         ])
 
 """The w2v_tfidf pipeline uses TF-IDF with W2V and a RFDT Classifier, """
 etree_w2v_tfidf = Pipeline([
-                        ("word2vec vectorizer",
-                        TfidfEmbedVectorizer(w2v)),
+                        ("word2vec vectorizer", TfidfEmbedVectorizer(w2v)),
                         ("extra trees", ExtraTreesClassifier(n_estimators=200))
-            ])
+                ])
 
 all_models = [
     ("bayes_mult_nb", mult_nb),

@@ -8,7 +8,8 @@ import pandas as pd
 import pylab
 from sklearn.cross_validation import StratifiedShuffleSplit
 from sklearn.metrics import accuracy_score
-import itertools, collections
+import itertools
+import collections
 
 
 def transform(df):
@@ -96,9 +97,9 @@ def plot(df):
                                                              "glove_small_tfidf",
                                                              "glove_big",
                                                              "glove_big_tfidf",
-                                                            ]
+                                                        ]
                                             )
-                            ]
+                                ]
                         )
     sns.set_context("notebook", font_scale=1.5)
     fig.set(ylabel="accuracy")
