@@ -45,10 +45,9 @@ else:
 """Store the data and perform the appropriate transformations, cleaning, and tokenizing. """
 df = pd.read_json(iso_path)
 X, y = processes.transform(df)
-
 logger.info("Total examples %d" % len(y))
 
-"""After, load the word2vec and gloe vectorizers. """
+"""After, load the word2vec and glove vectorizers. """
 with open(GLOVE_6B_50D_PATH, "rb") as lines:
     wvec = {line.split()[0].decode(encoding): np.array(line.split()[1:], dtype=np.float32)
             for line in lines}
@@ -156,13 +155,12 @@ all_models = [
     ("glove_small_tfidf", glove_small_tfidf),
     ("glove_big", glove_big),
     ("glove_big_tfidf", glove_big_tfidf),
-
 ]
 
 unsorted_scores = [(name, cross_val_score(model, X, y, cv=5).mean()) for name, model in all_models]
 scores = sorted(unsorted_scores, key=lambda x: -x[1])
 logger.debug(tabulate(scores, floatfmt=".4f", headers=("model", 'score')))
-train_sizes = [800, 1600, 3200, 6400, 9200, 13200]  # Training sizes
+train_sizes = [800, 1600, 3200, 6400, 9200, 13200]
 table = []
 
 for name, model in all_models:
