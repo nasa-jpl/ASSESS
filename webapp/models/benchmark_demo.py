@@ -9,6 +9,12 @@ from sklearn.naive_bayes import BernoulliNB, MultinomialNB
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
 from sklearn.cross_validation import cross_val_score
+import dill as pickle
+from vectorizers import MeanEmbedVectorizer, TfidfEmbedVectorizer
+import processes
+import yaml
+import logging
+import os, sys
 try:
     from nltk.corpus import stopwords
 except ImportError:
@@ -16,13 +22,6 @@ except ImportError:
     print("Downloading missing nltk resources.")
     nltk.download('stopwords')
     nltk.download('punkt')
-import dill as pickle
-from vectorizers import MeanEmbedVectorizer, TfidfEmbedVectorizer
-import processes
-import yaml
-import logging
-import os, sys
-
 
 logger = logging.getLogger(__file__)
 

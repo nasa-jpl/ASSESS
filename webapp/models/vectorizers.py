@@ -1,11 +1,12 @@
 import numpy as np
-
+from sklearn.feature_extraction.text import TfidfVectorizer
+from collections import defaultdict
 
 class MeanEmbedVectorizer(object):
     def __init__(self, word2vec):
         self.word2vec = word2vec
         if len(word2vec) > 0:
-            self.dim = len(word2vec[next(iter(glove_small))])
+            self.dim = len(word2vec[next(iter(word2vec))])
         else:
             self.dim = 0
 
@@ -25,7 +26,7 @@ class TfidfEmbedVectorizer(object):
         self.word2vec = word2vec
         self.word2weight = None
         if len(word2vec) > 0:
-            self.dim = len(word2vec[next(iter(glove_small))])
+            self.dim = len(word2vec[next(iter(word2vec))])
         else:
             self.dim = 0
 
