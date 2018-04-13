@@ -1,40 +1,22 @@
-import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd
 import numpy as np
-from nltk.tokenize import sent_tokenize
-from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 import string
 import dill as pickle
-from sklearn import datasets
+import processes
 
 
 # Vectorize input
-stop = set(stopwords.words('english'))
-all_stops = stop | set(string.punctuation)
-encoding="utf-8"
 X, y = [], []
-
-# Specify input
 text = """
 The program is establishing a federated enterprise information sharing architecture for data sharing and decision support tools for cross‐organizational collaboration that is cost effective and adaptable for current and future technologies. As shown in the figure below, the program is focused on technologies with a nexus to the land domain which are interoperable with other data sources and decision support tools.
-
 The core technology is being leveraged from an S&T coastal situational awareness project, reducing the lifecycle cost and risk while also enabling information sharing across border domains (i.e. land, coastal).
-
 The program is pursuing a mix of government‐of‐the‐shelf (GOTS) and Homeland Security Industrial Base decision support tools as a risk pooling strategy that manages cost and ensures some capability is delivered while also making some investments in innovative, higher risk technologies.
-
 """
-words = word_tokenize(text)
-text_no_stop_words_punct = [t for t in words if t not in stop and t not in string.punctuation]
-wordList = []
-for word in text_no_stop_words_punct:
-    wordList.append(word)
-X.append(wordList)
+tokens = processes.tokenizer(text)
+X.append(tokens)
 X, y = np.array(X), np.array(y)
 print(X)
 
-# List of models
 model_names = [
     "bayes_mult_nb",
     "bayes_mult_nb_tfidf",

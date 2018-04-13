@@ -21,7 +21,6 @@ def transform(df):
     df.ics = df.ics.transform(lambda x: tuple(x))
     # If ics members are less than 10, remove them
     df = df.groupby('ics').filter(lambda x: len(x) > 10)
-    stop = set(stopwords.words('english'))
     for item in df.itertuples():
         """This is where you customize your tokenizer and seprate labels and text,
         defining your Xs and Ys"""
@@ -30,19 +29,24 @@ def transform(df):
         if not item.ics or not section or len(' '.join(section)) < 10:
             continue
         text = item.title + ' ' + ' '.join(section)
-        words = word_tokenize(text)
-        text_no_stop_words_punct = [t for t in words if t not in stop and t not in string.punctuation]
-        wordList = []
-        for word in text_no_stop_words_punct:
-            wordList.append(word)
+        tokens = tokenizer(text)
         for label in item.ics:
-            X.append(wordList)
+            X.append(tokens)
             y.append(label)
-            print(wordList)
+            print(tokens)
             print("========================")
             print(label)
     return (np.array(X), np.array(y))
 
+def tokenizer(text):
+    """Tokenize words"""
+    stop = set(stopwords.words('english'))
+    words = word_tokenize(text)
+    text_no_stop_words_punct = [t for t in words if t not in stop and t not in string.punctuation]
+    wordList = []
+    for word in text_no_stop_words_punct:
+        wordList.append(word)
+    return wordList
 
 def benchmark(model, X, y, n):
     """
