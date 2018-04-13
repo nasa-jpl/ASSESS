@@ -10,6 +10,7 @@ from sklearn.cross_validation import StratifiedShuffleSplit
 from sklearn.metrics import accuracy_score
 import itertools, collections
 
+
 def transform(df):
     """
     Filter dataframe before iterating through each datapoint
@@ -51,6 +52,26 @@ def check_distribution():
     counter = collections.Counter(itertools.chain(*list(df["field"])))
     return counter
 
+def get_field(row):
+    field = []
+    for ics in row:
+        field.append(ics.split(".")[0])
+    return field
+
+def get_group(row):
+    group = []
+    for ics in row:
+        group.append(ics.split(".")[1])
+    return group
+
+def get_subgroup(row):
+    subgroup = []
+    for ics in row:
+        try:
+            subgroup.append(ics.split(".")[2])
+            return subgroup
+        except IndexError:
+            return None
 
 def benchmark(model, X, y, n):
     """
