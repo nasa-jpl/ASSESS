@@ -35,7 +35,7 @@ def transform(df):
         wordList = []
         for word in text_no_stop_words_punct:
             wordList.append(word)
-        for i in len(item.ics):
+        for i in item.ics:
             field = item.ics[i].split('.')[0:3]
             label = ".".join(field)
             X.append(wordList)
