@@ -47,17 +47,14 @@ df = pd.read_json(iso_path)
 X, y = processes.transform(df)
 logger.info("Total examples %d" % len(y))
 
-"""After, load the word2vec and glove vectorizers. """
+"""Load the word2vec and glove vectorizers. """
 with open(GLOVE_6B_50D_PATH, "rb") as lines:
     wvec = {line.split()[0].decode(encoding): np.array(line.split()[1:], dtype=np.float32)
             for line in lines}
-
-
 glove_small = processes.glove_training(GLOVE_6B_50D_PATH, X)
 glove_big = processes.glove_training(GLOVE_840B_300D_PATH, X)
-model = Word2Vec(X, size=100, window=5, min_count=5, workers=2)
-w2v = {w: vec for w, vec in zip(model.wv.index2word, model.wv.syn0)}
-
+w2v_model = Word2Vec(X, size=100, window=5, min_count=5, workers=2)
+w2v = {w: vec for w, vec in zip(w2v_model.wv.index2word, w2v_model.wv.syn0)}
 
 """The bayes_mult_nb pipeline uses a count vectorizer with TF along with a multinomial bayesian model. """
 bayes_mult_nb = Pipeline([
