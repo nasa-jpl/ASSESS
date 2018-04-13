@@ -8,7 +8,7 @@ import pandas as pd
 import pylab
 from sklearn.cross_validation import StratifiedShuffleSplit
 from sklearn.metrics import accuracy_score
-
+import itertools, collections
 
 def transform(df):
     """
@@ -46,6 +46,11 @@ def transform(df):
         print(field)
         print("* END *")
     return (np.array(X), np.array(y))
+
+def check_distribution():
+    counter = collections.Counter(itertools.chain(*list(df["field"])))
+    return counter
+
 
 def benchmark(model, X, y, n):
     """

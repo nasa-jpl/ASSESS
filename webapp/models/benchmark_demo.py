@@ -26,7 +26,7 @@ import os, sys
 
 logger = logging.getLogger(__file__)
 
-
+"""Load the configuration variables, returning an error if the incorrect path is found. """
 with open('config.yaml', 'r') as f:
     config = yaml.load(f)
 iso_path = config['data']
@@ -34,32 +34,32 @@ GLOVE_6B_50D_PATH = config['glove_small']
 GLOVE_840B_300D_PATH = config['glove_big']
 model_path = config['model_path']
 stats = config['stats']
-
 ready = [os.path.exists(p) for p in [iso_path, GLOVE_6B_50D_PATH, GLOVE_840B_300D_PATH, model_path, stats]]
 encoding = "utf-8"
 if all(ready):
     logger.info("All paths exist. Cleaning data set...")
 else:
-    logger.error("* A config path wasn't found... Check your config.yaml settings. Exiting. *")
+    logger.error("A config path wasn't found... Check your config.yaml settings. Exiting.")
     sys.exit(0)
 
+"""Store the data and perform the appropiate transformations, cleaning, tokenization. """
 df = pd.read_json(iso_path)
 X, y = processes.transform(df)
 
-logger.info("Total examples %s" % len(y))
+logger.info("Total examples %d" % len(y))
 
+"""After, load the word2vec and gloe vectorizers. """
 with open(GLOVE_6B_50D_PATH, "rb") as lines:
     wvec = {line.split()[0].decode(encoding): np.array(line.split()[1:], dtype=np.float32)
             for line in lines}
 
 glove_small = {}
 glove_big = {}
-
 processes.glove_training(GLOVE_840B_300D_PATH, X)
 processes.glove_training(GLOVE_6B_50D_PATH, X)
-# Train word2vec
 model = Word2Vec(X, size=100, window=5, min_count=5, workers=2)
 w2v = {w: vec for w, vec in zip(model.wv.index2word, model.wv.syn0)}
+
 
 """ The bayes_mult_nb pipeline is a count vectorizer using TF along with a multinomial bayesian model. """
 bayes_mult_nb = Pipeline([
@@ -102,41 +102,41 @@ svc_tfidf = Pipeline([
                         TfidfVectorizer(analyzer=lambda x: x)),
                         ("linear svc", SVC(kernel="linear"))
             ])
-""" The glove_small pipeline uses the GLOVE vectorization on a 60D textfile. """
+""" The glove_small pipeline uses the glove vectorization on a 60D textfile. """
 glove_small = Pipeline([
                             ("glove vectorizer",
                             MeanEmbedVectorizer(glove_small)),
                             ("extra trees", ExtraTreesClassifier(n_estimators=200))
             ])
 
-""" The glove_small_tfidf pipeline uses the GLOVE vectorization on a 60D textfile. """
+""" The glove_small_tfidf pipeline uses the glove vectorization on a 50D textfile. """
 glove_small_tfidf = Pipeline([
                                 ("glove vectorizer",
                                 TfidfEmbedVectorizer(glove_small)),
                                 ("extra trees", ExtraTreesClassifier(n_estimators=200))
                     ])
 
-""" The glove_big pipeline uses the GLOVE vectorization on a 180D textfile. """
+""" The glove_big pipeline uses the glove vectorization and a 300D textfile. """
 glove_big = Pipeline([
                         ("glove vectorizer",
                         MeanEmbedVectorizer(glove_big)),
                         ("extra trees", ExtraTreesClassifier(n_estimators=200))
             ])
-""" The glove_big_tfidf pipeline uses the GLOVE vectorization on a 180D textfile. """
+""" The glove_big_tfidf pipeline uses the glove vectorization and a 300D textfile. """
 glove_big_tfidf = Pipeline([
                             ("glove vectorizer",
                             TfidfEmbedVectorizer(glove_big)),
                             ("extra trees", ExtraTreesClassifier(n_estimators=200))
                 ])
 
-""" The etc_w2v pipeline uses... """
+""" The etc_w2v pipeline uses mean embedding on a w2v classifier and a RFDT Classifier. """
 etc_w2v = Pipeline([
                     ("word2vec vectorizer",
                      MeanEmbedVectorizer(w2v)),
                     ("extra trees", ExtraTreesClassifier(n_estimators=200))
         ])
 
-""" The w2v_tfidf pipeline uses... """
+""" The w2v_tfidf pipeline uses TF-IDF with W2V and a RFDT Classifier"""
 w2v_tfidf = Pipeline([
                         ("word2vec vectorizer",
                         TfidfEmbedVectorizer(w2v)),
@@ -162,12 +162,7 @@ all_models = [
 unsorted_scores = [(name, cross_val_score(model, X, y, cv=5).mean()) for name, model in all_models]
 scores = sorted(unsorted_scores, key=lambda x: -x[1])
 logger.debug(tabulate(scores, floatfmt=".4f", headers=("model", 'score')))
-# Show preliminary data
-#plt.figure(figsize=(15, 6))
-#sns.barplot(x=[name for name, _ in scores], y=[score for _, score in scores])
-#pylab.show()
 train_sizes = [800, 1600, 3200, 6400, 9200, 13200]  # Training sizes
-
 table = []
 
 for name, model in all_models:
@@ -180,6 +175,7 @@ for name, model in all_models:
         print(("Saving model...%s") % (name))
         filename = '%s/%s_%d.sav' % (model_path, name, n)
         pickle.dump(model, open(filename, 'wb'))
+
 df = pd.DataFrame(table)
 df.to_pickle("%s/stats.pkl" % (stats))
 logger.debug("Training Complete.")
