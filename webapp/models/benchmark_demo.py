@@ -160,12 +160,12 @@ w2v = {w: vec for w, vec in zip(model.wv.index2word, model.wv.syn0)}
 unsorted_scores = [(name, cross_val_score(model, X, y, cv=5).mean()) for name, model in all_models]
 scores = sorted(unsorted_scores, key=lambda x: -x[1])
 logger.debug(tabulate(scores, floatfmt=".4f", headers=("model", 'score')))
-# *Show preliminary data
+# Show preliminary data
 #plt.figure(figsize=(15, 6))
 #sns.barplot(x=[name for name, _ in scores], y=[score for _, score in scores])
 #pylab.show()
-# Training sizes- make sure they're scaled to the data
-train_sizes = [800, 1600, 3200, 6400, 9200, 13200]
+train_sizes = [800, 1600, 3200, 6400, 9200, 13200]  # Training sizes
+
 table = []
 
 for name, model in all_models:
