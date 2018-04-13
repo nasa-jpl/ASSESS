@@ -52,10 +52,9 @@ with open(GLOVE_6B_50D_PATH, "rb") as lines:
     wvec = {line.split()[0].decode(encoding): np.array(line.split()[1:], dtype=np.float32)
             for line in lines}
 
-glove_small = {}
-glove_big = {}
-processes.glove_training(GLOVE_840B_300D_PATH, X)
-processes.glove_training(GLOVE_6B_50D_PATH, X)
+
+glove_small = processes.glove_training(GLOVE_6B_50D_PATH, X)
+glove_big = processes.glove_training(GLOVE_840B_300D_PATH, X)
 model = Word2Vec(X, size=100, window=5, min_count=5, workers=2)
 w2v = {w: vec for w, vec in zip(model.wv.index2word, model.wv.syn0)}
 
