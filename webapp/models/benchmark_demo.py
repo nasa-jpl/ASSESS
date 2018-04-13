@@ -57,30 +57,30 @@ w2v = {w: vec for w, vec in zip(w2v_model.wv.index2word, w2v_model.wv.syn0)}
 
 """The bayes_mult_nb pipeline uses a count vectorizer with TF along with a multinomial bayesian model. """
 mult_nb  = Pipeline([
-                            ("count_vectorizer",
-                            CountVectorizer(analyzer=lambda x: x)),
-                            ("multinomial nb", MultinomialNB())
+                        ("count_vectorizer",
+                        CountVectorizer(analyzer=lambda x: x)),
+                        ("multinomial nb", MultinomialNB())
                 ])
 
 """The bayes_bern_nb pipeline is a count vectorizer with TF along with a bernoulli bayesian model """
 bern_nb = Pipeline([
-                            ("count_vectorizer",
-                            CountVectorizer(analyzer=lambda x: x)),
-                            ("bernoulli nb", BernoulliNB())
+                        ("count_vectorizer",
+                        CountVectorizer(analyzer=lambda x: x)),
+                        ("bernoulli nb", BernoulliNB())
                 ])
 
 """The bayes_mult_nb_tfidf pipeline is using TF-IDF along with a a multinomial bayesian model. """
 mult_nb_tfidf = Pipeline([
-                                ("tfidf_vectorizer",
-                                TfidfVectorizer(analyzer=lambda x: x)),
-                                ("multinomial nb", MultinomialNB())
+                            ("tfidf_vectorizer",
+                            TfidfVectorizer(analyzer=lambda x: x)),
+                            ("multinomial nb", MultinomialNB())
      ])
 
 """The bayes_bern_nb_tfidf pipeline is using TF-IDF along with a bernoulli bayesian model. """
 bern_nb_tfidf= Pipeline([
-                                    ("tfidf_vectorizer",
-                                    TfidfVectorizer(analyzer=lambda x: x)),
-                                    ("bernoulli nb", BernoulliNB())
+                            ("tfidf_vectorizer",
+                            TfidfVectorizer(analyzer=lambda x: x)),
+                            ("bernoulli nb", BernoulliNB())
                     ])
 
 """The svc pipeline is a count vectorizer along with a linear support vector classifier. """
@@ -96,38 +96,40 @@ svc_tfidf = Pipeline([
                         TfidfVectorizer(analyzer=lambda x: x)),
                         ("linear svc", SVC(kernel="linear"))
             ])
+
 """The glove_small pipeline uses the glove vectorization on a 60D textfile. """
 etree_glove_small = Pipeline([
-                            ("glove vectorizer",
-                            MeanEmbedVectorizer(glove_small)),
-                            ("extra trees", ExtraTreesClassifier(n_estimators=200))
+                                ("glove vectorizer",
+                                MeanEmbedVectorizer(glove_small)),
+                                ("extra trees", ExtraTreesClassifier(n_estimators=200))
             ])
 
 """The glove_small_tfidf pipeline uses the glove vectorization on a 50D textfile. """
 etree_glove_small_tfidf = Pipeline([
-                                ("glove vectorizer",
-                                TfidfEmbedVectorizer(glove_small)),
-                                ("extra trees", ExtraTreesClassifier(n_estimators=200))
-                    ])
+                                        ("glove vectorizer",
+                                        TfidfEmbedVectorizer(glove_small)),
+                                        ("extra trees", ExtraTreesClassifier(n_estimators=200))
+                        ])
 
 """The glove_big pipeline uses the glove vectorization and a 300D textfile. """
 etree_glove_big = Pipeline([
-                        ("glove vectorizer",
-                        MeanEmbedVectorizer(glove_big)),
-                        ("extra trees", ExtraTreesClassifier(n_estimators=200))
-            ])
+                                ("glove vectorizer",
+                                MeanEmbedVectorizer(glove_big)),
+                                ("extra trees", ExtraTreesClassifier(n_estimators=200))
+                ])
+
 """he glove_big_tfidf pipeline uses the glove vectorization and a 300D textfile. """
 etree_glove_big_tfidf = Pipeline([
-                            ("glove vectorizer",
-                            TfidfEmbedVectorizer(glove_big)),
-                            ("extra trees", ExtraTreesClassifier(n_estimators=200))
-                ])
+                                    ("glove vectorizer",
+                                    TfidfEmbedVectorizer(glove_big)),
+                                    ("extra trees", ExtraTreesClassifier(n_estimators=200))
+                        ])
 
 """The etc_w2v pipeline uses mean embedding on a w2v classifier and a RFDT Classifier. """
 etree_w2v = Pipeline([
-                    ("word2vec vectorizer",
-                     MeanEmbedVectorizer(w2v)),
-                    ("extra trees", ExtraTreesClassifier(n_estimators=200))
+                        ("word2vec vectorizer",
+                         MeanEmbedVectorizer(w2v)),
+                        ("extra trees", ExtraTreesClassifier(n_estimators=200))
         ])
 
 """The w2v_tfidf pipeline uses TF-IDF with W2V and a RFDT Classifier, """
@@ -138,18 +140,18 @@ etree_w2v_tfidf = Pipeline([
             ])
 
 all_models = [
-    ("bayes_mult_nb", bayes_mult_nb),
-    ("bayes_mult_nb_tfidf", bayes_mult_nb_tfidf),
-    ("bayes_bern_nb", bayes_bern_nb),
-    ("bayes_bern_nb_tfidf", bayes_bern_nb_tfidf),
+    ("bayes_mult_nb", mult_nb),
+    ("bayes_mult_nb_tfidf", mult_nb_tfidf),
+    ("bayes_bern_nb", bern_nb),
+    ("bayes_bern_nb_tfidf", bern_nb_tfidf),
     ("svc", svc),
     ("svc_tfidf", svc_tfidf),
-    ("w2v", etc_w2v),
-    ("w2v_tfidf", w2v_tfidf),
-    ("glove_small", glove_small),
-    ("glove_small_tfidf", glove_small_tfidf),
-    ("glove_big", glove_big),
-    ("glove_big_tfidf", glove_big_tfidf),
+    ("w2v", etree_w2v),
+    ("w2v_tfidf", etree_w2v_tfidf),
+    ("glove_small", etree_glove_small),
+    ("glove_small_tfidf", etree_glove_small_tfidf),
+    ("glove_big", etree_glove_big),
+    ("glove_big_tfidf", etree_glove_big_tfidf),
 ]
 
 unsorted_scores = [(name, cross_val_score(model, X, y, cv=5).mean()) for name, model in all_models]
