@@ -13,13 +13,12 @@ import itertools, collections
 
 def transform(df):
     """
-    Filter dataframe before iterating through each datapoint
+    Clean, append, and tokenize data to final set.
     """
     X, y = [], []
     # Convert to tuples in order to use the groupby function.
     df.ics = df.ics.transform(lambda x: tuple(x))
-    # If the ICS members are less than 10, remove them
-    # TODO: train each X on every ICS code in the list.
+    # If ics members are less than 10, remove them
     df = df.groupby('ics').filter(lambda x: len(x) > 10)
     stop = set(stopwords.words('english'))
     for item in df.itertuples():
@@ -38,41 +37,15 @@ def transform(df):
         for label in item.ics:
             X.append(wordList)
             y.append(label)
-            print("* START: *")
             print(wordList)
             print("========================")
             print(label)
-            print("* END *")
     return (np.array(X), np.array(y))
 
-def check_distribution():
-    counter = collections.Counter(itertools.chain(*list(df["field"])))
-    return counter
-
-def get_field(row):
-    field = []
-    for ics in row:
-        field.append(ics.split(".")[0])
-    return field
-
-def get_group(row):
-    group = []
-    for ics in row:
-        group.append(ics.split(".")[1])
-    return group
-
-def get_subgroup(row):
-    subgroup = []
-    for ics in row:
-        try:
-            subgroup.append(ics.split(".")[2])
-            return subgroup
-        except IndexError:
-            return None
 
 def benchmark(model, X, y, n):
     """
-    Divide into training and test data sets, train, then evaluate the score.
+    Divide into training and test sets, train, then evaluate the score.
     """
     test_size = 1 - (n / float(len(y)))
     scores = []
@@ -82,6 +55,7 @@ def benchmark(model, X, y, n):
         y_train, y_test = y[train], y[test]
         scores.append(accuracy_score(model.fit(X_train, y_train).predict(X_test), y_test))
     return np.mean(scores)
+
 
 def glove_training(path, X, encoding="utf-8"):
     all_words = set(w for words in X for w in words)
@@ -93,15 +67,23 @@ def glove_training(path, X, encoding="utf-8"):
                 nums = np.array(parts[1:], dtype=np.float32)
                 path[word] = nums
 
+
+def get_samples(df):
+    counter = collections.Counter(itertools.chain(*list(df["field"])))
+    return counter
+
+
 def plot(df):
-    """Graph results from the pickled scores"""
+    """
+    Graph results from the pickled scores.
+    """
     print("Graphing results...")
     df = pd.read_pickle()
     df.to_pickle(df)
     plt.figure(figsize=(15, 6))
     fig = sns.pointplot(x='train_size', y='accuracy', hue='model',
                         data=df[df.model.map(lambda x: x in [
-                                                            "bayes_mult_nb",
+                                                             "bayes_mult_nb",
                                                              "bayes_mult_nb_tfidf",
                                                              "bayes_bern_nb",
                                                              "bayes_bern_nb_tfidf",
