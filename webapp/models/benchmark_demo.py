@@ -136,7 +136,7 @@ etc_w2v = Pipeline([
                     ("extra trees", ExtraTreesClassifier(n_estimators=200))
         ])
 
-""" The w2v_tfidf pipeline uses TF-IDF with W2V and a RFDT Classifier"""
+""" The w2v_tfidf pipeline uses TF-IDF with W2V and a RFDT Classifier, """
 w2v_tfidf = Pipeline([
                         ("word2vec vectorizer",
                         TfidfEmbedVectorizer(w2v)),

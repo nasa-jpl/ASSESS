@@ -29,23 +29,22 @@ def transform(df):
             section = item.sections[1:]
         if not item.ics or not section or len(' '.join(section)) < 10:
             continue
-        # TODO: Make these parameters for input
         text = item.title + ' ' + ' '.join(section)
         words = word_tokenize(text)
         text_no_stop_words_punct = [t for t in words if t not in stop and t not in string.punctuation]
         wordList = []
         for word in text_no_stop_words_punct:
             wordList.append(word)
-        # TODO: Find multiple candidates for standards instead of just one standard.
-        field = item.ics[0].split('.')[0:3]
-        label = ".".join(field)
-        X.append(wordList)
-        y.append(label)
-        print("* START: *")
-        print(wordList)
-        print("========================")
-        print(field)
-        print("* END *")
+        for i in len(item.ics):
+            field = item.ics[i].split('.')[0:3]
+            label = ".".join(field)
+            X.append(wordList)
+            y.append(label)
+            print("* START: *")
+            print(wordList)
+            print("========================")
+            print(field)
+            print("* END *")
     return (np.array(X), np.array(y))
 
 def check_distribution():
