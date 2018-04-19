@@ -8,3 +8,6 @@ def true_function():
 
 def test_fixture_returns():
     assert true_function()
+
+def test_mock_model():
+    assert True
