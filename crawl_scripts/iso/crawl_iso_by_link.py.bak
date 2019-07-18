@@ -15,11 +15,11 @@ def quitdriver(driver):
     try:
         driver.service.process.send_signal(signal.SIGTERM)
         driver.quit()
-        print('driver quit successfully!')
+        print 'driver quit successfully!'
         return 'done'
     except:
         error = traceback.format_exc()
-        print('error quitting',error)
+        print 'error quitting',error
         return 'error: quitting the driver ' + str(error)
 
 def featchtext(url):
@@ -54,12 +54,12 @@ def fetchpage(url):
         # driver=webdriver.Chrome(executable_path='/Users/asitangm/Desktop/current/chromedriver')
         # driver.set_page_load_timeout(20)
         driver.get(url)
-        print('got page')
+        print 'got page'
         return driver
 
     except:
         error = traceback.format_exc()
-        print(error)
+        print error
         if driver!='':
             quitdriver(driver)
         return ''
@@ -76,7 +76,7 @@ for index, rows in df.iterrows():
 
     sow=rows['SoW']
     for standardurl in standards:
-        print(standardurl)
+        print standardurl
         driver=fetchpage(standardurl)
 
         if driver=='':
@@ -91,7 +91,7 @@ for index, rows in df.iterrows():
             quitdriver(driver)
 
         except:
-            print('no preview')
+            print 'no preview'
             quitdriver(driver)
             continue
 
@@ -102,7 +102,7 @@ for index, rows in df.iterrows():
                 EC.presence_of_element_located((By.XPATH, '//div[@class="v-label v-widget h2 v-label-h2 v-label-undef-w"]'))
             )
         except:
-            print(standardurl,url,'no good!')
+            print standardurl,url,'no good!'
             quitdriver(driver)
             continue
 
@@ -116,13 +116,13 @@ for index, rows in df.iterrows():
             title=ele.text
         except:
             error = traceback.format_exc()
-            print(error)
+            print error
 
         try:
             soup = BeautifulSoup(driver.page_source)
         except:
             error = traceback.format_exc()
-            print(error)
+            print error
             quitdriver(driver)
             continue
 
@@ -139,15 +139,15 @@ for index, rows in df.iterrows():
             for i in range(3):
                 if 'intro' in children[i]['id']:
                     introduction=children[i].text
-                    print('intro found')
+                    print 'intro found'
                 elif children[i]['id'][-1]=='1':
                     scope=children[i].text
-                    print('scope found')
+                    print 'scope found'
 
         except:
             error = traceback.format_exc()
-            print(error)
-            print('missing intro or scope!',standardurl,url)
+            print error
+            print 'missing intro or scope!',standardurl,url
 
         tempwrite.write(introduction.encode('utf-8'))
         tempwrite.flush()
@@ -163,7 +163,7 @@ for index, rows in df.iterrows():
 
         except:
             error = traceback.format_exc()
-            print(error)
+            print error
 
 
 

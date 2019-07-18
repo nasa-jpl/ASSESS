@@ -19,7 +19,7 @@ def quitdriver(driver):
         return 'done'
     except:
         error = traceback.format_exc()
-        print('error quitting',error)
+        print 'error quitting',error
         return 'error: quitting the driver ' + str(error)
 
 def featchtext(url):
@@ -60,7 +60,7 @@ def fetchpage(url):
 
     except:
         error = traceback.format_exc()
-        print(error)
+        print error
         if driver!='':
             quitdriver(driver)
         return ''
@@ -68,8 +68,8 @@ def fetchpage(url):
 def getFields(standardurl):
 
     fields = ['id', 'title', 'introduction', 'scope', 'scope_init']
-    fields = list(map(str, fields))
-    allinfo = dict(list(zip(fields, ['','','','',''])))
+    fields = map(unicode, fields)
+    allinfo = dict(zip(fields, ['','','','','']))
 
 
     errors=[]
@@ -152,7 +152,7 @@ def getFields(standardurl):
             allinfo['title'] = title
     except:
         error = traceback.format_exc()
-        print(error)
+        print error
 
     try:
         soup = BeautifulSoup(driver.page_source, "lxml")
@@ -196,7 +196,7 @@ def getFields(standardurl):
 df=pd.read_csv('strds.csv',index_col=0)
 
 urls=set(df['url'])
-print(len(urls))
+print len(urls)
 
 
 tempwrite=open('gt_write','w')
@@ -205,11 +205,11 @@ errorwrite=open('refetch','w')
 for i,url in enumerate(list(urls)):
     try:
         errors,fields=getFields(url)
-        print(str(i), url)
+        print str(i), url
         errorwrite.write(str(i)+' '+ url+' '+str(errors)+'\n')
         errorwrite.flush()
     except:
-        print(i, url, traceback.format_exc())
+        print i, url, traceback.format_exc()
         errorwrite.write('FATAL: '+str(i)+' '+ url+' '+traceback.format_exc()+'\n')
         errorwrite.flush()
 

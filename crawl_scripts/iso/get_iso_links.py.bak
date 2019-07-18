@@ -92,7 +92,7 @@ def get_ics(url, node_ics, node_ics_json):
             ics_table = driver.find_element_by_id(selector)
             break
         except exceptions.NoSuchElementException as ex:
-           print((ex.message))
+           print(ex.message)
 
     ics_table_id = ics_table.get_attribute("id")
 
@@ -100,7 +100,7 @@ def get_ics(url, node_ics, node_ics_json):
         links = ics_table.find_elements_by_css_selector("tbody tr")
 
         urls = {get_link_text(link): [link.find_element_by_css_selector("td[data-title='Field']").text.replace('\n', ' '), get_link_href(link)] for link in links}
-        for key, url in urls.items():
+        for key, url in urls.iteritems():
             if url[1] and (ics_table_id != "datatable-ics" or not fields or key in fields):
                 logger.info("Processing field/group/subgroup " + key)
 

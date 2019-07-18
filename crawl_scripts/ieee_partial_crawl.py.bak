@@ -17,11 +17,11 @@ def quitdriver(driver):
     try:
         driver.service.process.send_signal(signal.SIGTERM)
         driver.quit()
-        print('driver quit successfully!')
+        print 'driver quit successfully!'
         return 'done'
     except:
         error = traceback.format_exc()
-        print('error quitting',error)
+        print 'error quitting',error
         return 'error: quitting the driver ' + str(error)
 
 
@@ -32,12 +32,12 @@ def fetchpage(url):
         driver = webdriver.PhantomJS(
         executable_path=phantomjs_exec_path)
         driver.get(url)
-        print('got page')
+        print 'got page'
         return driver
 
     except:
         error = traceback.format_exc()
-        print(error)
+        print error
         if driver!='':
             quitdriver(driver)
         return ''
@@ -57,28 +57,28 @@ for index, rows in df.iterrows():
     try:
         driver=fetchpage(link)
     except:
-        print('cannot fecth site!')
+        print 'cannot fecth site!'
 
     abstract=''
     try:
         abstract=driver.find_element_by_xpath('//div[@ng-bind-html="::vm.details.abstract"]')
         abstract=abstract.text
     except:
-        print('error')
+        print 'error'
 
     scope=''
     try:
         scope = driver.find_element_by_xpath('//div[@ng-bind-html="::vm.details.scope"]')
         scope = scope.text
     except:
-        print('error')
+        print 'error'
 
     purpose=''
     try:
         purpose = driver.find_element_by_xpath('//div[@ng-bind-html="::vm.details.purpose"]')
         purpose = purpose.text
     except:
-        print('error')
+        print 'error'
 
     quitdriver(driver)
 
@@ -101,10 +101,10 @@ dff=open('ieee_new','r')
 for line in dff:
     line=line.strip()
     jsn=ast.literal_eval(line)
-    print(jsn)
+    print jsn
     df_text=df_text.append(jsn,ignore_index=True)
 
-print(df_text.shape,df.shape)
+print df_text.shape,df.shape
 df.reset_index(inplace=True, drop=True)
 df_text.reset_index(inplace=True, drop=True)
 
