@@ -31,45 +31,35 @@ public class StandardOrganizations {
 	private static Map<String, String> organizations;
 	static {
 		organizations = new TreeMap<String, String>();
-		//manually added organizations
-		organizations.put("CFR", "Code of Federal Regulations");
-		organizations.put("BIPM", "International Bureau of Weights and Measures");
-		organizations.put("CGPM", "General Conference on Weights and Measures");
-		organizations.put("CIPM", "International Committee for Weights and Measures");
-
-
 		//International standard organizations
 	    organizations.put("3GPP", "3rd Generation Partnership Project");
 	    organizations.put("3GPP2", "3rd Generation Partnership Project 2");
-	    organizations.put("ABYC", "The American Boat & Yacht Council");
 	    organizations.put("Accellera", "Accellera Organization");
-	    organizations.put("A4L", "Access for Learning Community");
+	    organizations.put("A4L", "Access for Learning Community (formerly known as the Schools Interoperability Framework)");
 	    organizations.put("AES", "Audio Engineering Society");
 	    organizations.put("AIIM", "Association for Information and Image Management");
-	    organizations.put("ASAM", "Association for Automation and Measuring Systems");
-	    organizations.put("ASHRAE", "American Society of Heating, Refrigerating and Air-Conditioning Engineers");
-	    organizations.put("ASME", "American Society of Mechanical Engineers");
-	    organizations.put("ASTM", "American Society for Testing and Materials");
+	    organizations.put("ASAM", "Association for Automation and Measuring Systems - Automotive technology");
+	    organizations.put("ASHRAE", "American Society of Heating, Refrigerating and Air-Conditioning Engineers (ASHRAE is an international organization, despite its name)");
+	    organizations.put("ASME", "formerly The American Society of Mechanical Engineers");
+	    organizations.put("ASTM", "ASTM (American Society for Testing and Materials) International");
 	    organizations.put("ATIS", "Alliance for Telecommunications Industry Solutions");
 	    organizations.put("AUTOSAR", "Automotive technology");
-	    //organizations.put("BIPM, CGPM, and CIPM", "Bureau International des Poids et Mesures and the related organizations established under the Metre Convention of 1875.");
+	    organizations.put("BIPM, CGPM, and CIPM", "Bureau International des Poids et Mesures and the related organizations established under the Metre Convention of 1875.");
 	    organizations.put("CableLabs", "Cable Television Laboratories");
 	    organizations.put("CCSDS", "Consultative Committee for Space Data Sciences");
-	    organizations.put("CIE", "International Commission on Illumination");
 	    organizations.put("CISPR", "International Special Committee on Radio Interference");
 	    organizations.put("CFA", "Compact flash association");
 	    organizations.put("DCMI", "Dublin Core Metadata Initiative");
-	    organizations.put("DDEX", "Digital Data Exchange");
 	    organizations.put("DMTF", "Distributed Management Task Force");
-	    organizations.put("ECMA", "Ecma International");
-	    organizations.put("EKOenergy", "EKOenergy");
+	    organizations.put("Ecma International", "Ecma International (previously called ECMA)");
+	    organizations.put("EKOenergy", "EKOenergy Network managed by environmental NGOs");
 	    organizations.put("FAI", "Fédération Aéronautique Internationale");
 	    organizations.put("GlobalPlatform", "Secure element and TEE standards");
-	    organizations.put("GS1", "Global supply chain standards");
+	    organizations.put("GS1", "Global supply chain standards (identification numbers, barcodes, electronic commerce transactions, RFID)");
 	    organizations.put("HGI", "Home Gateway Initiative");
 	    organizations.put("HFSB", "Hedge Fund Standards Board");
 	    organizations.put("IATA", "International Air Transport Association");
-	    organizations.put("IAU", "International Arabic Union");
+	    organizations.put("IAU*", "International Arabic Union");
 	    organizations.put("ICAO", "International Civil Aviation Organization");
 	    organizations.put("IEC", "International Electrotechnical Commission");
 	    organizations.put("IEEE", "Institute of Electrical and Electronics Engineers");
@@ -82,28 +72,28 @@ public class StandardOrganizations {
 	    organizations.put("ISO", "International Organization for Standardization");
 	    organizations.put("IPTC", "International Press Telecommunications Council");
 	    organizations.put("ITU", "The International Telecommunication Union");
-	    organizations.put("ITU-R", "ITU Radiocommunications Sector");
-	    organizations.put("CCIR", "Comité Consultatif International pour la Radio");
-	    organizations.put("ITU-T", "ITU Telecommunications Sector");
-	    organizations.put("CCITT", "Comité Consultatif International Téléphonique et Télégraphique");
-	    organizations.put("ITU-D", "ITU Telecom Development");
+	    organizations.put("ITU-R", "ITU Radiocommunications Sector (formerly known as CCIR)");
+	    organizations.put("CCIR", "Comité Consultatif International pour la Radio, a forerunner of the ITU-R");
+	    organizations.put("ITU-T", "ITU Telecommunications Sector (formerly known as CCITT)");
+	    organizations.put("CCITT", "Comité Consultatif International Téléphonique et Télégraphique, renamed ITU-T in 1993");
+	    organizations.put("ITU-D", "ITU Telecom Development (formerly known as BDT)");
 	    organizations.put("BDT", "Bureau de développement des télécommunications, renamed ITU-D");
 	    organizations.put("IUPAC", "International Union of Pure and Applied Chemistry");
 	    organizations.put("Liberty Alliance", "Liberty Alliance");
 	    organizations.put("Media Grid", "Media Grid Standards Organization");
-	    organizations.put("NACE International", "National Association of Corrosion Engineers");
+	    organizations.put("NACE International", "Formerly known as National Association of Corrosion Engineers");
 	    organizations.put("OASIS", "Organization for the Advancement of Structured Information Standards");
 	    organizations.put("OGC", "Open Geospatial Consortium");
 	    organizations.put("OHICC", "Organization of Hotel Industry Classification & Certification");
-	    organizations.put("OIF", "Optical Internetworking Forum");
 	    organizations.put("OMA", "Open Mobile Alliance");
 	    organizations.put("OMG", "Object Management Group");
-	    organizations.put("OGF", "Open Grid Forum");
+	    organizations.put("OGF", "Open Grid Forum (merger of Global Grid Forum (GGF) and Enterprise Grid Alliance (EGA))");
 	    organizations.put("GGF", "Global Grid Forum");
 	    organizations.put("EGA", "Enterprise Grid Alliance");
+	    organizations.put("OpenTravel Alliance", "OpenTravel Alliance (previously known as OTA)");
 	    organizations.put("OTA", "OpenTravel Alliance");
 	    organizations.put("OSGi", "OSGi Alliance");
-	    organizations.put("PESC", "P20 Education Standards Council");
+	    organizations.put("PESC", "P20 Education Standards Council[1]");
 	    organizations.put("SAI", "Social Accountability International");
 	    organizations.put("SDA", "Secure Digital Association");
 	    organizations.put("SNIA", "Storage Networking Industry Association");
@@ -124,7 +114,7 @@ public class StandardOrganizations {
 	    //Regional standards organizations
 	    //Africa
 	    organizations.put("ARSO", "African Regional Organization for Standarization");
-	    organizations.put("SADCSTAN", "Southern African Development Community Cooperation in Standarization");
+	    organizations.put("SADCSTAN", "Southern African Development Community (SADC) Cooperation in Standarization");
 	    //Americas
 	    organizations.put("COPANT", "Pan American Standards Commission");
 	    organizations.put("AMN", "MERCOSUR Standardization Association");
@@ -140,9 +130,7 @@ public class StandardOrganizations {
 	    organizations.put("URS", "United Registrar of Systems, UK");
 	    organizations.put("ETSI", "European Telecommunications Standards Institute");
 	    organizations.put("EASC", "Euro-Asian Council for Standardization, Metrology and Certification");
-	    organizations.put("IRMM", "Institute for Reference Materials and Measurements");
-	    organizations.put("WELMEC", "European Cooperation in Legal Metrology");
-	    organizations.put("EURAMET", "the European Association of National Metrology Institutes");
+	    organizations.put("IRMM", "Institute for Reference Materials and Measurements (European Union)");
 	    //Middle East
 	    organizations.put("AIDMO", "Arab Industrial Development and Mining Organization");
 	    organizations.put("IAU", "International Arabic Union");
@@ -151,14 +139,11 @@ public class StandardOrganizations {
 	    organizations.put("BSI", "British Standards Institution aka BSI Group");
 	    organizations.put("DStan", "UK Defence Standardization");
 	    //United States of America
-	    //organizations.put("ANSI", "American National Standards Institute");
+	    organizations.put("ANSI", "American National Standards Institute");
 	    organizations.put("ACI", "American Concrete Institute");
 	    organizations.put("NIST", "National Institute of Standards and Technology");
-	    organizations.put("Ecma\\sInternational", "TEST");
-	    organizations.put("American\\sNational\\sStandards\\sInstitute", "TEST");
-	    
-    }
-	 		
+	}
+	
 	/**
 	 * Returns the map containing the collection of the most important technical standard organizations.
 	 * 
@@ -174,7 +159,8 @@ public class StandardOrganizations {
 	 * @return the regular expression containing the most important technical standard organizations.
 	 */
 	public static String getOrganzationsRegex() {
-		String regex = "(" + String.join("|", organizations.keySet()) + ")"; //1) regex improved, 2) take care of white space w/ second fxn
+		String regex = "(" + String.join("|", organizations.keySet()) + ")";
+		
 		return regex;
 	}
 }
