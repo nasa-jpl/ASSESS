@@ -57,10 +57,10 @@ public class StandardsText {
 
 	// Regular expression to match the "APPLICABLE DOCUMENTS" and equivalent
 	// sections
-	private static final String REGEX_APPLICABLE_DOCUMENTS = "(?i:.*APPLICABLE\\sDOCUMENTS|REFERENCE|STANDARD|REQUIREMENT|GUIDELINE|COMPLIANCE.*)";
+	private static final String REGEX_APPLICABLE_DOCUMENTS = "(?i:.*APPLICABLE\\sDOCUMENTS|REFERENCE|STANDARD|REQUIREMENT|GUIDELINE|COMPLIANCE.*)"; 
 
 	// Regular expression to match the alphanumeric identifier of the standard
-	private static final String REGEX_IDENTIFIER = "(?<identifier>([0-9]{3,}|([A-Z]+(-|_|\\.)?[0-9]{2,}))((-|_|\\.)?[A-Z0-9]+)*)";
+	private static final String REGEX_IDENTIFIER = "(?<identifier>([0-9]{2,}|([A-Z]+(-|_|\\.)?[0-9]{2,}))((-|_|\\.)?[A-Z0-9]+)*)";//new line here??
 
 	// Regular expression to match the standard organization
 	private static final String REGEX_ORGANIZATION = StandardOrganizations.getOrganzationsRegex();
@@ -71,9 +71,9 @@ public class StandardsText {
 
 	// Regular expression to match a string that is supposed to be a standard
 	// reference
-	private static final String REGEX_FALLBACK = "\\(?" + "(?<mainOrganization>[A-Z]\\w+)"
-			+ "\\)?((\\s?(?<separator>\\/)\\s?)(\\w+\\s)*\\(?" + "(?<secondOrganization>[A-Z]\\w+)" + "\\)?)?"
-			+ REGEX_STANDARD_TYPE + "?" + "(-|\\s)?" + REGEX_IDENTIFIER;
+	private static final String REGEX_FALLBACK = "\\(?" + "(?<mainOrganization>(([A-Z]+\\w+\\s?){1,10}))"
+			+ "\\)?((\\s?(?<separator>\\/)\\s?)(\\w+\\s)*\\(?" + "(?<secondOrganization>[A-Z]+\\w+)" + "\\)?)?"
+			+ REGEX_STANDARD_TYPE + "?" + "(-|\\s)?" + REGEX_IDENTIFIER; //or new line here?? 
 
 	// Regular expression to match the standard organization within a string
 	// that is supposed to be a standard reference
@@ -147,9 +147,9 @@ public class StandardsText {
 							.setSecondOrganization(matcher.group("separator"), matcher.group("secondOrganization"));
 			score = 0.25;
 
-			// increases by 0.25 the score of references which include the name of a known standard organization
+			// increases by 0.5 the score of references which include the name of a known standard organization
 			if (matcher.group().matches(REGEX_STANDARD)) {
-				score += 0.25;
+				score += 0.5;
 			}
 			
 			// increases by 0.25 the score of references which include the word "Publication" or "Standard"

@@ -1,5 +1,5 @@
 import dill
-from textblob import TextBlob
+# from textblob import TextBlob
 import math
 x=float('nan')
 math.isnan(x)
@@ -31,7 +31,7 @@ def loadmodel(infile):
         model = dill.load(inp)
     return model
 
-def noun_tokenize(x):
-    blob = TextBlob(x)
-    phrases = blob.noun_phrases
-    return phrases
+# def noun_tokenize(x):
+#     blob = TextBlob(x)
+#     phrases = blob.noun_phrases
+#     return phrases
