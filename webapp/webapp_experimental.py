@@ -78,50 +78,8 @@ def clean_ngram(doc):
 
 
 
-def hierarchy_pos(G, root, levels=None, width=1., height=1.):
-    '''If there is a cycle that is reachable from root, then this will see infinite recursion.
-       G: the graph
-       root: the root node
-       levels: a dictionary
-               key: level number (starting from 0)
-               value: number of nodes in this level
-       width: horizontal space allocated for drawing
-       height: vertical space allocated for drawing'''
-    TOTAL = "total"
-    CURRENT = "current"
-    def make_levels(levels, node=root, currentLevel=0, parent=None):
-        """Compute the number of nodes for each level
-        """
-        if not currentLevel in levels:
-            levels[currentLevel] = {TOTAL : 0, CURRENT : 0}
-        levels[currentLevel][TOTAL] += 1
-        neighbors = list(G.neighbors(node))
-        for neighbor in neighbors:
-            if not neighbor == parent:
-                levels =  make_levels(levels, neighbor, currentLevel + 1, node)
-        return levels
 
-    def make_pos(pos, node=root, currentLevel=0, parent=None, vert_loc=0):
-        dx = 1/levels[currentLevel][TOTAL]
-        left = dx/2
-        pos[node] = ((left + dx*levels[currentLevel][CURRENT])*width, vert_loc)
-        levels[currentLevel][CURRENT] += 1
-        neighbors = G.neighbors(node)
-        for neighbor in neighbors:
-            if not neighbor == parent:
-                pos = make_pos(pos, neighbor, currentLevel + 1, node, vert_loc-vert_gap)
-        return pos
-    if levels is None:
-        levels = make_levels({})
-    else:
-        levels = {l:{TOTAL: levels[l], CURRENT:0} for l in levels}
-    vert_gap = height / (max([l for l in levels])+1)
-    return make_pos({})
-
-
-
-
-# ================================================================= Prepare the predictor
+# ================================================================= Prepare the predictor (when the app starts)
 
 
 pos=loadmodel(os.path.join(models_dir,'pos_'))
@@ -141,6 +99,9 @@ nbrs_brute = NearestNeighbors(n_neighbors=X.shape[0], algorithm='brute', metric=
 print('fitting')
 nbrs_brute.fit(X.todense())
 print('fitted')
+
+# =================================================================
+
 
 
 
@@ -172,7 +133,6 @@ def extract_standard_ref(filename):
     return standard_refs
 
 
-
 def parse_text(filepath):
 
     if os.path.exists(filepath+'_parsed.txt'):
@@ -192,9 +152,9 @@ def parse_text(filepath):
 
     return str(output)
 
+
 @app.route('/predict',methods=['POST'])
 def predict():
-    global Xn, Yn, labels, values, hoverlabels, Xe, Ye, pos, df, graph, title_lookup, indices, distances
 
     text=''
     # ======================== find the referenced standards
@@ -266,8 +226,5 @@ def predict():
 if __name__ == "__main__":
     app.run()
 
-# todo: set up a search dashboard in kibana with iso data??
-# todo: tune the results/ improve the model
-# when searched "auronautics" in wikipedia. and I put a couple of first paragraphs from it and then the whole page. The reults vary very much.
-#  Seems like the model is very sensitive (to noisy stuff). Also, how come there is some potato standards in the results when I put only a couple of
-# paragraphs. So the recall and precision both are off at different times.
+
+# todo: make this the main version of api. Add the endpoint for creating the graph.
