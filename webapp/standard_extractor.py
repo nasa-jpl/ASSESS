@@ -1,9 +1,10 @@
+# -*- coding: utf-8 -*-
 
 import re
 
 
 standard_orgs={}
-for line in open('standards/standard_orgs.txt','r').readlines():
+for line in open('standards/data/standard_orgs.txt','r').readlines():
     line=line.strip()
     abbr=line.split(' — ')[0]
     name=line.split(' — ')[1]
