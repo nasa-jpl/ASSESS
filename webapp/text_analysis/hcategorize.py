@@ -145,7 +145,7 @@ exit()
 
 
 
-# ============================== predict, add scores to graph and plot
+# ============================== predict/rank
 
 pos=loadmodel('pos_')
 graph=loadmodel('graph')
@@ -192,7 +192,13 @@ for indx in indices[:10]:
 print('scored standards')
 
 
+
+
+
+
+# =====================================================, add and aggregate scores in the graph
 # recursively accumulate scores (mean, std, max, median)
+
 Xn=[]
 Yn=[]
 labels=[]
@@ -262,6 +268,13 @@ def examine(node, parent_node):
 
 print('scoring categories and plotting')
 examine('~-1', '~-2')
+
+
+
+
+
+
+# ================================== plot the tree
 
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=Xe,
