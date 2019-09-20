@@ -1,26 +1,18 @@
 from flask import Flask, send_from_directory, safe_join
-from text_analysis import model
 import os
 import json
 import subprocess
 from flask import request
 from flask_cors import CORS, cross_origin
-import pandas as pd
 from sklearn.neighbors import NearestNeighbors
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import normalize
 import ast
 import re
-import statistics
 import string
-from itertools import tee, islice
-import math
 import dill
-import networkx as nx
 import numpy as np
 import pandas as pd
-import plotly.graph_objs as go
-import plotly.offline
 from sklearn.feature_extraction import text
 import spacy
 from standard_extractor import find_standard_ref
@@ -30,7 +22,7 @@ app = Flask(__name__)
 app.static_folder = "webui"
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
-standards_dir = 'standards'
+standards_dir = 'standards/data'
 json_output_dir = 'output'
 models_dir='models'
 
@@ -204,15 +196,18 @@ def predict():
         link=df.iloc[indx]['link']
         standard_code = df.iloc[indx]['standard']
 
-        print(title)
-        print(description)
+        # todo: this code calculates the word importances for the top results (slows the operation, hence commented)
+        # print(title)
+        # print(description)
+        #
+        # to_print = [
+        #     tfidftransformer.get_feature_names()[i]
+        #     + ' ' +
+        #     str(abs(np.array(sow[0].todense()).flatten()[i] - np.array(X[indx].todense()).flatten()[i]))
+        #     for i in set(sow.indices).intersection(X[indx].indices)]
+        # print(' || '.join(to_print), '\n')
 
-        to_print = [
-            tfidftransformer.get_feature_names()[i]
-            + ' ' +
-            str(abs(np.array(sow[0].todense()).flatten()[i] - np.array(X[indx].todense()).flatten()[i]))
-            for i in set(sow.indices).intersection(X[indx].indices)]
-        print(' || '.join(to_print), '\n')
+
         result['recc'].append(
             {'title': title+' ('+standard_code.replace('~','')+')', 'description':description, 'url': link, 'sim': 100 * round(1-dist, 2)})
 
