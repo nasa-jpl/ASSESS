@@ -26,6 +26,8 @@ RUN pip3 install -U textblob
 RUN curl https://raw.github.com/sloria/TextBlob/master/download_corpora.py | python3
 RUN python3 -m textblob.download_corpora
 RUN python3 -m spacy download en
-WORKDIR /ASSESS/webapp/standards
+WORKDIR /ASSESS/webapp/standards/data
 RUN unzip \*.zip
-RUN unzip ../models/graph.zip
+WORKDIR /ASSESS/webapp/models
+RUN unzip graph.zip
+WORKDIR /ASSESS/webapp
