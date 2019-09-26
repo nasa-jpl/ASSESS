@@ -6,4 +6,4 @@
 - Improve Standards Extractor. See issue [10](https://github.com/nasa-jpl/ASSESS/issues/10).
 
 ## [v1.0.0](https://github.com/chrismattmann/T-ENTacle/tree/v1.0.0) (2019-07-11)
-- First release includes web application with very basic back-end capabilities.
+- First release includes web application with boostrapped front-end and basic back-end algorithm.
