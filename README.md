@@ -12,6 +12,6 @@ Run the docker container as follows:
 
 Start the web application as follows:
 
-> python webapp.py
+> python3 webapp.py
 
 Open `http://0.0.0.0:5000` with your web browser and then upload a SoW to extract standard references and suitable standards.
