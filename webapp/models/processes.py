@@ -10,7 +10,9 @@ from sklearn.cross_validation import StratifiedShuffleSplit
 from sklearn.metrics import accuracy_score
 import itertools
 import collections
-
+import logging
+logging.basicConfig()
+logger = logging.getLogger('logger')
 
 def transform(df):
     """
@@ -32,10 +34,10 @@ def transform(df):
         tokens = tokenizer(text)
         for label in item.ics:
             X.append(tokens)
-            y.append(label)
+            y.append(label[0])
             print(tokens)
             print("========================")
-            print(label)
+            print(label[0])
     return (np.array(X), np.array(y))
 
 def tokenizer(text):
