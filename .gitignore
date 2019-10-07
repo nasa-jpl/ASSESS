@@ -1,5 +1,6 @@
 webapp/standards/*
 webapp/output/*
+webapp/config.yaml
 
 # Distribution / packaging
 env/
