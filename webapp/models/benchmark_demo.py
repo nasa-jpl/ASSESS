@@ -16,6 +16,7 @@ import yaml
 import logging
 import os
 import sys
+import re 
 try:
     from nltk.corpus import stopwords
 except ImportError:
@@ -43,8 +44,14 @@ else:
     sys.exit(0)
 
 """Store the data and perform the appropriate transformations, cleaning, and tokenizing. """
-df = pd.read_json(iso_path)
-X, y = processes.transform(df)
+#df = pd.read_json(iso_path)
+df = pd.read_csv(iso_path)
+fields = (df['field'])
+df['field'] = df['field'].str.extract('(\d+)', expand=False)
+clean_df =  df[['field', 'description_clean']]
+clean_df = clean_df.dropna()
+print(clean_df)
+X, y = clean_df['field'].tolist(), clean_df['description_clean'].tolist()
 logger.info("Total examples %d" % len(y))
 
 """Load the word2vec and glove vectorizers. """
@@ -129,24 +136,24 @@ etree_w2v_tfidf = Pipeline([
                 ])
 
 all_models = [
-    ("bayes_mult_nb", mult_nb),
-    ("bayes_mult_nb_tfidf", mult_nb_tfidf),
-    ("bayes_bern_nb", bern_nb),
-    ("bayes_bern_nb_tfidf", bern_nb_tfidf),
+    #("bayes_mult_nb", mult_nb),
+    #("bayes_mult_nb_tfidf", mult_nb_tfidf),
+    #("bayes_bern_nb", bern_nb),
+    #("bayes_bern_nb_tfidf", bern_nb_tfidf),
     ("svc", svc),
     ("svc_tfidf", svc_tfidf),
-    ("w2v", etree_w2v),
-    ("w2v_tfidf", etree_w2v_tfidf),
-    ("glove_small", etree_glove_small),
-    ("glove_small_tfidf", etree_glove_small_tfidf),
-    ("glove_big", etree_glove_big),
-    ("glove_big_tfidf", etree_glove_big_tfidf),
+    #("w2v", etree_w2v),
+    #("w2v_tfidf", etree_w2v_tfidf),
+    #("glove_small", etree_glove_small),
+    #("glove_small_tfidf", etree_glove_small_tfidf),
+    #("glove_big", etree_glove_big),
+    #("glove_big_tfidf", etree_glove_big_tfidf),
 ]
 
 unsorted_scores = [(name, cross_val_score(model, X, y, cv=5).mean()) for name, model in all_models]
 scores = sorted(unsorted_scores, key=lambda x: -x[1])
 logger.debug(tabulate(scores, floatfmt=".4f", headers=("model", 'score')))
-train_sizes = [800, 1600, 3200, 6400, 9200, 13200]
+train_sizes = [800, 3200, 13200]
 table = []
 
 for name, model in all_models:
