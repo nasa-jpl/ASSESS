@@ -54,6 +54,9 @@ def benchmark(model, X, y, n):
     """
     Divide into training and test sets, train, then evaluate the score.
     """
+    print(n)
+    print(len(X))
+    print(len(y))
     test_size = 1 - (n / float(len(y)))
     scores = []
     for train, test in StratifiedShuffleSplit(y, n_iter=5, test_size=test_size):
@@ -86,23 +89,13 @@ def plot(df):
     Graph results from the pickled scores.
     """
     print("Graphing results...")
-    df = pd.read_pickle()
-    df.to_pickle(df)
+    #df = pd.read_pickle()
+    #df.to_pickle(df)
     plt.figure(figsize=(15, 6))
     fig = sns.pointplot(x='train_size', y='accuracy', hue='model',
                         data=df[df.model.map(lambda x: x in [
-                                                             "bayes_mult_nb",
-                                                             "bayes_mult_nb_tfidf",
-                                                             "bayes_bern_nb",
-                                                             "bayes_bern_nb_tfidf",
                                                              "svc",
                                                              "svc_tfidf",
-                                                             "w2v",
-                                                             "w2v_tfidf",
-                                                             "glove_small",
-                                                             "glove_small_tfidf",
-                                                             "glove_big",
-                                                             "glove_big_tfidf",
                                                         ]
                                             )
                                 ]
