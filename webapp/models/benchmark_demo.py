@@ -49,16 +49,17 @@ df = pd.read_csv(iso_path)
 fields = (df['field'])
 df['field'] = df['field'].str.extract('(\d+)', expand=False)
 clean_df =  df[['field', 'description_clean']]
+print(len(clean_df))
 clean_df = clean_df.dropna()
-print(clean_df)
 #field_max = clean_df.groupby["field"].transform(len)
 #mask = (field_max > 3)
 #clean_df = clean_df[mask]
-clean_df = clean_df.apply(lambda x: x.mask(x.map(x.value_counts())<3, None))
-
+print(len(clean_df))
+#clean_df = clean_df.apply(lambda x: x.mask(x.map(x.value_counts())<3, None))
+clean_df = clean_df.groupby('field').filter(lambda x : len(x)>3)
 clean_df = clean_df.dropna()
-
-X, y = clean_df['field'].as_matrix(), clean_df['description_clean'].as_matrix()
+print(len(clean_df))
+X, y = clean_df['description_clean'].as_matrix(), clean_df['field'].as_matrix(),
 print("done loading data")
 logger.info("Total examples %d" % len(y))
 
@@ -95,16 +96,16 @@ logger.info("Total examples %d" % len(y))
 #                             ("bernoulli nb", BernoulliNB())
 #                     ])
 
-"""The svc pipeline is a count vectorizer along with a linear support vector classifier. """
-svc = Pipeline([
-                    ("count_vectorizer", CountVectorizer(analyzer=lambda x: x)),
-                    ("linear svc", SVC(kernel="linear"))
-        ])
+# """The svc pipeline is a count vectorizer along with a linear support vector classifier. """
+# svc = Pipeline([
+#                     ("count_vectorizer", CountVectorizer(analyzer=lambda x: x)),
+#                     ("linear svc", SVC(kernel="linear"))
+#         ])
 
 """The svc_tfidf pipeline is a TF-IDF vectorizer along with a linear support vector classifier. """
 svc_tfidf = Pipeline([
                         ("tfidf_vectorizer", TfidfVectorizer(analyzer=lambda x: x)),
-                        ("linear svc", SVC(kernel="linear"))
+                        ("linear svc", SVC(kernel="linear", probability=True))
             ])
 
 # """The glove_small pipeline uses the glove vectorization on a 60D textfile. """
@@ -148,7 +149,7 @@ all_models = [
     #("bayes_mult_nb_tfidf", mult_nb_tfidf),
     #("bayes_bern_nb", bern_nb),
     #("bayes_bern_nb_tfidf", bern_nb_tfidf),
-    ("svc", svc),
+#    ("svc", svc),
     ("svc_tfidf", svc_tfidf),
     #("w2v", etree_w2v),
     #("w2v_tfidf", etree_w2v_tfidf),
@@ -162,7 +163,7 @@ unsorted_scores = [(name, cross_val_score(model, X, y, cv=3).mean()) for name, m
 print("ending scoring")
 scores = sorted(unsorted_scores, key=lambda x: -x[1])
 logger.debug(tabulate(scores, floatfmt=".4f", headers=("model", 'score')))
-train_sizes = [1000]
+train_sizes = [20000]
 table = []
 
 for name, model in all_models:
