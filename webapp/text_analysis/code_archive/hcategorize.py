@@ -197,7 +197,7 @@ print('scored standards')
 
 
 # =====================================================, add and aggregate scores in the graph
-# recursively accumulate scores (mean, std, max, median)
+# recursively accumulate scores (mean, std, max, median) and create data structures for plotting
 
 Xn=[]
 Yn=[]
