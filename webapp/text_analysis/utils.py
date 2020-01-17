@@ -1,6 +1,10 @@
 import dill
 # from textblob import TextBlob
 import math
+import spacy
+import re
+from sklearn.feature_extraction import text
+
 x=float('nan')
 math.isnan(x)
 
@@ -30,6 +34,36 @@ def loadmodel(infile):
     with open(infile, 'rb') as inp:
         model = dill.load(inp)
     return model
+
+nlp = spacy.load('en')
+# python3 -m spacy download en_core_web_sm
+# python3 -m spacy download en
+
+def hasNumbers(str):
+    return bool(re.search(r'\d', str))
+
+def has_non_alpha(str):
+    if re.search('[^a-zA-Z]', str)==None:
+        return False
+    return True
+
+def has_camelcase_alpha(str):
+    if len(str)==1:
+        return False
+
+    if len(re.findall('[A-Z]', str[1:]))==0:
+        return False
+    return True
+
+
+def clean_text(txt, no_pos=True):
+    # todo: check again the no_pos logic once
+    txt_=[]
+    for w in nlp(txt):
+        if w.ent_type_ not in ['DATE', 'TIME', 'GPE', 'PERSON', 'CARDINAL', 'ORG', 'LOC'] and\
+                not has_non_alpha(w.text) and not has_camelcase_alpha(w.text) and w.text not in text.ENGLISH_STOP_WORDS and (no_pos or w.pos_ not in ['ADV','DET','ADP','X']): # and (w.pos_ == 'NOUN' or w.pos_ == 'VERB'): # and w.text not in stop_words and w.pos_ == 'NOUN':
+            txt_.append(w.text)
+    return ' '.join(txt_)
 
 # def noun_tokenize(x):
 #     blob = TextBlob(x)
