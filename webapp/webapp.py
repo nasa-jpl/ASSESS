@@ -7,16 +7,11 @@ from flask_cors import CORS, cross_origin
 from sklearn.neighbors import NearestNeighbors
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import normalize
-import ast
-import re
-import string
 import dill
-import numpy as np
 import pandas as pd
 from sklearn.feature_extraction import text
-import spacy
 from standard_extractor import find_standard_ref
-
+from text_analysis.utils import loadmodel
 
 app = Flask(__name__)
 app.static_folder = "webui"
@@ -25,49 +20,6 @@ cors = CORS(app, resources={r"/*": {"origins": "*"}})
 standards_dir = 'standards/data'
 json_output_dir = 'output'
 models_dir='models'
-
-nlp = spacy.load('en')
-
-def to_string(ar):
-    return str(ar)
-
-
-def to_array(sr):
-    return ast.literal_eval(sr)
-
-
-def savemodel(model, outfile):
-    with open(outfile, 'wb') as output:
-        dill.dump(model, output)
-    return ''
-
-
-def loadmodel(infile):
-    with open(infile, 'rb') as inp:
-        model = dill.load(inp)
-    return model
-
-
-def hasNumbers(str):
-    return bool(re.search(r'\d', str))
-
-
-def ispun(str):
-    if str in string.punctuation:
-        return True
-    else:
-        return False
-
-
-def clean_ngram(doc):
-    global nlp
-
-    stop_words = text.ENGLISH_STOP_WORDS
-    for w in nlp(doc):
-        if w.ent_type_ not in ['DATE', 'TIME', 'GPE', 'PERSON', 'CARDINAL'] and not hasNumbers(
-                w.text) and not ispun(w.text) and w.text not in stop_words and w.pos_ == 'NOUN':
-                    yield w.lemma_.lower()
-
 
 
 
@@ -81,11 +33,11 @@ df=pd.read_csv(os.path.join(standards_dir,'iso_final_all_clean_text.csv'),index_
 df=df[df['type']=='standard'].reset_index(drop=True)
 df.fillna('', inplace=True)
 
-# tfidftransformer=TfidfVectorizer(ngram_range=(1,1), stop_words=text.ENGLISH_STOP_WORDS)
-# X=tfidftransformer.fit_transform([m+' '+n for m, n in zip(df['description_clean'], df['title'])]) # using both desc and tile to predict
+tfidftransformer=TfidfVectorizer(ngram_range=(1,1), stop_words=text.ENGLISH_STOP_WORDS)
+X=tfidftransformer.fit_transform([m+' '+n for m, n in zip(df['description_clean'], df['title'])]) # using both desc and tile to predict
 
-tfidftransformer=TfidfVectorizer(ngram_range=(1,1))
-X=tfidftransformer.fit_transform([m+' '+n for m, n in zip(df['description'], df['title'])]) # using both desc and tile to predict
+# tfidftransformer=TfidfVectorizer(ngram_range=(1,1))
+# X=tfidftransformer.fit_transform([m+' '+n for m, n in zip(df['description'], df['title'])]) # using both desc and tile to predict
 
 print('shape', X.shape)
 
