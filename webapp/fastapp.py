@@ -21,6 +21,10 @@ from fastapi.responses import HTMLResponse, ORJSONResponse, JSONResponse
 from fastapi import FastAPI, File, Form, UploadFile, Request
 from fastapi.encoders import jsonable_encoder
 import requests
+from starlette.requests import Request
+from starlette.responses import Response
+from pydantic import BaseModel
+
 
 app = FastAPI()
 #app.static_folder = "webui"
@@ -35,6 +39,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+class Sow(BaseModel):
+    text_field: str
 
 """BEGIN
 @app.get('/')
@@ -72,12 +79,14 @@ async def index(request: Request):
     return HTMLResponse(content=content, status_code=200)
 
 
-@app.get('/recommend_text/(text)')
-async def recommend_text(text: str):
+@app.post('/recommend_text')
+async def recommend_text(sow: Sow):
     """
-    GET from text
+    POST from input text
     """
-    prediction = extract_prep.predict(text=text)
+    print(sow)
+    in_text = sow.text_field
+    prediction = extract_prep.predict(in_text=in_text)
     json_compatible_item_data = jsonable_encoder(prediction)
     return JSONResponse(content=json_compatible_item_data)
 
@@ -101,7 +110,7 @@ async def extract(pdf: bytes = File(...)):
     return JSONResponse(content=json_compatible_item_data)
 
 
-@app.get('/standard_info/(pdf_location)', response_class=ORJSONResponse)
+@app.get('/standard_info/{pdf_location}', response_class=ORJSONResponse)
 async def standard_info(pdf_location: str):
     """
     GET standard info given a unique standard identifier
@@ -131,3 +140,5 @@ async def add_standards():
 
 if __name__ == "__main__":
     uvicorn.run(app)
+    #prediction = extract_prep.predict(in_text="airplane testing")
+    #print(prediction)

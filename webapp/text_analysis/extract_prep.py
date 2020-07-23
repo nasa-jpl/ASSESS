@@ -1,10 +1,7 @@
 
-from flask import Flask, send_from_directory, safe_join
 import os
 import json
 import subprocess
-from flask import request
-from flask_cors import CORS, cross_origin
 from sklearn.neighbors import NearestNeighbors
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import normalize
@@ -14,33 +11,6 @@ from sklearn.feature_extraction import text
 from standard_extractor import find_standard_ref
 import pathlib
 
-
-def load_data():
-    dirPath = str(pathlib.Path(__file__).parent.absolute())
-
-    standards_dir = dirPath + '/../standards/data'
-    json_output_dir = 'output'
-    models_dir='models'
-
-    df=pd.read_csv(os.path.join(standards_dir,'iso_final_all_clean_text.csv'),index_col=0)
-    df=df[df['type']=='standard'].reset_index(drop=True)
-    df.fillna('', inplace=True)
-
-    tfidftransformer=TfidfVectorizer(ngram_range=(1,1), stop_words=text.ENGLISH_STOP_WORDS)
-    X=tfidftransformer.fit_transform([m+' '+n for m, n in zip(df['description_clean'], df['title'])]) # using both desc and tile to predict
-    # tfidftransformer=TfidfVectorizer(ngram_range=(1,1))
-    # X=tfidftransformer.fit_transform([m+' '+n for m, n in zip(df['description'], df['title'])]) # using both desc and tile to predict
-    print('shape', X.shape)
-    X=normalize(X, norm='l2', axis=1)
-    nbrs_brute = NearestNeighbors(n_neighbors=X.shape[0], algorithm='brute', metric='cosine')
-    print('fitting')
-    nbrs_brute.fit(X.todense())
-    print('fitted')
-
-    return df
-
-def test():
-    print("hello")
 
 def extract_standard_ref(filename):
     bashCommand = "java -cp standards_extraction/lib/tika-app-1.16.jar:standards_extraction/bin StandardsExtractor " + \
@@ -73,36 +43,57 @@ def parse_text(filepath):
 
 
 #@app.route('/predict',methods=['POST'])
-def predict(files=None, text=None):
-    df = load_data()
+def predict(files=None, in_text=None):
+    dirPath = str(pathlib.Path(__file__).parent.absolute())
+
+    standards_dir = dirPath + '/../standards/data'
+    json_output_dir = 'output'
+    models_dir='models'
+
+    df=pd.read_csv(os.path.join(standards_dir,'iso_final_all_clean_text.csv'),index_col=0)
+    df=df[df['type']=='standard'].reset_index(drop=True)
+    df.fillna('', inplace=True)
+
+    tfidftransformer=TfidfVectorizer(ngram_range=(1,1), stop_words=text.ENGLISH_STOP_WORDS)
+    X=tfidftransformer.fit_transform([m+' '+n for m, n in zip(df['description_clean'], df['title'])]) # using both desc and tile to predict
+    # tfidftransformer=TfidfVectorizer(ngram_range=(1,1))
+    # X=tfidftransformer.fit_transform([m+' '+n for m, n in zip(df['description'], df['title'])]) # using both desc and tile to predict
+    print('shape', X.shape)
+    X=normalize(X, norm='l2', axis=1)
+    nbrs_brute = NearestNeighbors(n_neighbors=X.shape[0], algorithm='brute', metric='cosine')
+    print('fitting')
+    nbrs_brute.fit(X.todense())
+    print('fitted')
     
     # How do we get request.file
-    text=''
+    new_text=''
     # ======================== find the referenced standards
     filename='temp_text'
     # check if the post request has the file part
-    if 'file' in request.files:
-        file = request.files['file']
+    if files:
+        # INSERT FILES OBJECT HERE
+        file = files['file']
     # if user does not select file, browser also
     # submit a empty part without filename
         if file.filename == '':
             return 'no selected file!'
             # return redirect(request.url)
         if file :
-            filename=file.filename
+            filename = file.filename
             file.save(filename)
-            text=parse_text(filename)
+            new_text = parse_text(filename)
             print('parsed')
     else:
         # get text from form
+        new_text = in_text
         file = open(filename, 'w')
-        file.write(str(text.encode('utf-8', 'ignore')))
+        file.write(str(new_text.encode('utf-8', 'ignore')))
         file.flush()
         file.close()
 
     print('extracting standards')
     # standard_refs=extract_standard_ref(filename)
-    standard_refs=find_standard_ref(text)
+    standard_refs=find_standard_ref(new_text)
     print('standards extracted')
 
     # ======================== find the recommended standards
@@ -111,7 +102,7 @@ def predict(files=None, text=None):
     result['refs'] = standard_refs
     result['recc'] = []
 
-    sow = tfidftransformer.transform([text])
+    sow = tfidftransformer.transform([new_text])
     sow = normalize(sow, norm='l2', axis=1)
 
     print('scoring standards')
