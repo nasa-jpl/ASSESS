@@ -43,7 +43,7 @@ def parse_text(filepath):
 
 
 #@app.route('/predict',methods=['POST'])
-def predict(files=None, in_text=None):
+def predict(file=None, in_text=None):
     dirPath = str(pathlib.Path(__file__).parent.absolute())
 
     standards_dir = dirPath + '/../standards/data'
@@ -70,9 +70,10 @@ def predict(files=None, in_text=None):
     # ======================== find the referenced standards
     filename='temp_text'
     # check if the post request has the file part
-    if files:
+    if file:
+        print("made it to the PDF part")
         # INSERT FILES OBJECT HERE
-        file = files['file']
+        #file = files['file']
     # if user does not select file, browser also
     # submit a empty part without filename
         if file.filename == '':
@@ -80,7 +81,8 @@ def predict(files=None, in_text=None):
             # return redirect(request.url)
         if file :
             filename = file.filename
-            file.save(filename)
+            ### Save the file someplace
+            ###file.save(filename)
             new_text = parse_text(filename)
             print('parsed')
     else:

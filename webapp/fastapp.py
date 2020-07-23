@@ -91,17 +91,18 @@ async def recommend_text(sow: Sow):
     return JSONResponse(content=json_compatible_item_data)
 
 @app.post('/recommend_file')
-async def recommend_file(pdf: bytes = File(...)):
+async def recommend_file(pdf: UploadFile = File(...)):
     """
     POST from PDF
     """
-    prediction = extract_prep.predict(files=pdf)
+    print("File received")
+    prediction = extract_prep.predict(file=pdf)
     json_compatible_item_data = jsonable_encoder(prediction)
     return JSONResponse(content=json_compatible_item_data)
 
 
 @app.post('/extract')
-async def extract(pdf: bytes = File(...)):
+async def extract(pdf: UploadFile = File(...)):
     """
     POST from PDF
     """
