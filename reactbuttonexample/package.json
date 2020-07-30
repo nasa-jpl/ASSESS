@@ -3,12 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@react-pdf/renderer": "^1.6.10",
     "bootstrap": "^4.3.1",
     "react": "^16.9.0",
     "react-bootstrap": "^1.0.0-beta.11",
     "react-dom": "^16.9.0",
+    "react-dropzone": "^11.0.2",
+    "react-icons": "^3.10.0",
+    "react-pdf": "^4.2.0",
+    "react-redux": "^7.2.1",
     "react-router-dom": "^5.0.1",
-    "react-scripts": "3.1.0"
+    "react-scripts": "3.1.0",
+    "reactstrap": "^8.5.1",
+    "redux": "^4.0.5",
+    "redux-thunk": "^2.3.0",
+    "styled-components": "^5.1.1",
+    "thunk": "0.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
