@@ -117,6 +117,13 @@ def predict(file=None, in_text=None):
         description=df.iloc[indx]['description']
         link=df.iloc[indx]['link']
         standard_code = df.iloc[indx]['standard']
+        standard_id=df.iloc[indx]['id'].replace('~','')
+        code=df.iloc[indx]['code'].replace('~','')
+        tc=df.iloc[indx]['tc']
+        type_standard=["Information Technology"]
+
+
+
 
         # todo: this code calculates the word importances for the top results (slows the operation, hence commented)
         # print(title)
@@ -131,7 +138,9 @@ def predict(file=None, in_text=None):
 
 
         result['recc'].append(
-            {'title': title+' ('+standard_code.replace('~','')+')', 'description':description, 'url': link, 'sim': 100 * round(1-dist, 2)})
+            {'title': title+' ('+standard_code.replace('~','')+')', 'description':description, 'url': link, 'sim': 100 * round(1-dist, 2),
+            'id':standard_id, 'code':code, 'tc':tc, 'type':type_standard})
 
     print('scored standards')
+    print(json.dumps(result))
     return json.dumps(result)
