@@ -97,8 +97,8 @@ async def recommend_file(pdf: UploadFile = File(...)):
     """
     print("File received")
     prediction = extract_prep.predict(file=pdf)
-    json_compatible_item_data = jsonable_encoder(prediction)
-    return JSONResponse(content=json_compatible_item_data)
+    #json_compatible_item_data = jsonable_encoder(prediction)
+    return JSONResponse(content=prediction)
 
 
 @app.post('/extract')
