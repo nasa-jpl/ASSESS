@@ -15,21 +15,17 @@ const PdfReportItem = (props) => {
 
     return (
         <div style={{padding: "5px 15px 5px 30px"}}>
-            <Container fliud>
-                <Row style={{width: "100%"}}>
-                    <Col xs={10}>
-                        <p className="pdf-name" style={{padding: "10px 0px 0px 15px", display: "inline-block"}}> {props.file.name} </p>
-                    </Col>
-                    <Col xs={2}  style={{paddingTop: "10px"}} >
-                        <Button
-                            onClick={onButtonClick} 
-                            variant="outline-primary" 
-                        >
-                            Preview
-                        </Button>
-                    </Col>
-                </Row>
-            </Container>
+            
+            <p className="pdf-name" style={{padding: "10px 50px 0px 15px", display: "inline-block", fontSize:"1.5em"}}> {props.file.name} </p>
+        
+            <Button
+                style={{position: "absolute", right: "100px", fontSize: "2em"}}
+                onClick={onButtonClick} 
+                variant="outline-primary" 
+            >
+                Preview
+            </Button>
+
         </div>
     )
 }

@@ -11,7 +11,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 
-import Uploader from "./../components/Uploader"
+import Uploader from "./../components/UploaderV2"
 import Report from "./../Report/Report";
 
 import {
@@ -31,10 +31,6 @@ class DashboardTab extends Component {
             previewPdf: null
         }
 
-    }
-
-    componentDidMount() {
-        if ( !this.props.rec ) this.props.fetchRecs();
     }
 
     uploadFinished = (files) => {
@@ -68,7 +64,7 @@ class DashboardTab extends Component {
                     <Report 
                         pdfs={this.state.pdfs}
                         text={this.state.text}
-                        recs={this.props.rec}
+                        recs={this.props.rec.recc}
                         renderPdf={this.renderPdf}
                         navigateTo={this.navigateTo}
                     />
@@ -79,7 +75,7 @@ class DashboardTab extends Component {
                 <div style={{ margin: "0px" }}>
                     <PdfViewer 
                         previewFile={this.state.previewPdf}
-                        navigateTo={this.navigateTo}    
+                        navigateTo={this.navigateTo}
                     />
                 </div>
             )
@@ -88,19 +84,5 @@ class DashboardTab extends Component {
 
 }
 
-const mapStateToProps = (state) => ({
-    rec: getRec(state),
-    recLoading: getRecLoading(state),
-    recError: getRecError(state),
-});
 
-const mapDispatchToProps = (dispatch) =>
-    bindActionCreators(
-    {
-        fetchRecs: fetchRecsAction,
-    },
-    dispatch
-);
-
-
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(DashboardTab));
+export default DashboardTab;

@@ -57,13 +57,18 @@ const Button = styled.a`
 class Report extends React.Component {
     constructor(props){
         super(props);
+        console.log('report!', props)
+        props.recs.forEach(function(d, i){
+            d.toggle_id = i
+        })
+
         this.state = {
             standards: props.recs,
             pdfs: props.pdfs,
             searchValue: "Search Recommendations"
         }
         
-
+        
         this.renderPdf = this.renderPdf.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);

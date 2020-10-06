@@ -5,7 +5,8 @@ import styled from  'styled-components';
 
 const References = (props) => {
     // state.standards = 
-    const recs = props.standards.map((standard) => 
+
+    const refs = props.standards.map((standard) => 
         <li>
             <Standard 
                 standard={standard}
@@ -13,9 +14,13 @@ const References = (props) => {
             />
         </li>
     );
-    
     return (
-        <ul style={{marginTop: "15px", marginBottom: "25px"}}> {recs} </ul>
+        <div style={{paddingTop:"30px"}}>
+            { refs.length ?  <ul style={{marginTop: "15px", marginBottom: "25px"}}> {refs} </ul> 
+            : <div style={{height:"20vh", paddingLeft: "50px", paddingTop: "10vh"}}>  
+                <h2> No Referenced Standards </h2>
+            </div> }
+        </div>
     )
 }
 

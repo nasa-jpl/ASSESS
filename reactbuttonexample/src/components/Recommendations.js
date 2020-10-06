@@ -4,7 +4,7 @@ import styled from  'styled-components';
 
 
 const Recommendations = (props) => {
-    // state.standards = 
+    // state.standards =
     const recs = props.standards.map((standard) => 
         <li>
             <Standard 
@@ -15,7 +15,10 @@ const Recommendations = (props) => {
     );
     
     return (
-        <ul style={{marginTop: "15px"}}> {recs} </ul>
+        <div style={{paddingTop: "30px"}}>
+            <ul style={{marginTop: "15px"}}> {recs} </ul>
+        </div>
+        
     )
     
 }

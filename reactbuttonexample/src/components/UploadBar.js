@@ -9,12 +9,12 @@ const Styled = styled.div`
 `;
 
 const UploadBar = (props) => {
+    console.log(props)
     return (
         <div style={{width:"100%", paddingBottom: "10px", paddingTop: "10px", backgroundColor: "#d1d9e5"}}>
-            
-            <Container style={{padding:"0"}}>
-                <h1 className="title"> Uploaded </h1>
-            </Container>
+
+            <h1 className="title" style={{paddingLeft: "30px", fontSize:"2.5em"}}> Uploaded </h1>
+
             {props.pdfs.map((file)=>
             <li style={{listStyleType: "none"}}>
                 <PdfReportItem file={file} renderPdf={props.renderPdf}/>

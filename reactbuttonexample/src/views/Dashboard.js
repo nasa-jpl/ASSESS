@@ -1,6 +1,6 @@
 import React from "react";
 import { Route } from "react-router-dom";
-import DashboardTab from "./DashboardTab";
+import DashboardTab from "./DashboardTabV2";
 import Container from "react-bootstrap/Container";
 
 const Dashboard = ({ match }) => (
