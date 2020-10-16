@@ -3,8 +3,10 @@
 
 ## Setup
 
-navigate to the '/dashboard' folder
+`cd dashboard/`
+
 `npm install`
 
 ## Running locally
- `npm start`
+
+`npm start`
