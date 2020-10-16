@@ -1,2 +1,10 @@
-# ReactButtonExample
-React js on button click navigates to a new page using History
+# ASSESS
+
+
+## Setup
+
+navigate to the '/dashboard' folder
+`npm install`
+
+## Running locally
+ `npm start`
