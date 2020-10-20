@@ -24,6 +24,7 @@ import requests
 from starlette.requests import Request
 from starlette.responses import Response
 from pydantic import BaseModel
+from elasticsearch import Elasticsearch
 
 
 app = FastAPI()
@@ -31,10 +32,12 @@ app = FastAPI()
 origins = [
     "http://localhost",
 ]
+es = Elasticsearch()
+es_index = "test-csv"
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -106,18 +109,21 @@ async def extract(pdf: UploadFile = File(...)):
     """
     POST from PDF
     """
-    refs = extract_prep.extract_standard_ref(filename=pdf)
+    refs = find_standard_ref(filename=pdf)
     json_compatible_item_data = jsonable_encoder(refs)
     return JSONResponse(content=json_compatible_item_data)
 
 
-@app.get('/standard_info/{pdf_location}', response_class=ORJSONResponse)
-async def standard_info(pdf_location: str):
+@app.get('/standard_info/{searchq}', response_class=ORJSONResponse)
+async def standard_info(searchq: str):
     """
     GET standard info given a unique standard identifier
     """
-    standard_details = [{"id": pdf_location}]
-    json_compatible_item_data = jsonable_encoder(standard_details)
+    res = es.search(index=es_index, body={"query": {"match": {"num_id":searchq}}})
+    print("Got %d Hits:" % res['hits']['total']['value'])
+    for hit in res['hits']['hits']:
+        source = (hit["_source"])
+    json_compatible_item_data = jsonable_encoder(source)
     return JSONResponse(content=json_compatible_item_data)
 
 
@@ -128,10 +134,14 @@ async def save_activity():
 
 
 # Incomplete
-@app.get('/search', response_class=HTMLResponse)
-async def search():
-    return
-
+@app.get('/search/{searchq}', response_class=HTMLResponse)
+async def search(searchq: str):
+    res = es.search(index=es_index, body={"query": {"match": {"description":searchq}}})
+    print("Got %d Hits:" % res['hits']['total']['value'])
+    for hit in res['hits']['hits']:
+        source = (hit["_source"])
+    json_compatible_item_data = jsonable_encoder(source)
+    return JSONResponse(content=json_compatible_item_data)    
 
 # Incomplete
 @app.get('/add_standards', response_class=HTMLResponse)
@@ -140,6 +150,6 @@ async def add_standards():
 
 
 if __name__ == "__main__":
-    uvicorn.run(app)
+    uvicorn.run(app, host="0.0.0.0", port=8080)
     #prediction = extract_prep.predict(in_text="airplane testing")
     #print(prediction)
