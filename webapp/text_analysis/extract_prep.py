@@ -141,6 +141,6 @@ def predict(file=None, in_text=None):
             {'title': title+' ('+standard_code.replace('~','')+')', 'description':description, 'url': link, 'sim': 100 * round(1-dist, 2),
             'id':standard_id, 'code':code, 'tc':tc, 'type':type_standard})
 
-    print('scored standards')
-    print(json.dumps(result))
-    return json.dumps(result)
+    #print('scored standards')
+    #print(json.dumps(result))
+    return result
