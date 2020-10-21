@@ -23,7 +23,7 @@ def search_test(uri, term):
 
 
 def client_search(searchq, n):
-    return es.search(index=es_index, body={"query": {"match": {"description":searchq}, size=n)
+    return es.search(index=es_index, body={"query": {"match": {"description":searchq}}}, size=n)
 
 
 def search_by_text(searchq):
