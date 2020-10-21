@@ -25,6 +25,10 @@ from starlette.requests import Request
 from starlette.responses import Response
 from pydantic import BaseModel
 from elasticsearch import Elasticsearch
+import shutil
+from pathlib import Path
+from tempfile import NamedTemporaryFile
+from typing import Callable
 
 
 app = FastAPI()
@@ -34,6 +38,8 @@ origins = [
 ]
 es = Elasticsearch(["172.19.0.2"])
 es_index = "iso_final_clean"
+#es = Elasticsearch()
+#es_index = "test-csv"
 
 app.add_middleware(
     CORSMiddleware,
@@ -63,7 +69,8 @@ async def index(request: Request):
     recc_file_url = str(host) +'recommend_file'
     extract_url = str(host) + 'extract'
     st_info_url = str(host) + 'standard_info'
-    print(recc_text_url)
+    search_url = str(host) + 'search'
+    add_url = str(host) + 'add_standards'
     content = """
     <html>
         <head>
@@ -76,9 +83,11 @@ async def index(request: Request):
             <p>{recc_file_url}</p>
             <p>{extract_url}</p>
             <p>{st_info_url}</p>
+            <p>{search_url}</p>
+            <p>{add_url}</p>
         </body>
     </html>""".format(recc_text_url=recc_text_url, recc_file_url=recc_file_url,
-     extract_url=extract_url, st_info_url=st_info_url)
+     extract_url=extract_url, st_info_url=st_info_url, search_url=search_url, add_url=add_url)
     return HTMLResponse(content=content, status_code=200)
 
 
@@ -87,11 +96,11 @@ async def recommend_text(sow: Sow):
     """
     POST from input text
     """
-    print(sow)
     in_text = sow.text_field
     prediction = extract_prep.predict(in_text=in_text)
     json_compatible_item_data = jsonable_encoder(prediction)
     return JSONResponse(content=json_compatible_item_data)
+
 
 @app.post('/recommend_file')
 async def recommend_file(pdf: UploadFile = File(...)):
@@ -109,48 +118,63 @@ async def extract(pdf: UploadFile = File(...)):
     """
     POST from PDF
     """
-    refs = find_standard_ref(filename=pdf)
+
+    #filepath = save_upload_file_tmp(pdf) 
+
+    text = extract_prep.parse_text(pdf.filename)
+    refs = find_standard_ref(text)
     json_compatible_item_data = jsonable_encoder(refs)
     return JSONResponse(content=json_compatible_item_data)
 
 
 @app.get('/standard_info/{searchq}', response_class=ORJSONResponse)
-async def standard_info(searchq: str):
+async def standard_info(searchq: str, size: int = 1):
     """
     GET standard info given a unique standard identifier
     """
-    res = es.search(index=es_index, body={"query": {"match": {"num_id":searchq}}})
-    print("Got %d Hits:" % res['hits']['total']['value'])
+    res = es.search(index=es_index, body={"size": size, "query": {"match": {"num_id":searchq}}})
+    #print("Got %d Hits:" % res['hits']['total']['value'])
     results = {}
     for num, hit in enumerate(res['hits']['hits']):
         results[num+1] = hit["_source"]
-    json_object = json.dumps(results, indent=4)
-    json_compatible_item_data = jsonable_encoder(json_object)
+    json_compatible_item_data = jsonable_encoder(results)
     return JSONResponse(content=json_compatible_item_data)    
 
-
-# Incomplete
+# incomplete
 @app.get('/save_activity', response_class=HTMLResponse)
 async def save_activity():
     return
 
 
-# Incomplete
 @app.get('/search/{searchq}', response_class=HTMLResponse)
-async def search(searchq: str):
-    res = es.search(index=es_index, body={"query": {"match": {"description":searchq}}})
-    print("Got %d Hits:" % res['hits']['total']['value'])
+async def search(searchq: str, size: int = 10):
+    res = es.search(index=es_index, body={"size": size, "query": {"match": {"description":searchq}}})
+    #print("Got %d Hits:" % res['hits']['total']['value'])
     results = {}
     for num, hit in enumerate(res['hits']['hits']):
-        results[num+1] = hit["_source"]
-    json_object = json.dumps(results, indent=4)
-    json_compatible_item_data = jsonable_encoder(json_object)
+        results[num+1] = hit["_source"]#["num_id"]
+    json_compatible_item_data = jsonable_encoder(results)
     return JSONResponse(content=json_compatible_item_data)    
 
-# Incomplete
-@app.get('/add_standards', response_class=HTMLResponse)
-async def add_standards():
-    return
+
+@app.put('/add_standards', response_class=HTMLResponse)
+async def add_standards(doc: dict):
+    #print(doc)
+    res = es.index(index=es_index, body=json.dumps(doc))
+    print(res)
+    json_compatible_item_data = jsonable_encoder(doc)
+    return JSONResponse(content=json_compatible_item_data)
+
+
+# def save_upload_file_tmp(upload_file: UploadFile) -> Path:
+#     try:
+#         suffix = Path(upload_file.filename).suffix
+#         with NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+#             shutil.copyfileobj(upload_file.file, tmp)
+#             tmp_path = Path(tmp.name)
+#     finally:
+#         upload_file.file.close()
+#     return tmp_path
 
 
 if __name__ == "__main__":

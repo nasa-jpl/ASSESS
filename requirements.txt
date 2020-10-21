@@ -6,6 +6,7 @@ cymem==2.0.2
 decorator==4.4.0
 dill==0.3.0
 elasticsearch==7.9.1
+elasticsearch-dsl==7.3.0
 Flask==1.1.1
 Flask-Cors==3.0.8
 idna==2.8
