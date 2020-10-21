@@ -32,8 +32,8 @@ app = FastAPI()
 origins = [
     "http://localhost",
 ]
-es = Elasticsearch()
-es_index = "test-csv"
+es = Elasticsearch(["172.19.0.2"])
+es_index = "iso_final_clean"
 
 app.add_middleware(
     CORSMiddleware,
@@ -121,10 +121,12 @@ async def standard_info(searchq: str):
     """
     res = es.search(index=es_index, body={"query": {"match": {"num_id":searchq}}})
     print("Got %d Hits:" % res['hits']['total']['value'])
-    for hit in res['hits']['hits']:
-        source = (hit["_source"])
-    json_compatible_item_data = jsonable_encoder(source)
-    return JSONResponse(content=json_compatible_item_data)
+    results = {}
+    for num, hit in enumerate(res['hits']['hits']):
+        results[num+1] = hit["_source"]
+    json_object = json.dumps(results, indent=4)
+    json_compatible_item_data = jsonable_encoder(json_object)
+    return JSONResponse(content=json_compatible_item_data)    
 
 
 # Incomplete
@@ -138,9 +140,11 @@ async def save_activity():
 async def search(searchq: str):
     res = es.search(index=es_index, body={"query": {"match": {"description":searchq}}})
     print("Got %d Hits:" % res['hits']['total']['value'])
-    for hit in res['hits']['hits']:
-        source = (hit["_source"])
-    json_compatible_item_data = jsonable_encoder(source)
+    results = {}
+    for num, hit in enumerate(res['hits']['hits']):
+        results[num+1] = hit["_source"]
+    json_object = json.dumps(results, indent=4)
+    json_compatible_item_data = jsonable_encoder(json_object)
     return JSONResponse(content=json_compatible_item_data)    
 
 # Incomplete
