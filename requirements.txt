@@ -5,6 +5,8 @@ Click==7.0
 cymem==2.0.2
 decorator==4.4.0
 dill==0.3.0
+elasticsearch==7.9.1
+elasticsearch-dsl==7.3.0
 Flask==1.1.1
 Flask-Cors==3.0.8
 idna==2.8
@@ -20,6 +22,7 @@ plac==0.9.6
 plotly==4.1.0
 preshed==2.0.1
 python-dateutil==2.8.0
+python-multipart==0.0.5
 pytz==2019.2
 requests==2.22.0
 retrying==1.3.3
