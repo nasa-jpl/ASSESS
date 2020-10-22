@@ -3,28 +3,37 @@ services:
   fastapp:
     # Current Dockerfile doesn't build the full codebase
     build: /docker/fastapi/.
-    context: .
     ports:
       - "8080:8080"
-    network: "jointops"
+    networks: 
+      - "jointops"
   react:
     # Merge UI to master so this is accessible
     build: /dashboard/Docker-ui/.
-    context: .
-    ports: "3000:3000"
-    network: "jointops"
+    ports: 
+      - "3000:3000"
+    networks: 
+      - "jointops"
   elastic-search:
     image: "docker.elastic.co/elasticsearch/elasticsearch:7.9.2"
     ports:
       - "9200:9200"
       - "9300:9300"
-    network: "jointops"
+    networks:
+      - "jointops"
   kibana:
     image: "docker.elastic.co/kibana/kibana:7.9.2 "
     ports:
       - "5601:5601"
-    network: 
-      "jointops"
-  networks:
-    # Check this syntax.
-    "jointops"
+    networks:
+      - "jointops"
+  redis:
+    image: 'bitnami/redis:latest'
+    environment:
+        - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - "jointops"
+    ports:
+        - "6379:6379"
+networks:
+  jointops:
