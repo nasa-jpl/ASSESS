@@ -11,7 +11,6 @@ import dill
 import pandas as pd
 from sklearn.feature_extraction import text
 from standard_extractor import find_standard_ref
-#from text_analysis.utils import loadmodel
 from text_analysis import extract_prep
 import uvicorn
 from fastapi import FastAPI
@@ -25,21 +24,15 @@ from starlette.requests import Request
 from starlette.responses import Response
 from pydantic import BaseModel
 from elasticsearch import Elasticsearch
-import shutil
-from pathlib import Path
-from tempfile import NamedTemporaryFile
-from typing import Callable
+from web_utils import connect_to_es
 
 
 app = FastAPI()
-#app.static_folder = "webui"
 origins = [
     "http://localhost",
 ]
-es = Elasticsearch(["172.19.0.2"])
-es_index = "iso_final_clean"
-#es = Elasticsearch()
-#es_index = "test-csv"
+
+es, es_index = connect_to_es()
 
 app.add_middleware(
     CORSMiddleware,
@@ -52,15 +45,6 @@ app.add_middleware(
 class Sow(BaseModel):
     text_field: str
 
-"""BEGIN
-@app.get('/')
-def index():    #return send_from_directory('webui/', 'index.html')
-    webapi = FastAPI(openapi_url="index.html")
-    webapi.mount("/webui", StaticFiles(directory="webui"))
-    app.mount("/static", StaticFiles(directory="webui/"), name="webui")
-    #return HTMLResponse(pkg_resources.resource_string(__name__, 'static/index.html'))
-    return HTMLResponse(content=html_content, status_code=200)
-END"""
 
 @app.get('/', response_class=HTMLResponse)
 async def index(request: Request):
@@ -78,13 +62,18 @@ async def index(request: Request):
         </head>
         <body>
             <h1>Welcome to the ASSESS API </h1>
-            <h2>API Endpoints</h2>
+            <h2>Functional API Endpoints</h2>
             <p>{recc_text_url}</p>
             <p>{recc_file_url}</p>
             <p>{extract_url}</p>
             <p>{st_info_url}</p>
             <p>{search_url}</p>
             <p>{add_url}</p>
+            <br><br><br>
+            <h2>Other Links</h2>
+            <p>https://assess-old.jpl.nasa.gov</p>
+            <p>https://assess-kb.jpl.nasa.gov</p>
+            <p>https://assess-api.jpl.nasa.gov/redoc</p>
         </body>
     </html>""".format(recc_text_url=recc_text_url, recc_file_url=recc_file_url,
      extract_url=extract_url, st_info_url=st_info_url, search_url=search_url, add_url=add_url)
@@ -118,9 +107,7 @@ async def extract(pdf: UploadFile = File(...)):
     """
     POST from PDF
     """
-
     #filepath = save_upload_file_tmp(pdf) 
-
     text = extract_prep.parse_text(pdf.filename)
     refs = find_standard_ref(text)
     json_compatible_item_data = jsonable_encoder(refs)
@@ -132,13 +119,14 @@ async def standard_info(searchq: str, size: int = 1):
     """
     GET standard info given a unique standard identifier
     """
-    res = es.search(index=es_index, body={"size": size, "query": {"match": {"num_id":searchq}}})
+    res = es.search(index=es_index, body={"size": size, "query": {"match": {"num_id": searchq}}})
     #print("Got %d Hits:" % res['hits']['total']['value'])
     results = {}
     for num, hit in enumerate(res['hits']['hits']):
         results[num+1] = hit["_source"]
     json_compatible_item_data = jsonable_encoder(results)
     return JSONResponse(content=json_compatible_item_data)    
+
 
 # incomplete
 @app.get('/save_activity', response_class=HTMLResponse)
@@ -148,7 +136,7 @@ async def save_activity():
 
 @app.get('/search/{searchq}', response_class=HTMLResponse)
 async def search(searchq: str, size: int = 10):
-    res = es.search(index=es_index, body={"size": size, "query": {"match": {"description":searchq}}})
+    res = es.search(index=es_index, body={"size": size, "query": {"match": {"description": searchq}}})
     #print("Got %d Hits:" % res['hits']['total']['value'])
     results = {}
     for num, hit in enumerate(res['hits']['hits']):
@@ -159,25 +147,12 @@ async def search(searchq: str, size: int = 10):
 
 @app.put('/add_standards', response_class=HTMLResponse)
 async def add_standards(doc: dict):
-    #print(doc)
     res = es.index(index=es_index, body=json.dumps(doc))
     print(res)
     json_compatible_item_data = jsonable_encoder(doc)
     return JSONResponse(content=json_compatible_item_data)
 
 
-# def save_upload_file_tmp(upload_file: UploadFile) -> Path:
-#     try:
-#         suffix = Path(upload_file.filename).suffix
-#         with NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-#             shutil.copyfileobj(upload_file.file, tmp)
-#             tmp_path = Path(tmp.name)
-#     finally:
-#         upload_file.file.close()
-#     return tmp_path
-
-
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8080)
-    #prediction = extract_prep.predict(in_text="airplane testing")
-    #print(prediction)
+
