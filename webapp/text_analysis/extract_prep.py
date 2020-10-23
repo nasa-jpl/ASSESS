@@ -1,4 +1,3 @@
-
 import os
 import json
 import subprocess
@@ -10,22 +9,14 @@ import pandas as pd
 from sklearn.feature_extraction import text
 from standard_extractor import find_standard_ref
 import pathlib
+from elasticsearch import Elasticsearch
+from web_utils import connect_to_es
 
 
-def extract_standard_ref(filename):
-    bashCommand = "java -cp standards_extraction/lib/tika-app-1.16.jar:standards_extraction/bin StandardsExtractor " + \
-                  filename + " 0.75 > " + filename + ".json"
-    output = subprocess.check_output(['bash', '-c', bashCommand])
-    js = json.load(open(filename + '.json'))
-    standard_refs=[]
-    if 'standard_references' in js.keys():
-        standard_refs = js['standard_references']
-    print('no standard refs found!')
-    return standard_refs
-
+# Connect to Elasticsearch
+es, es_index = connect_to_es()
 
 def parse_text(filepath):
-
     if os.path.exists(filepath+'_parsed.txt'):
         # todo: remove this. Caches the parsed text.
         return str(open(filepath+'_parsed.txt', 'r').read())
@@ -42,7 +33,6 @@ def parse_text(filepath):
     return str(output)
 
 
-#@app.route('/predict',methods=['POST'])
 def predict(file=None, in_text=None):
     dirPath = str(pathlib.Path(__file__).parent.absolute())
 
@@ -50,8 +40,13 @@ def predict(file=None, in_text=None):
     json_output_dir = 'output'
     models_dir='models'
 
-    df=pd.read_csv(os.path.join(standards_dir,'iso_final_all_clean_text.csv'),index_col=0)
-    df=df[df['type']=='standard'].reset_index(drop=True)
+    res = es.search(index=es_index, body= {"query": {"match_all": {} }})
+    print(res)
+    #TODO: Fix this line
+    #df = pd.concat(map(pd.DataFrame.from_dict, res), axis=1)
+    df = pd.read_csv(os.path.join(standards_dir,'iso_final_all_clean_text.csv'),index_col=0)
+    #print(df2)
+    df = df[df['type']=='standard'].reset_index(drop=True)
     df.fillna('', inplace=True)
 
     tfidftransformer=TfidfVectorizer(ngram_range=(1,1), stop_words=text.ENGLISH_STOP_WORDS)
@@ -59,7 +54,7 @@ def predict(file=None, in_text=None):
     # tfidftransformer=TfidfVectorizer(ngram_range=(1,1))
     # X=tfidftransformer.fit_transform([m+' '+n for m, n in zip(df['description'], df['title'])]) # using both desc and tile to predict
     print('shape', X.shape)
-    X=normalize(X, norm='l2', axis=1)
+    X = normalize(X, norm='l2', axis=1)
     nbrs_brute = NearestNeighbors(n_neighbors=X.shape[0], algorithm='brute', metric='cosine')
     print('fitting')
     nbrs_brute.fit(X.todense())
@@ -81,8 +76,7 @@ def predict(file=None, in_text=None):
             # return redirect(request.url)
         if file :
             filename = file.filename
-            ### Save the file someplace
-            ###file.save(filename)
+            ### Save the file
             new_text = parse_text(filename)
             print('parsed')
     else:
@@ -121,11 +115,7 @@ def predict(file=None, in_text=None):
         code=df.iloc[indx]['code'].replace('~','')
         tc=df.iloc[indx]['tc']
         type_standard=["Information Technology"]
-
-
-
-
-        # todo: this code calculates the word importances for the top results (slows the operation, hence commented)
+        # TODO: this code calculates the word importances for the top results (slows the operation, hence commented)
         # print(title)
         # print(description)
         #
@@ -140,7 +130,5 @@ def predict(file=None, in_text=None):
         result['recc'].append(
             {'title': title+' ('+standard_code.replace('~','')+')', 'description':description, 'url': link, 'sim': 100 * round(1-dist, 2),
             'id':standard_id, 'code':code, 'tc':tc, 'type':type_standard})
-
-    #print('scored standards')
-    #print(json.dumps(result))
+    
     return result
