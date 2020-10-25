@@ -6,3 +6,5 @@ webapp/output/*
 
 .DS_Store
 .idea
+
+data/
