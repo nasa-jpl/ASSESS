@@ -17,7 +17,7 @@ import DummyStandards from "./../Report/DummyStandards";
 
 import PdfViewer from "../PdfViewer/PdfViewer";
 
-import { apiCheck, getRecText, getStandardInfo } from "../api/api";
+import { apiCheck, getRecText, getRecFile, getStandardInfo } from "../api/api";
 
 const DashboardTab = props => {
     const [pdf, setPdf] = useState(undefined)
@@ -27,9 +27,10 @@ const DashboardTab = props => {
     const [recs, setRecs] = useState([])
     const [refs, setRefs] = useState([])
 
-    const uploadPdf = (files) => {
-        // console.log('upload pdf!', files)
-        // apiCheck();
+    const uploadPdf = async (files) => {
+        const t = await getRecFile(files[0])
+        setRecs(t.recc)
+        setRefs(t.refs)
         setPdf(files)
         setActiveKey('report')
     }

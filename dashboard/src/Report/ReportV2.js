@@ -30,7 +30,7 @@ const StyledHeader =  styled.div`
     .dropdown-custom-1 {
         background-color: #343e4c;
         border-color: #343e4c;
-        font-size: 1.2em;
+        font-size: 2em;
         color: #fff;
     }
 
@@ -41,7 +41,8 @@ const StyledHeader =  styled.div`
 
     .menu-item {
         color: #fff;
-        font-size: 1.2em
+        font-size: 2em;
+        margin: 10px 0px;
     }
 `;
 
@@ -61,7 +62,8 @@ const Report = (props) => {
     })
     const [recs, setRecs] = useState(props.recs)
     const [refs, setRefs] = useState(props.refs)
-    const [searchValue, setSearchValue] = useState("")
+    const [searchValue, setSearchValue] = useState("Search the database")
+    const [userSearched, setUserSearched] = useState(false)
     const [pdfs , setPdfs] = useState(props.pdfs)
 
     const renderPdf = (file) => {
@@ -81,6 +83,12 @@ const Report = (props) => {
         setSearchValue("")
     }
 
+    const subfunction = () => {
+        //do api call here!
+        // pass props to child components
+        
+    }
+
     return (
         <Container expand="lg" style={{width: "100%", maxWidth: "100%", padding: "0px", height: "100%"}}>
             <Row style={{ width: "100%", margin: 0, padding: "0px", height: "100vh" }}>
@@ -88,18 +96,22 @@ const Report = (props) => {
                     <Sidebar />
                 </Col>
                 <Col xs={10} style={{padding: "0px"}}>
-                    <RecTitle navigateTo={props.navigateTo}/>
-                    {pdfs ? <UploadBar pdfs={pdfs} renderPdf={renderPdf}/> : null }
-                    <StyledHeader>
-                        <h2> Referenced Standards </h2>
-                    </StyledHeader>
+                    <Row>
+                        <RecTitle navigateTo={props.navigateTo}/>
+                        {pdfs ? <UploadBar pdfs={pdfs} renderPdf={renderPdf}/> : null }
+                    </Row>
+                    <Row style={{background:"#343e4c", height:"5vh", minHeight:"85px", paddingTop:"20px"}}>
 
+                        <Col xs={5} style={{paddingLeft:"40px"}}>
+                            <h2 className="rec-title"> Referenced Standards </h2>
+                        </Col>
+                    </Row>
                     <References standards={refs} />
-
-
-                    <StyledHeader>
-                        <h2> Recommended Standards </h2>
-                        <div style={{display:"inline-block", marginLeft: "20%"}}>
+                    <Row style={{background:"#343e4c", height:"5vh", minHeight:"85px", paddingTop:"20px"}}>
+                        <Col xs={5} style={{paddingLeft:"40px"}}>
+                            <h2 className="rec-title"> Recommended Standards </h2>
+                        </Col>
+                        <Col xs={2}>
                             <Dropdown >
                                 <Dropdown.Toggle className="dropdown-custom-1">
                                     Category: All
@@ -111,9 +123,8 @@ const Report = (props) => {
                                     <Dropdown.Item className="menu-item" href="#/action-3">Item 3</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
-                        </div>
-
-                        <div style={{display:"inline-block", marginLeft: "5%"}}>
+                        </Col>
+                        <Col xs={2}>
                             <Dropdown >
                                 <Dropdown.Toggle className="dropdown-custom-1">
                                     Body: All
@@ -125,23 +136,36 @@ const Report = (props) => {
                                     <Dropdown.Item className="menu-item" href="#/action-3">Item 3</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
+                        </Col>
+                        <Col xs={3}>
+                            <div>
+                                <form style={{ height: "100%" }} onSubmit={handleSubmit} >
+                                    <input 
+                                        style={{display:"inline-block", height: "40px", width: "60%", color: "#ababab"}} 
+                                        type="text" 
+                                        value={searchValue} 
+                                        onChange={handleChange}
+                                        onClick={clearSearch}
+                                        // onSubmit={submitfunctionhere}
+                                    />
+                                    <Button >
+                                        <p className="search"> <FaSearch /> </p>
+                                    </Button>
+                                </form>
+                            </div>
+                        </Col>
+                    </Row>
+
+                        
+                        <div style={{display:"inline-block", marginLeft: "20%"}}>
+   
                         </div>
 
-                        <div style={{display:"inline-block", marginLeft: "10%", height: "55%"}}>
-                            <form style={{ height: "100%" }} onSubmit={handleSubmit} >
-                                <input 
-                                    style={{display:"inline-block", height: "100%", width: "200px", color: "#ababab"}} 
-                                    type="text" 
-                                    value={searchValue} 
-                                    onChange={handleChange}
-                                    onClick={clearSearch} 
-                                />
-                                <Button >
-                                    <p className="search"> <FaSearch /> </p>
-                                </Button>
-                            </form>
+                        <div style={{display:"inline-block", marginLeft: "5%"}}>
+                            
                         </div>
-                    </StyledHeader>
+
+                        
                     <Recommendations standards={recs} />
                 </Col>
             </Row>

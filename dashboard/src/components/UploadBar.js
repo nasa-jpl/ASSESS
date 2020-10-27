@@ -9,7 +9,6 @@ const Styled = styled.div`
 `;
 
 const UploadBar = (props) => {
-    console.log(props)
     return (
         <div style={{width:"100%", paddingBottom: "10px", paddingTop: "10px", backgroundColor: "#d1d9e5"}}>
 

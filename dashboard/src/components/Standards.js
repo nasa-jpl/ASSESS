@@ -36,28 +36,28 @@ const Styles = styled.div`
     }
 
     .standard-title {
-        font-size: 2em;
+        font-size: 1.7rem;
         font-weight: bold;
         display: inline;
         margin-right: 10px;
     }
 
     .standard-id {
-        font-size: 2em;
+        font-size: 1.3rem;
         font-weight: bold;
         display: inline;
         margin-right: 10px;
     }
 
     .standard-type {
-        font-size: 2em;
+        font-size: 1.3rem;
         font-weight: bold;
         display: inline;
         margin-right: 10px;
     }
 
     .standard-specs {
-        font-size: 2em;
+        font-size: 1.3rem;
         display: inline;
         margin-right: 10px;
     }

@@ -4,7 +4,8 @@ const endpoints = {
     recText: "recommend_text",
     recFile: "recommend_file",
     extract: "extract",
-    standardInfo: "standard_info"
+    standardInfo: "standard_info",
+    search: "search"
 }
 
 const url = "https://assess-api.jpl.nasa.gov/";
@@ -49,12 +50,45 @@ export const getRecText = async (text) => {
 
 }
 
+export const getRecFile = async (file) => {
+    const formData = new FormData();
+    formData.append('pdf', file)
+    const response = await fetch(url + endpoints.recFile,
+        {
+            method: "POST",
+            body: formData
+        })
+        const reader = response.body.getReader();
+        console.log(reader);
+        const utf8Decoder = new TextDecoder('utf-8')
+        let {value: chunk, done: readerDone} = await reader.read();
+        chunk = chunk ? utf8Decoder.decode(chunk) : "";
+        console.log(chunk)
+        return JSON.parse(chunk)
+    
+}
+
 export const getStandardInfo = async () => {
     return fetch( url + endpoints.standardInfo,
     {
         method: "GET"
     })
     .then(response => console.log(response));
+}
+
+export const getSearch = async (input) => {
+    const response = await fetch(url + endpoints.search,
+        {
+            method: "POST",
+            body: JSON.stringify({placeholder: input})
+        })
+        const reader = response.body.getReader();
+        console.log(reader);
+        const utf8Decoder = new TextDecoder('utf-8')
+        let {value: chunk, done: readerDone} = await reader.read();
+        chunk = chunk ? utf8Decoder.decode(chunk) : "";
+        console.log(chunk)
+        return JSON.parse(chunk)
 }
 
 
