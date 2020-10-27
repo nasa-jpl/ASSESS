@@ -38,21 +38,21 @@ def predict(file=None, in_text=None):
 
     standards_dir = dirPath + '/../standards/data'
     json_output_dir = 'output'
-    models_dir='models'
+    models_dir = 'models'
 
     res = es.search(index=es_index, body= {"query": {"match_all": {} }})
     print(res)
     #TODO: Fix this line
     #df = pd.concat(map(pd.DataFrame.from_dict, res), axis=1)
-    df = pd.read_csv(os.path.join(standards_dir,'iso_final_all_clean_text.csv'),index_col=0)
+    df = pd.read_csv(os.path.join(standards_dir, 'iso_final_all_clean_text.csv'),index_col=0)
     #print(df2)
     df = df[df['type']=='standard'].reset_index(drop=True)
     df.fillna('', inplace=True)
 
-    tfidftransformer=TfidfVectorizer(ngram_range=(1,1), stop_words=text.ENGLISH_STOP_WORDS)
-    X=tfidftransformer.fit_transform([m+' '+n for m, n in zip(df['description_clean'], df['title'])]) # using both desc and tile to predict
-    # tfidftransformer=TfidfVectorizer(ngram_range=(1,1))
-    # X=tfidftransformer.fit_transform([m+' '+n for m, n in zip(df['description'], df['title'])]) # using both desc and tile to predict
+    tfidftransformer = TfidfVectorizer(ngram_range=(1,1), stop_words=text.ENGLISH_STOP_WORDS)
+    X = tfidftransformer.fit_transform([m + ' ' + n for m, n in zip(df['description_clean'], df['title'])]) # using both desc and tile to predict
+    # tfidftransformer = TfidfVectorizer(ngram_range=(1,1))
+    # X = tfidftransformer.fit_transform([m+' '+n for m, n in zip(df['description'], df['title'])]) # using both desc and tile to predict
     print('shape', X.shape)
     X = normalize(X, norm='l2', axis=1)
     nbrs_brute = NearestNeighbors(n_neighbors=X.shape[0], algorithm='brute', metric='cosine')
@@ -61,9 +61,9 @@ def predict(file=None, in_text=None):
     print('fitted')
     
     # How do we get request.file
-    new_text=''
+    new_text = ''
     # ======================== find the referenced standards
-    filename='temp_text'
+    filename = 'temp_text'
     # check if the post request has the file part
     if file:
         print("made it to the PDF part")
@@ -94,7 +94,7 @@ def predict(file=None, in_text=None):
 
     # ======================== find the recommended standards
 
-    result={}
+    result = {}
     result['refs'] = standard_refs
     result['recc'] = []
 
@@ -107,14 +107,15 @@ def predict(file=None, in_text=None):
     indices = list(indices[0])
 
     for indx, dist in zip(indices[:10],distances[:10]):
-        title=df.iloc[indx]['title']
-        description=df.iloc[indx]['description']
-        link=df.iloc[indx]['link']
+        title = df.iloc[indx]['title']
+        description = df.iloc[indx]['description']
+        link = df.iloc[indx]['link']
         standard_code = df.iloc[indx]['standard']
-        standard_id=df.iloc[indx]['id'].replace('~','')
-        code=df.iloc[indx]['code'].replace('~','')
-        tc=df.iloc[indx]['tc']
-        type_standard=["Information Technology"]
+        standard_id = df.iloc[indx]['id'].replace('~','')
+        code = df.iloc[indx]['code'].replace('~','')
+        tc = df.iloc[indx]['tc']
+        type_standard = ["Information Technology"]
+
         # TODO: this code calculates the word importances for the top results (slows the operation, hence commented)
         # print(title)
         # print(description)
@@ -126,9 +127,10 @@ def predict(file=None, in_text=None):
         #     for i in set(sow.indices).intersection(X[indx].indices)]
         # print(' || '.join(to_print), '\n')
 
-
         result['recc'].append(
-            {'title': title+' ('+standard_code.replace('~','')+')', 'description':description, 'url': link, 'sim': 100 * round(1-dist, 2),
-            'id':standard_id, 'code':code, 'tc':tc, 'type':type_standard})
+            {'title': title + ' (' + standard_code.replace('~','') + ')', 'description': description, 'url': link, 'sim': 100 * round(1 - dist, 2),
+            'id':standard_id, 'code': code, 'tc': tc, 'type': type_standard
+            }
+        )
     
     return result
