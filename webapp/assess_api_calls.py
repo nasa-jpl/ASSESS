@@ -2,7 +2,6 @@ import requests
 import json
 
 # Endpoints
-
 root = "https://assess-api.jpl.nasa.gov/"
 #root = "http://0.0.0.0:8080/"
 urlRec = root + "recommend_text"
@@ -43,34 +42,34 @@ print(r.text)
 
 ## Add/Ingest Standard
 doc = {
-		"num_id": "666666",
-		"code": "test-delete-later",
-		"field": "test-delete-later",
-		"group": "~0.0",
-		"id": "~6.6.6",
-		"id_": "~6",
-		"link": "test",
-		"new_field": "~6",
-		"new_group": "~6",
-		"new_standard": "",
-		"new_subgroup": "",
-		"standard": "",
-		"subgroup": "",
-		"title": "test test test test",
-		"type": "test",
-		"current_status": "",
-		"datetime": "",
-		"description": "",
-		"edition": "",
-		"ics": "",
-		"number_of_pages": "",
-		"preview_url": "",
-		"publication_date": "",
-		"section_titles": "",
-		"sections": "",
-		"tc": "",
-		"url": "",
-		"description_clean": "Testing index ingestion!"
+	"num_id": "111111",
+	"code": "test-delete-later",
+	"field": "test-delete-later",
+	"group": "~1.0",
+	"id": "~1.1.1",
+	"id_": "~6",
+	"link": "test",
+	"new_field": "~6",
+	"new_group": "~6",
+	"new_standard": "1",
+	"new_subgroup": "1",
+	"standard": "",
+	"subgroup": "1",
+	"title": "This is an Example Doc",
+	"type": "test_type",
+	"current_status": "Awaiting_Removal",
+	"datetime": "",
+	"description": "Testing index ingestion!",
+	"edition": "1",
+	"ics": "1.1.1",
+	"number_of_pages": "1",
+	"preview_url": "https://example.com",
+	"publication_date": "",
+	"section_titles": "Test Title",
+	"sections": "",
+	"tc": "",
+	"url": "https://example.com",
+	"description_clean": "Testing index ingestion!"
 }
 print("Testing add_standards")
 r = requests.put(urlAdd, json=doc)
@@ -78,5 +77,5 @@ print(r.text)
 
 # Look up newly indexed standard
 print("Testing standard_info on newly indexed standard")
-r = requests.get(urlStandardInfo + "/666666" + "?size=1")
+r = requests.get(urlStandardInfo + "/111111")
 print(r.text)

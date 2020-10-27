@@ -95,6 +95,7 @@ async def index(request: Request):
             <p>https://assess-old.jpl.nasa.gov</p>
             <p>https://assess-kb.jpl.nasa.gov</p>
             <p>https://assess-api.jpl.nasa.gov/redoc</p>
+            <p>https://assess-api.jpl.nasa.gov/docs</p>
         </body>
     </html>""".format(recc_text_url=recc_text_url, recc_file_url=recc_file_url,
      extract_url=extract_url, st_info_url=st_info_url, search_url=search_url, add_url=add_url)
