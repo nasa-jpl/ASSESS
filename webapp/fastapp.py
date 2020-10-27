@@ -1,9 +1,6 @@
-from flask import Flask, send_from_directory, safe_join
 import os
 import json
 import subprocess
-#from flask import request
-from flask_cors import CORS, cross_origin
 from sklearn.neighbors import NearestNeighbors
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import normalize
@@ -17,12 +14,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, ORJSONResponse, JSONResponse
-from fastapi import FastAPI, File, Form, UploadFile, Request
+from fastapi import FastAPI, File, Form, UploadFile, Request, Body
 from fastapi.encoders import jsonable_encoder
 import requests
 from starlette.requests import Request
 from starlette.responses import Response
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from elasticsearch import Elasticsearch
 from web_utils import connect_to_es, read_logs
 from fastapi import FastAPI, HTTPException
@@ -38,6 +35,9 @@ origins = [
 
 es, es_index = connect_to_es()
 
+if not os.path.exists('log'):
+    os.makedirs('log')
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -48,7 +48,9 @@ app.add_middleware(
 
 
 class Sow(BaseModel):
-    text_field: str
+    text_field: str = Field(
+        example="Technology is great. Airplanes are significantly complex."
+    )
 
 
 def log_stats(request, data=None):
@@ -100,7 +102,10 @@ async def index(request: Request):
 
 
 @app.post('/recommend_text')
-async def recommend_text(request: Request, sow: Sow):
+async def recommend_text(
+    request: Request, 
+    sow: Sow,
+    ):
     """
     POST from input text
     """
@@ -136,23 +141,27 @@ async def extract(request: Request, pdf: UploadFile = File(...)):
     return JSONResponse(content=json_compatible_item_data)
 
 
-@app.get('/standard_info/{searchq}', response_class=ORJSONResponse)
-async def standard_info(request: Request, searchq: str, size: int = 1):
+@app.get('/standard_info/{info_key}', response_class=ORJSONResponse)
+async def standard_info(
+    request: Request, 
+    info_key: str,
+    size: int = 1
+    ):
     """
     GET standard info given a unique standard identifier
     """
-    res = es.search(index=es_index, body={"size": size, "query": {"match": {"num_id": searchq}}})
+    res = es.search(index=es_index, body={"size": size, "query": {"match": {"num_id": info_key}}})
     #print("Got %d Hits:" % res['hits']['total']['value'])
     results = {}
     for num, hit in enumerate(res['hits']['hits']):
         results[num+1] = hit["_source"]
     json_compatible_item_data = jsonable_encoder(results)
-    log_stats(request, data=searchq)
+    log_stats(request, data=info_key)
     return JSONResponse(content=json_compatible_item_data)    
 
 
 @app.get('/search/{searchq}', response_class=HTMLResponse)
-async def search(request: Request, searchq: str, size: int = 10):
+async def search(request: Request, searchq: str = Field(example="Airplanes"), size: int = 10):
     res = es.search(index=es_index, body={"size": size, "query": {"match": {"description": searchq}}})
     #print("Got %d Hits:" % res['hits']['total']['value'])
     results = {}
@@ -186,7 +195,6 @@ if __name__ == "__main__":
     fastapi_logger.info(json.dumps(startMsg))
     #read_logs()
     #log_config = uvicorn.config.LOGGING_CONFIG
-    #print(log_config)
     #log_config["formatters"]["access"]["fmt"] = "%(asctime)s - %(levelname)s - %(message)s"
     #log_config["formatters"]["default"]["fmt"] = "%(asctime)s - %(levelname)s - %(message)s"
     #print(log_config["formatters"]["default"]["fmt"])
