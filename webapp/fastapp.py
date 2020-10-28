@@ -68,7 +68,6 @@ def log_stats(request, data=None):
 
 @app.get('/', response_class=HTMLResponse)
 async def index(request: Request):
-    log_stats(request)
     host = request.url
     recc_text_url = str(host) +'recommend_text'
     recc_file_url = str(host) +'recommend_file'

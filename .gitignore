@@ -7,5 +7,6 @@ webapp/output/*
 .DS_Store
 .idea
 
-data/
+data/*.zip
+data/*.csv
 log/
