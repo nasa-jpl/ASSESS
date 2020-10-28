@@ -1,5 +1,6 @@
 import requests
 import json
+import time
 
 # Endpoints
 root = "https://assess-api.jpl.nasa.gov/"
@@ -74,6 +75,7 @@ doc = {
 print("Testing add_standards")
 r = requests.put(urlAdd, json=doc)
 print(r.text)
+time.sleep(2)
 
 # Look up newly indexed standard
 print("Testing standard_info on newly indexed standard")

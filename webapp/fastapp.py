@@ -49,7 +49,7 @@ app.add_middleware(
 
 class Sow(BaseModel):
     text_field: str = Field(
-        example="Technology is great. Airplanes are significantly complex."
+        example="Airplanes are significantly complex."
     )
 
 
