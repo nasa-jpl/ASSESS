@@ -1,0 +1,14 @@
+.sidebar {
+    background: #343d4c !important;
+}
+
+.sidebar-title {
+    text-align: center;
+    color: #fff;
+    font-size: 4.5em;
+}
+
+.sidebar-section {
+    margin-left: 10px;
+    color: #fff
+}

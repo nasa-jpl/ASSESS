@@ -16,12 +16,14 @@ def connect_to_es():
     es_index = conf["es_index"][0]
     return es, es_index
 
+
 def read_logs(logFile="log/app.log"):
     with open(logFile) as json_file:
         data = json.load(json_file)
     res = json.dumps(data, sort_keys=True, indent=4)
     print(res)
     return
+
 
 def save_upload_file_tmp(upload_file: UploadFile) -> Path:
     try:
