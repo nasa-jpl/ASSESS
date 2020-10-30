@@ -1,10 +1,11 @@
 # Automatic Semantic Search Engine for Suitable Standards 
 
 ## Getting Started
-There are a few main components ASSESS provides:
-- React front-end applications
-- Fast API server
-- Elastcisearch server with data indices
+There are a few main components to ASSESS:
+- A React front-end
+- A FastAPI server
+- An Elastcisearch server with 3 data indices (main index, system logs, and user statistics)
+- Kibana for viewing data
 
 `docker-compose.yml` shows the software stack. You can connect to the stack using `docker-compose up`
 
