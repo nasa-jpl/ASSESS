@@ -10,9 +10,9 @@ There are a few main components ASSESS provides:
 
 Make sure you edit `conf.yaml` with the correct server/port locations for elasticsearch.
 
-To understand the backend code, look at the API in (fastapp.py)[https://github.com/nasa-jpl/ASSESS/blob/master/api/fastapp.py]
+To understand the backend code, look at the API in [fastapp.py](https://github.com/nasa-jpl/ASSESS/blob/master/api/fastapp.py)
 
 ## Testing the stack
-You can test the Rest API with (assess_api_calls.py)[https://github.com/nasa-jpl/ASSESS/blob/master/api/assess_api_calls.py]
+You can test the Rest API with [assess_api_calls.py](https://github.com/nasa-jpl/ASSESS/blob/master/api/assess_api_calls.py)
 
 If running locally, open `http://0.0.0.0:3000` with your web browser. Then, upload an SoW or insert text.
