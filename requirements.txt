@@ -16,6 +16,7 @@ idna==2.8
 itsdangerous==1.1.0
 Jinja2==2.10.1
 joblib==0.13.2
+jsonschema==3.2.0
 MarkupSafe==1.1.1
 murmurhash==1.0.2
 networkx==2.3
