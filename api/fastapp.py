@@ -26,6 +26,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.logger import logger as fastapi_logger
 from logging.handlers import RotatingFileHandler
 import logging
+from jsonschema import validate
 
 
 app = FastAPI()
@@ -33,7 +34,16 @@ origins = [
     "http://localhost",
 ]
 
-es, es_index = connect_to_es()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Connect to Elasticsearch
+es, idx_main, idx_log, idx_stats = connect_to_es()
 
 if not os.path.exists('log'):
     os.makedirs('log')
@@ -49,13 +59,17 @@ app.add_middleware(
 
 class Sow(BaseModel):
     text_field: str = Field(
-        example="Airplanes are significantly complex."
+        example="Airplanes are complex."
     )
 
 
-def log_stats(request, data=None):
+def log_stats(request, data=None, user=None):
+    """Log detailed data in JSON for incoming/outgoing API request.
+    """
     client_host = request.client.host
     msg = {}
+    # TODO: Log user once authentication is connected.
+    #msg["user"] = str(user)
     msg["method"] = str(request.method)
     msg["url"] = str(request.url)
     msg["host"] = str(client_host)
@@ -64,6 +78,8 @@ def log_stats(request, data=None):
     msg["headers"] = dict(request.headers)
     msg["data"] = str(data)
     fastapi_logger.info(json.dumps(msg))
+    es.index(index=idx_log, body=json.dumps(msg))
+    return
 
 
 @app.get('/', response_class=HTMLResponse)
@@ -106,8 +122,7 @@ async def recommend_text(
     request: Request, 
     sow: Sow,
     ):
-    """
-    POST from input text
+    """Recommend standards from input text.
     """
     in_text = sow.text_field
     prediction = extract_prep.predict(in_text=in_text)
@@ -118,8 +133,7 @@ async def recommend_text(
 
 @app.post('/recommend_file')
 async def recommend_file(request: Request, pdf: UploadFile = File(...)):
-    """
-    POST from PDF
+    """Recommend standards from PDF.
     """
     print("File received")
     prediction = extract_prep.predict(file=pdf)
@@ -130,10 +144,9 @@ async def recommend_file(request: Request, pdf: UploadFile = File(...)):
 
 @app.post('/extract')
 async def extract(request: Request, pdf: UploadFile = File(...)):
+    """Extract standards from PDF.
     """
-    POST from PDF
-    """
-    #filepath = save_upload_file_tmp(pdf) 
+    # filepath = save_upload_file_tmp(pdf) 
     text = extract_prep.parse_text(pdf.filename)
     refs = find_standard_ref(text)
     json_compatible_item_data = jsonable_encoder(refs)
@@ -147,10 +160,9 @@ async def standard_info(
     info_key: str,
     size: int = 1
     ):
+    """GET standard info given a primary key.
     """
-    GET standard info given a unique standard identifier
-    """
-    res = es.search(index=es_index, body={"size": size, "query": {"match": {"num_id": info_key}}})
+    res = es.search(index=idx_main, body={"size": size, "query": {"match": {"num_id": info_key}}})
     #print("Got %d Hits:" % res['hits']['total']['value'])
     results = {}
     for num, hit in enumerate(res['hits']['hits']):
@@ -162,7 +174,9 @@ async def standard_info(
 
 @app.get('/search/{searchq}', response_class=HTMLResponse)
 async def search(request: Request, searchq: str = Field(example="Airplanes"), size: int = 10):
-    res = es.search(index=es_index, body={"size": size, "query": {"match": {"description": searchq}}})
+    """Search elasticsearch.
+    """
+    res = es.search(index=idx_main, body={"size": size, "query": {"match": {"description": searchq}}})
     #print("Got %d Hits:" % res['hits']['total']['value'])
     results = {}
     for num, hit in enumerate(res['hits']['hits']):
@@ -174,10 +188,54 @@ async def search(request: Request, searchq: str = Field(example="Airplanes"), si
 
 @app.put('/add_standards', response_class=HTMLResponse)
 async def add_standards(request: Request, doc: dict):
-    res = es.index(index=es_index, body=json.dumps(doc))
+    """Add standards to main ES index.
+    """
+    res = es.index(index=idx_main, body=json.dumps(doc))
     print(res)
     json_compatible_item_data = jsonable_encoder(doc)
     log_stats(request, data=doc)
+    return JSONResponse(content=json_compatible_item_data)
+
+
+@app.post('/select_standards')
+async def select_standards(request: Request, selected: dict):
+    """Capture selected standards.
+    """
+    schema = {
+        "type" : "object",
+        "properties" : {
+            "username" : {"type" : "string"},
+            "standard_key" : {"type" : "array"},
+        },
+    }
+    #validate(instance={"username" : "user123", "selected" : [1, 2 ,3]}, schema=schema)
+    validate(instance=selected, schema=schema)
+    json_compatible_item_data = jsonable_encoder(selected)
+    res = es.index(index=idx_stats, body=json.dumps(selected))
+    print(res)
+    log_stats(request, data=selected)
+    return JSONResponse(content=json_compatible_item_data)
+
+
+@app.put('/set_standards')
+async def set_standards(request: Request, set_standards: dict):
+    """Validate and set preference of standards (done by Admin).
+    """
+    # TODO: Once we are connected to LDAP, add line to verify auth of Admin.
+    schema = {
+        "type" : "object",
+        "properties" : {
+            "username" : {"type" : "string"},
+            "standard_key": {"type" : "number"},
+            "priority" : {"type" : "number"},
+        },
+    }
+    validate(instance=set_standards, schema=schema)
+    json_compatible_item_data = jsonable_encoder(set_standards)
+    es.index(index=idx_stats, body=json.dumps(set_standards))
+    # TODO: Update the priority of the selected standards, ES code to update an item to {"priority": 100}
+    #es.index(index=idx_main, body=json.dumps(selected))
+    log_stats(request, data=set_standards)
     return JSONResponse(content=json_compatible_item_data)
 
 
@@ -194,8 +252,4 @@ if __name__ == "__main__":
     print(json.dumps(startMsg))
     fastapi_logger.info(json.dumps(startMsg))
     #read_logs()
-    #log_config = uvicorn.config.LOGGING_CONFIG
-    #log_config["formatters"]["access"]["fmt"] = "%(asctime)s - %(levelname)s - %(message)s"
-    #log_config["formatters"]["default"]["fmt"] = "%(asctime)s - %(levelname)s - %(message)s"
-    #print(log_config["formatters"]["default"]["fmt"])
     uvicorn.run(app, host="0.0.0.0", port=8080)

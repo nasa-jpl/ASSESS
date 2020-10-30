@@ -14,7 +14,8 @@ from web_utils import connect_to_es
 
 
 # Connect to Elasticsearch
-es, es_index = connect_to_es()
+es, idx_main, idx_log, idx_stats = connect_to_es()
+
 
 def parse_text(filepath):
     if os.path.exists(filepath+'_parsed.txt'):
@@ -40,7 +41,7 @@ def predict(file=None, in_text=None):
     json_output_dir = 'output'
     models_dir = 'models'
 
-    res = es.search(index=es_index, body= {"query": {"match_all": {} }})
+    res = es.search(index=idx_main, body= {"query": {"match_all": {} }})
     print(res)
     #TODO: Fix this line
     #df = pd.concat(map(pd.DataFrame.from_dict, res), axis=1)

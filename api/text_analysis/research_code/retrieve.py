@@ -14,7 +14,7 @@ df.fillna('', inplace=True)
 # # ======================================================================================================================
 #
 # find elmo vectors for each token in the text
-from webapp.text_analysis.utils.elmo import *
+from api.text_analysis.utils.elmo import *
 import tensorflow_hub as hub
 import tensorflow.compat.v1 as tf
 import copy
@@ -49,7 +49,7 @@ for indx, row in df.iterrows():
 ## Retrival based on 'averaged' version of ELMO (fast). Create a paragraph vector by squishing the ELMO token vectors.
 # ======================================================================================================================
 from sklearn.neighbors import NearestNeighbors
-from webapp.text_analysis.utils.elmo import *
+from api.text_analysis.utils.elmo import *
 import ast
 import dask.dataframe as dd
 import multiprocessing
@@ -97,8 +97,8 @@ for indx, dist in zip(indices[:10],distances[:10]):
 from sklearn.neighbors import NearestNeighbors
 import dask.dataframe as dd
 import multiprocessing
-from webapp.text_analysis.utils.utils import *
-from webapp.text_analysis.utils.word_vectors import *
+from api.text_analysis.utils.utils import *
+from api.text_analysis.utils.word_vectors import *
 import time
 
 for model_type in ['w2v','glove']:

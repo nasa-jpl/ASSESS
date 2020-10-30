@@ -52,7 +52,7 @@ This is research code to try out Elmo implementations
 # ======================================================================================================================
 import tensorflow_hub as hub
 import tensorflow.compat.v1 as tf
-from webapp.text_analysis.elmo_util import *
+from api.text_analysis.elmo_util import *
 from scipy.spatial import distance
 
 # To make tf 2.0 compatible with tf1.0 code, we disable the tf2.0 functionalities

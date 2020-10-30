@@ -1,4 +1,4 @@
-webapp/output/*
+api/output/*
 
 *.pyc
 

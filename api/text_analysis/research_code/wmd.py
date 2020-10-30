@@ -42,7 +42,7 @@ sentence_B = preprocess(sentence_B, model)
 # ======================================================================================================================
 ## WMD Using PulP solver
 # ======================================================================================================================
-from webapp.text_analysis.wmd_util import *
+from api.text_analysis.wmd_util import *
 
 print('stated calculating wmd....')
 prob = word_mover_distance_probspec(sentence_A, sentence_B, model)

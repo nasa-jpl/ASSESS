@@ -2,7 +2,7 @@ import statistics
 import networkx as nx
 import plotly.graph_objs as go
 import plotly.offline
-from webapp.text_analysis.utils.retrieve import *
+from api.text_analysis.utils.retrieve import *
 
 
 
