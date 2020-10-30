@@ -3,7 +3,7 @@ create ELMO vectors for all the standards and save it: use multi-threading to ma
 """
 import pandas as pd
 import os
-from webapp.text_analysis.elmo_util import *
+from api.text_analysis.elmo_util import *
 import dask.dataframe as dd
 import multiprocessing
 import time

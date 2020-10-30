@@ -6,13 +6,13 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import normalize
 
-from webapp.text_analysis.utils.word_vectors import *
-from webapp.text_analysis.utils.utils import *
+from api.text_analysis.utils.word_vectors import *
+from api.text_analysis.utils.utils import *
 from sklearn.feature_extraction import text
-from webapp.text_analysis.utils.soft_cosine import *
+from api.text_analysis.utils.soft_cosine import *
 import datetime
 
-from webapp.text_analysis.utils.elmo import *
+from api.text_analysis.utils.elmo import *
 import tensorflow_hub as hub
 import tensorflow.compat.v1 as tf
 import copy

@@ -1,8 +1,0 @@
-redis:
-  - localhost:9080
-es_server: 
-  - localhost
-  #- 172.19.0.2
-es_index:
-  - test-csv
-  #- iso_final_clean

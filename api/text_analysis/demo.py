@@ -1,5 +1,5 @@
-from webapp.text_analysis.utils.hplotprecdict import *
-from webapp.text_analysis.utils.utils import *
+from api.text_analysis.utils.hplotprecdict import *
+from api.text_analysis.utils.utils import *
 import pandas as pd
 import os
 

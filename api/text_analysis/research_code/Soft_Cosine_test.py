@@ -20,12 +20,12 @@ import numpy as np
 
 from scipy import spatial
 
-import webapp.text_analysis.research_code.Soft_Cosine_class as soft_cosine_1
-from webapp.text_analysis.utils.soft_cosine import *
+import api.text_analysis.research_code.Soft_Cosine_class as soft_cosine_1
+from api.text_analysis.utils.soft_cosine import *
 import time
 
 # %%
-from webapp.text_analysis.utils.word_vectors import *
+from api.text_analysis.utils.word_vectors import *
 # In the absence of copious training data we can utilize the pre-trained word embeddings. Google trained their model
 # utilizing a Google News dataset with roughly 100 billion words. The vector length is 300 features
 # pre_trained = os.path.join(dir_path, 'GoogleNews-vectors-negative300.bin')
