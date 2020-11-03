@@ -186,18 +186,7 @@ async def search(request: Request, searchq: str = Field(example="Airplanes"), si
         results[str(num+1)] = hit["_source"]#["num_id"]
     log_stats(request, data=searchq)
     return JSONResponse(content=results)    
-
-@app.get('/search2/{searchq}')
-async def search2():
-    """Search Demo
-    """
-    x = {
-    "name": "Foo",
-    "description": "An optional description",
-    "price": 45.2,
-    "tax": 3.5
-    }
-    return x 
+    
 
 @app.put('/add_standards', response_class=HTMLResponse)
 async def add_standards(request: Request, doc: dict):
