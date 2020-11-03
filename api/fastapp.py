@@ -27,7 +27,7 @@ from fastapi.logger import logger as fastapi_logger
 from logging.handlers import RotatingFileHandler
 import logging
 from jsonschema import validate
-
+import time
 
 app = FastAPI()
 origins = [
@@ -70,6 +70,8 @@ def log_stats(request, data=None, user=None):
     msg = {}
     # TODO: Log user once authentication is connected.
     #msg["user"] = str(user)
+    #request.state.time_started = time.time()
+    msg["time_started"] = str(time.time())
     msg["method"] = str(request.method)
     msg["url"] = str(request.url)
     msg["host"] = str(client_host)
@@ -182,9 +184,9 @@ async def search(request: Request, searchq: str = Field(example="Airplanes"), si
     results = {}
     for num, hit in enumerate(res['hits']['hits']):
         results[str(num+1)] = hit["_source"]#["num_id"]
-    #jsonResults = json.dumps(results, indent=4)
-    #jsonResults = json.loads(results, indent=4)
-    json_compatible_item_data = jsonable_encoder(results)
+    jsonResults = json.dumps(results, indent=4)
+    jsonResults = json.loads(results, indent=4)
+    json_compatible_item_data = jsonable_encoder(jsonResults)
     log_stats(request, data=searchq)
     return JSONResponse(content=json_compatible_item_data)    
 
