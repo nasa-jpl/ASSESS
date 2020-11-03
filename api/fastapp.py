@@ -182,8 +182,9 @@ async def search(request: Request, searchq: str = Field(example="Airplanes"), si
     results = {}
     for num, hit in enumerate(res['hits']['hits']):
         results[str(num+1)] = hit["_source"]#["num_id"]
-    jsonResults = json.dumps(results, indent = 4)
-    json_compatible_item_data = jsonable_encoder(jsonResults)
+    #jsonResults = json.dumps(results, indent=4)
+    #jsonResults = json.loads(results, indent=4)
+    json_compatible_item_data = jsonable_encoder(results)
     log_stats(request, data=searchq)
     return JSONResponse(content=json_compatible_item_data)    
 
