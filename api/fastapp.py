@@ -185,7 +185,7 @@ async def search(request: Request, searchq: str = Field(example="Airplanes"), si
     for num, hit in enumerate(res['hits']['hits']):
         results[str(num+1)] = hit["_source"]#["num_id"]
     log_stats(request, data=searchq)
-    return JSONResponse(content=jsonResults)    
+    return JSONResponse(content=results)    
 
 @app.get('/search2/{searchq}')
 async def search2():
