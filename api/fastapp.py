@@ -175,7 +175,7 @@ async def standard_info(
     return JSONResponse(content=json_compatible_item_data)    
 
 
-@app.get('/search/{searchq}', response_class=HTMLResponse)
+@app.get('/search/{searchq}')
 async def search(request: Request, searchq: str = Field(example="Airplanes"), size: int = 10):
     """Search elasticsearch.
     """
@@ -188,6 +188,18 @@ async def search(request: Request, searchq: str = Field(example="Airplanes"), si
     log_stats(request, data=searchq)
     return JSONResponse(content=jsonResults)    
 
+@app.get('/search2/{searchq}')
+async def search2():
+    """Search Demo
+    """
+    x = {
+    "name": "Foo",
+    "description": "An optional description",
+    "price": 45.2,
+    "tax": 3.5
+    }
+    y = json.loads(x)
+    return y 
 
 @app.put('/add_standards', response_class=HTMLResponse)
 async def add_standards(request: Request, doc: dict):
