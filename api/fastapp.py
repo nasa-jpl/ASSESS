@@ -186,7 +186,7 @@ async def search(request: Request, searchq: str = Field(example="Airplanes"), si
         results[str(num+1)] = hit["_source"]#["num_id"]
     jsonResults = json.dumps(results, indent=4)
     log_stats(request, data=searchq)
-    return JSONResponse(content=json_compatible_item_data)    
+    return JSONResponse(content=jsonResults)    
 
 
 @app.put('/add_standards', response_class=HTMLResponse)
