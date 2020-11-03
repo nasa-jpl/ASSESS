@@ -167,7 +167,8 @@ async def standard_info(
     results = {}
     for num, hit in enumerate(res['hits']['hits']):
         results[num+1] = hit["_source"]
-    json_compatible_item_data = jsonable_encoder(results)
+    jsonResults = json.dumps(results, indent = 4)
+    json_compatible_item_data = jsonable_encoder(jsonResults)
     log_stats(request, data=info_key)
     return JSONResponse(content=json_compatible_item_data)    
 
