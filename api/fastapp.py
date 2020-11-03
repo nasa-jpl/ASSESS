@@ -198,8 +198,7 @@ async def search2():
     "price": 45.2,
     "tax": 3.5
     }
-    y = json.loads(x)
-    return y 
+    return x 
 
 @app.put('/add_standards', response_class=HTMLResponse)
 async def add_standards(request: Request, doc: dict):
