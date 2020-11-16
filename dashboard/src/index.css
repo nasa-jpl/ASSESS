@@ -26,6 +26,7 @@ code {
 .rec-title {
   color: #fff;
   font-size: 2rem;
+  display: inline-block;
 }
 
 .report-header {
@@ -60,4 +61,16 @@ code {
   margin: 0 auto;
   width: 100%;
   font-size: 1.5rem !important;
+}
+
+.section-description {
+  padding-left: 5vh;
+  font-size: 1.5em;
+}
+
+.info-icon{
+  display: inline-block;
+  font-size: 1.2em;
+  color: #fff;
+  margin-left: 10px;
 }

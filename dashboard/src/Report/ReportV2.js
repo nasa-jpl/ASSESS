@@ -13,7 +13,7 @@ import Container from "react-bootstrap/Container";
 import { Dropdown } from "react-bootstrap"
 
 
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaQuestionCircle } from 'react-icons/fa';
 
 const StyledHeader =  styled.div`
     background-color: #343d4c;
@@ -56,6 +56,15 @@ const Button = styled.a`
     }
 `;
 
+
+// const useStyles = makeStyles((theme) => ({
+//     absolute: {
+//         position: "absolute", 
+//         bottom: theme.spacing(2),
+//         right: theme.spacing(3)
+//     }
+// }))
+
 const Report = (props) => {
     props.recs.forEach(function(d, i){
         d.toggle_id = i
@@ -83,8 +92,9 @@ const Report = (props) => {
         setSearchValue("")
     }
 
-    const subfunction = () => {
+    const searchSubmit = () => {
         //do api call here!
+        console.log(searchValue)
         // pass props to child components
         
     }
@@ -104,6 +114,11 @@ const Report = (props) => {
 
                         <Col xs={5} style={{paddingLeft:"40px"}}>
                             <h2 className="rec-title"> Referenced Standards </h2>
+                            <Tooltip title="Embedded">
+                                <Button aria-label="embedded">
+                                    <FaQuestionCircle className="info-icon"/>
+                                </Button>
+                            </Tooltip>
                         </Col>
                     </Row>
                     <References standards={refs} />
@@ -146,7 +161,7 @@ const Report = (props) => {
                                         value={searchValue} 
                                         onChange={handleChange}
                                         onClick={clearSearch}
-                                        // onSubmit={submitfunctionhere}
+                                        onSubmit={searchSubmit}
                                     />
                                     <Button >
                                         <p className="search"> <FaSearch /> </p>

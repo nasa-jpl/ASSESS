@@ -13,7 +13,7 @@ import PdfItem from "./PdfItem";
 
 import Loader from "react-loader-spinner";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
-
+import {getSearch} from "./../api/api";
 
 const Uploader = props => {
     const defaultText = 'Copy and Paste text here!'

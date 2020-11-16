@@ -76,19 +76,29 @@ export const getStandardInfo = async () => {
     .then(response => console.log(response));
 }
 
-export const getSearch = async (input) => {
-    const response = await fetch(url + endpoints.search,
-        {
-            method: "POST",
-            body: JSON.stringify({placeholder: input})
+export const getSearch = async (input, size=10) => {
+    if (!input) return undefined
+    let tmp = input.split(' ')
+    let uploadText;
+    if (tmp.length > 1){
+        tmp.forEach(function(d, i){
+            if (!i) uploadText = d
+            else uploadText += "%20" + d
         })
-        const reader = response.body.getReader();
-        console.log(reader);
-        const utf8Decoder = new TextDecoder('utf-8')
-        let {value: chunk, done: readerDone} = await reader.read();
-        chunk = chunk ? utf8Decoder.decode(chunk) : "";
-        console.log(chunk)
-        return JSON.parse(chunk)
+    } else {
+        uploadText = tmp[0]
+    }
+    
+
+    // const response = await fetch(
+    //     url + endpoints.search + "/" + uploadText + "?size=" + size,
+    //     {method: "GET"}
+    // )
+    // .then(response => console.log(response))
+    const data = await axios.get(
+        url + endpoints.search + "/" + uploadText + "size=" + size,
+    )
+    return data.data
 }
 
 
