@@ -11,9 +11,15 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import { Dropdown } from "react-bootstrap"
+import { withStyles, makeStyles } from "@material-ui/core/styles";
 
+import { FormControlLabel } from "@material-ui/core";
 
+import DropdownCheckboxes from "./../components/DropdownCheckboxes";
+
+import Tooltip from '@material-ui/core/Tooltip';
 import { FaSearch, FaQuestionCircle } from 'react-icons/fa';
+import { Checkbox } from '@material-ui/core';
 
 const StyledHeader =  styled.div`
     background-color: #343d4c;
@@ -56,23 +62,49 @@ const Button = styled.a`
     }
 `;
 
+const LightTooltip = withStyles((theme) => ({
+    tooltip: {
+      backgroundColor: "#fcf8c0",
+      color: 'rgba(0, 0, 0, 0.87)',
+      boxShadow: theme.shadows[1],
+      fontSize: "1.2rem",
+      marginTop: "20px"
 
-// const useStyles = makeStyles((theme) => ({
-//     absolute: {
-//         position: "absolute", 
-//         bottom: theme.spacing(2),
-//         right: theme.spacing(3)
-//     }
-// }))
+    },
+  }))(Tooltip);
+
+const customDropdown = {
+    dropdownButton: (provided, state) => ({
+        ...provided,
+        backgroundColor: "#000"
+    })
+}
 
 const Report = (props) => {
     props.recs.forEach(function(d, i){
         d.toggle_id = i
     })
+
+    const uniqueMain = []
+    const uniqueCatogories = []
+    
+    props.recs.forEach(d=> {
+        if (!uniqueMain.includes(d.type[0])){
+            uniqueMain.push(d.type[0])
+        }
+    })
+    props.recs.forEach(d=> {
+        if (!uniqueCatogories.includes(d.tc)){
+            uniqueCatogories.push(d.tc)
+        }
+    })
+
     const [recs, setRecs] = useState(props.recs)
     const [refs, setRefs] = useState(props.refs)
-    const [searchValue, setSearchValue] = useState("Search the database")
-    const [userSearched, setUserSearched] = useState(false)
+    const [categories, setCategories] = useState(uniqueCatogories)
+    const [main, setMain] = useState(uniqueMain)
+    const [filterValue, setFilterValue] = useState("Keyword filter")
+    const [userFiltered, setUserFiltered] = useState(false)
     const [pdfs , setPdfs] = useState(props.pdfs)
 
     const renderPdf = (file) => {
@@ -80,7 +112,7 @@ const Report = (props) => {
     }
 
     const handleChange = (event) => {
-        setSearchValue(event.target.value)
+        setFilterValue(event.target.value)
     }
 
     const handleSubmit = (event) => {
@@ -89,15 +121,27 @@ const Report = (props) => {
     }
 
     const clearSearch = () => {
-        setSearchValue("")
+        setFilterValue("")
     }
 
-    const searchSubmit = () => {
+    const filterSubmit = () => {
         //do api call here!
-        console.log(searchValue)
+        console.log(filterValue)
         // pass props to child components
         
     }
+
+    const dropdownChecked = (e) => {
+        console.log(e)
+    }
+
+    const handleFilter = (filtered, sel) => {
+        const tmp = props.recs.filter(function(d){
+            if (filtered.includes((sel == "main" ? d.type[0] : d.tc))) return d
+        })
+        setRecs(tmp)
+    }
+
 
     return (
         <Container expand="lg" style={{width: "100%", maxWidth: "100%", padding: "0px", height: "100%"}}>
@@ -110,58 +154,66 @@ const Report = (props) => {
                         <RecTitle navigateTo={props.navigateTo}/>
                         {pdfs ? <UploadBar pdfs={pdfs} renderPdf={renderPdf}/> : null }
                     </Row>
-                    <Row style={{background:"#343e4c", height:"5vh", minHeight:"85px", paddingTop:"20px"}}>
-
-                        <Col xs={5} style={{paddingLeft:"40px"}}>
-                            <h2 className="rec-title"> Referenced Standards </h2>
-                            <Tooltip title="Embedded">
+                    <Row style={{background:"#343e4c", minHeight:"85px", padding:"30px 0px"}}>=
+                        <Col md={12} lg={6} style={{paddingLeft:"40px"}}>
+                            <h2 className="rec-title"> Embedded Standards </h2>
+                            <LightTooltip title="Embedded standards are standards that are directly found within the document or text that was uploaded"
+                                className="clarify-tooltip"
+                            >
                                 <Button aria-label="embedded">
                                     <FaQuestionCircle className="info-icon"/>
                                 </Button>
-                            </Tooltip>
+                            </LightTooltip>
                         </Col>
                     </Row>
                     <References standards={refs} />
-                    <Row style={{background:"#343e4c", height:"5vh", minHeight:"85px", paddingTop:"20px"}}>
-                        <Col xs={5} style={{paddingLeft:"40px"}}>
+                    <Row style={{background:"#343e4c", minHeight:"85px", paddingTop:"30px"}}>
+                        <Col md={12} lg={12} xl={6} style={{paddingLeft:"40px"}}>
                             <h2 className="rec-title"> Recommended Standards </h2>
+                            <LightTooltip title="Recommended standards are standards suggested using machine learning models "
+                                className="clarify-tooltip"
+                            >
+                                <Button aria-label="recommended">
+                                    <FaQuestionCircle className="info-icon"/>
+                                </Button>
+                            </LightTooltip>
                         </Col>
-                        <Col xs={2}>
-                            <Dropdown >
-                                <Dropdown.Toggle className="dropdown-custom-1">
-                                    Category: All
-                                </Dropdown.Toggle>
-
-                                <Dropdown.Menu className="drop-menu">
-                                    <Dropdown.Item className="menu-item" href="#/action-1">Item 1</Dropdown.Item>
-                                    <Dropdown.Item className="menu-item" href="#/action-2">Item 2</Dropdown.Item>
-                                    <Dropdown.Item className="menu-item" href="#/action-3">Item 3</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
+                    </Row>
+                    <Row style={{background:"#343e4c", paddingBottom: "30px"}}>
+                        <Col xs={12} sm={12} md={12} lg={12} xl={4}>
+                            <div className="filters-box">
+                                <h4 className="filters-title"> Filter: Category</h4>
+                            </div>
+                            <DropdownCheckboxes
+                                className="dropdown-menu-box"
+                                values={uniqueMain}
+                                handleFilter={handleFilter}
+                                dropdownType={'main'}
+                            />
                         </Col>
-                        <Col xs={2}>
-                            <Dropdown >
-                                <Dropdown.Toggle className="dropdown-custom-1">
-                                    Body: All
-                                </Dropdown.Toggle>
-
-                                <Dropdown.Menu className="drop-menu">
-                                    <Dropdown.Item className="menu-item" href="#/action-1">Item 1</Dropdown.Item>
-                                    <Dropdown.Item className="menu-item" href="#/action-2">Item 2</Dropdown.Item>
-                                    <Dropdown.Item className="menu-item" href="#/action-3">Item 3</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
+                        <Col xs={12} sm={12} md={12} lg={12} xl={4}>
+                            <div className="filters-box">
+                                <h4 className="filters-title"> Filter: Body</h4>
+                            </div>
+                            <DropdownCheckboxes 
+                                values={categories}
+                                handleFilter={handleFilter}
+                                dropdownType={'categories'}
+                            />
                         </Col>
-                        <Col xs={3}>
-                            <div>
-                                <form style={{ height: "100%" }} onSubmit={handleSubmit} >
+                        <Col xs={12} sm={12} md={12} lg={12} xl={4}>
+                            <div className="filters-box">
+                                <h4 className="filters-title"> Filter: Keyword</h4>
+                            </div>
+                            <div className="dropdown-menu-box">
+                                <form style={{ height: "100%"}} onSubmit={handleSubmit} >
                                     <input 
-                                        style={{display:"inline-block", height: "40px", width: "60%", color: "#ababab"}} 
+                                        style={{display:"inline-block", height: "40px", width: "80%", color: "#ababab", marginLeft: "10%"}} 
                                         type="text" 
-                                        value={searchValue} 
+                                        value={filterValue} 
                                         onChange={handleChange}
                                         onClick={clearSearch}
-                                        onSubmit={searchSubmit}
+                                        onSubmit={filterSubmit}
                                     />
                                     <Button >
                                         <p className="search"> <FaSearch /> </p>

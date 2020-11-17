@@ -15,9 +15,9 @@ const References = (props) => {
     );
     return (
         <div style={{paddingTop:"30px"}}>
-            { refs.length ?  <ul style={{marginTop: "15px", marginBottom: "25px"}}> {refs} </ul> 
-            : <div style={{height:"10vh", paddingLeft: "50px", paddingTop: "10vh"}}>  
-                <h2> No Referenced Standards </h2>
+            { refs.length ?  <ul style={{marginTop: "15px", marginBottom: "25px", listStyle:"none"}}> {refs} </ul> 
+            : <div style={{margin: "50px 0px", paddingLeft: "50px"}}>  
+                <h2> No Embedded Standards </h2>
             </div> }
         </div>
     )

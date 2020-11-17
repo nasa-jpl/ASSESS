@@ -64,24 +64,31 @@ const Uploader = props => {
                     <Sidebar />
                 </Col>
                 <Col xs={{span:8, offset:1}}>
-                    <div style={{padding: "15px", marginTop: "10vh"}}>
-                        <h1 className="upload-title"> Upload </h1>
-                        <p className="upload-description"> Assess uses machine-learning to identify standards referenced in your work and
-                            standards relevant to your work. Upload a document or paste a block of text in the window below.
-                        </p>
-                        
-                    </div>
-
-                    <div className="uploader-menu">
-                        <button className="text-button" onClick={() => setUploadMode('pdf')}> Upload Documents</button>
-                        <button className="text-button" onClick={() => setUploadMode('text')}> Upload Text</button>
-                    </div>
+                    <Row>
+                        <div style={{padding: "15px", marginTop: "10vh"}}>
+                            <h1 className="upload-title"> Upload </h1>
+                            <p className="upload-description"> Assess uses machine-learning to identify standards referenced in your work and
+                                standards relevant to your work. Upload a document or paste a block of text in the window below.
+                            </p>
+                        </div>
+                    </Row>
+                    <Row className="uploader-menu">
+                        <Col md={12} lg={6}>
+                            <button className={mode=="pdf" ? "text-button-selected" : "text-button"} onClick={() => setUploadMode('pdf')}> Upload Documents</button>
+                        </Col>
+                        <Col md={12} lg={6}>
+                            <button className={mode=="text" ? "text-button-selected" : "text-button"}  onClick={() => setUploadMode('text')}> Upload Text</button>
+                        </Col>
+                           
+                            
+                    </Row>
+                    
                     {mode == "pdf" ? 
                         <DropZone  onPdfUploaded={pdfUploaded} accept="application/pdf" />
                     : 
                         <div style={{padding:"15px", backgroundColor: "#d1d9e5"}}>
                             <textarea 
-                                style={{height:"45vh", width: "100%", fontSize:"2em", padding: "35px 20px", color: "#ababab", backgroundColor: "#fafafa"}}
+                                style={{height:"45vh", width: "100%", fontSize:"2rem", padding: "35px 20px", color: "#ababab", backgroundColor: "#fafafa"}}
                                 type='text' 
                                 value={text} 
                                 onChange={handleTextChange}

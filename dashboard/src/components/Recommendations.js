@@ -16,7 +16,7 @@ const Recommendations = (props) => {
     
     return (
         <div style={{paddingTop: "30px"}}>
-            <ul style={{marginTop: "15px"}}> {recs} </ul>
+            <ul style={{marginTop: "15px", listStyle:"none"}}> {recs} </ul>
         </div>
         
     )
