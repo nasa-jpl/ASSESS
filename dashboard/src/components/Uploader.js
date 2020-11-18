@@ -59,7 +59,7 @@ const Uploader = props => {
         <Container expand="lg" style={{width: "100%", maxWidth: "100%", padding: "0px", height: "100%"}}>
             <Row style={{ width: "100%", margin: 0, padding: "0px", height: "100vh" }}>
                 <Col xs={2} style={{padding: "0px"}}>
-                    <Sidebar />
+                    <Sidebar page={'uploader'} />
                 </Col>
                 <Col xs={{span:8, offset:1}}>
                     <Row>

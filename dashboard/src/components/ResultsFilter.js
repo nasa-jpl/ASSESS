@@ -35,13 +35,6 @@ const ResultsFilter = (props) => {
         props.updateDispRecs(tmp)
     }
 
-
-    const handleSubmit = (event) => {
-        alert("A Search was submitted! want to send to API instead " + this.state.searchValue )
-        event.preventDefault();
-    }
-
-
     const handleChange = (event) => {
         setFilterValue(event.target.value)
 

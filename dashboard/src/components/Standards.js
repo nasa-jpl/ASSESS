@@ -58,7 +58,6 @@ const Standards = (props) => {
     const onCopyClick = () => {
         alert.show("Copied to clipboard!")
     }
-    
     return (
         <div style={{margin:"20px 35px"}}>
             <Styles>

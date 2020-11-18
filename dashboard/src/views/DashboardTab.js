@@ -3,6 +3,7 @@ import { withRouter } from "react-router";
 
 import Uploader from "./../components/Uploader"
 import Report from "../components/Report";
+import Search from "../components/Search";
 
 import { fetchData } from "../api/api";
 
@@ -38,6 +39,8 @@ const DashboardTab = props => {
             setText('')
         } else if (page == "report"){
             setActiveKey(page);
+        } else if (page == 'search'){
+            setActiveKey(page);
         }
     }  
 
@@ -57,6 +60,12 @@ const DashboardTab = props => {
                                 navigateTo={navigateTo}
                             />
                         );
+                    case 'search':
+                        return (
+                            <Search 
+                                navigateTo={navigateTo}
+                            />
+                        )
                     default:
                         return null;
                 }

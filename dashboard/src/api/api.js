@@ -47,8 +47,4 @@ export const fetchData = async ( selection, data, size=10) => {
     const response = await axios(options)
     if (response.status == 200) return response.data
     else return null;
-}   
-
-
-
-
+}

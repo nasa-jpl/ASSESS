@@ -28,9 +28,9 @@ const Report = (props) => {
         <Container expand="lg" style={{width: "100%", maxWidth: "100%", padding: "0px", height: "100%"}}>            
             <Row style={{ width: "100%", margin: 0, padding: "0px", height: "100vh" }}>
                 <Col xs={2} style={{padding: "0px"}}>
-                    <Sidebar />
+                    <Sidebar page='report' navigateTo={props.navigateTo}/>
                 </Col>
-                <Col xs={10} style={{padding: "0px"}}>
+                <Col xs={10} style={{padding: "15px"}}>
                     <div style={{padding: "2vh 50px"}}>
                         <Row>
                             <h1 className="title"> Standards Report </h1>
