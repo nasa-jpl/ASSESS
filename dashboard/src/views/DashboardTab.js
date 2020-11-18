@@ -1,88 +1,70 @@
-import React, { Component } from "react";
-import Tabs from "react-bootstrap/Tabs";
-import Tab from "react-bootstrap/Tab";
-import Spinner from "react-bootstrap/Spinner";
+import React, { useState } from "react";
 import { withRouter } from "react-router";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import fetchRecsAction from "./../redux/actions/fetchRecs";
 
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Container from "react-bootstrap/Container";
+import Uploader from "./../components/Uploader"
+import Report from "../components/Report";
 
-import Uploader from "./../components/UploaderV2"
-import Report from "./../Report/Report";
+import { fetchData } from "../api/api";
 
-import {
-    getRec,
-    getRecLoading,
-    getRecError,
-} from "../redux/selectors";
-import PdfViewer from "../PdfViewer/PdfViewer";
+const DashboardTab = props => {
+    const [pdf, setPdf] = useState(undefined)
+    const [activeKey, setActiveKey] = useState('uploader')
+    const [text, setText] = useState('')
+    const [recs, setRecs] = useState([])
+    const [refs, setRefs] = useState([])
 
-class DashboardTab extends Component {
-    constructor(props){ 
-        super(props);
-        this.state = {
-            activeKey: 'uploader',
-            pdfs: {},
-            text: null,
-            previewPdf: null
-        }
-
+    const uploadPdf = async (files) => {
+        //How am i supposed to handle errors? In this component do i catch a failed response code from the api and display
+        // a warning message to the user?
+        const resp = await fetchData('recFile', files[0])
+        setRecs(resp.recc)
+        setRefs(resp.refs)
+        setPdf(files)
+        setActiveKey('report')
     }
 
-    uploadFinished = (files) => {
-        this.setState({pdfs: files})
-        this.setState({activeKey:"report"})
+    const uploadText = async (text) => {
+        const resp = await fetchData('recText', text);
+        setRecs(resp.recc)
+        setRefs(resp.refs)
+        setText(text)
+        setActiveKey('report')
     }
 
-    renderPdf = (file) => {
-        this.setState({previewPdf: file})
-        this.setState({activeKey:"preview"})
-    }
-
-    navigateTo = (page) => {
+    const navigateTo = (page) => {
         if (page == "uploader"){
-            this.setState({ activeKey: page, pdfs: {}, text: null, previewFile: null})
+            setActiveKey(page)
+            setPdf(null)
+            setText('')
+        } else if (page == "report"){
+            setActiveKey(page);
         }
-        else if (page == "report" || page == "preview" ) this.setState({ activeKey: page})
-    }
+    }  
 
+    return (
+        <div>
+            {(function() {
+                switch (activeKey) {
+                    case 'uploader':
+                        return <Uploader uploadPdf={uploadPdf} uploadText={uploadText} />
+                    case 'report':
+                        return (
+                            <Report 
+                                pdfs={pdf}
+                                text={text}
+                                recs={recs}
+                                refs={refs}
+                                navigateTo={navigateTo}
+                            />
+                        );
+                    default:
+                        return null;
+                }
+            })()}
+        </div>
+    );
 
-    render() {
-        if (this.state.activeKey == "uploader"){
-            return (
-                <Uploader
-                    uploadFinished={this.uploadFinished} 
-                />
-            )
-        } else if (this.state.activeKey == "report"){
-            return (
-                <div style={{ margin: "0px" }}>
-                    <Report 
-                        pdfs={this.state.pdfs}
-                        text={this.state.text}
-                        recs={this.props.rec.recc}
-                        renderPdf={this.renderPdf}
-                        navigateTo={this.navigateTo}
-                    />
-                </div>
-            )
-        } else if (this.state.activeKey == "preview"){
-            return (
-                <div style={{ margin: "0px" }}>
-                    <PdfViewer 
-                        previewFile={this.state.previewPdf}
-                        navigateTo={this.navigateTo}
-                    />
-                </div>
-            )
-        }
-    }
 
 }
-
 
 export default DashboardTab;

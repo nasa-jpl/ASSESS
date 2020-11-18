@@ -33,6 +33,10 @@ const Button = styled.a`
         color: #d5d6a9;
     }
 
+
+    .copy:hover, .icon:hover, .expand:hover{
+        cursor: pointer;
+    }
 `;
 
 const Container = styled.div`
@@ -133,9 +137,7 @@ const Standards = (props) => {
                 </UncontrolledCollapse>
             </Styles>
         </div>
-        
     )
-    
 }
 
 export default Standards

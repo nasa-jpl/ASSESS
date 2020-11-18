@@ -1,126 +1,54 @@
 import axios from "axios";
 
-const endpoints = {
-    recText: "recommend_text",
-    recFile: "recommend_file",
-    extract: "extract",
-    standardInfo: "standard_info",
-    search: "search"
+const apiValues = {
+    recText: {endpoint: "recommend_text", method: 'post'},
+    recFile: {endpoint: "recommend_file", method: 'post'},
+    extract: {endpoint: "extract", method: 'post'},
+    standardInfo: {endpoint: "standard_info", method: 'get'},
+    search: {endpoint: "search", method: 'get'},
+    check: {endpoint: '', method: 'get'}
 }
 
-const url = "https://assess-api.jpl.nasa.gov/";
+const baseUrl = "https://assess-api.jpl.nasa.gov/";
 
 let username = 'portal'
 let password = '***REMOVED***'
 
-//Axios request
+export const fetchData = async ( selection, data, size=10) => {
+    var url = baseUrl + apiValues[selection].endpoint
+    var uploadData;
 
-export const apiCheck = async () => {
-    // axios.get(url,{}
-    //     // {
-    //     //     headers:{
-    //     //         'Access-Control-Allow-Origin': '*'
-    //     //     },
-    //     //     // auth: {
-    //     //     //     username: username,
-    //     //     //     password: password
-    //     //     // }
-    //     // }
-    // )
-    // .then(response => console.log(response))
-    // .then(json => console.log(json));
-    return fetch(url, {
-        method: "GET"
-    })
-    .then(res=> console.log(res))
-}
-
-
-export const getRecText = async (text) => {
-    const response = await fetch(url + endpoints.recText,
-    {
-        method: "POST",
-        body: JSON.stringify({ text_field: text})
-    })
-    const reader = response.body.getReader();
-    const utf8Decoder = new TextDecoder('utf-8')
-    let {value: chunk, done: readerDone} = await reader.read();
-    chunk = chunk ? utf8Decoder.decode(chunk) : "";
-    return JSON.parse(chunk)
-
-}
-
-export const getRecFile = async (file) => {
-    const formData = new FormData();
-    formData.append('pdf', file)
-    const response = await fetch(url + endpoints.recFile,
-        {
-            method: "POST",
-            body: formData
+    if (selection == 'search'){
+        //If searching the database the url must look appropriate for an E.S. query
+        if (!data) return null;
+        let searchText;
+        data.split(' ').forEach(function(d, i){
+            if (!i) searchText = d
+            else searchText += "%20" + d
         })
-        const reader = response.body.getReader();
-        console.log(reader);
-        const utf8Decoder = new TextDecoder('utf-8')
-        let {value: chunk, done: readerDone} = await reader.read();
-        chunk = chunk ? utf8Decoder.decode(chunk) : "";
-        console.log(chunk)
-        return JSON.parse(chunk)
-    
-}
-
-export const getStandardInfo = async () => {
-    return fetch( url + endpoints.standardInfo,
-    {
-        method: "GET"
-    })
-    .then(response => console.log(response));
-}
-
-export const getSearch = async (input, size=10) => {
-    if (!input) return undefined
-    let tmp = input.split(' ')
-    let uploadText;
-    if (tmp.length > 1){
-        tmp.forEach(function(d, i){
-            if (!i) uploadText = d
-            else uploadText += "%20" + d
-        })
-    } else {
-        uploadText = tmp[0]
+        url += "/" + searchText + "size=" + size;
+        
     }
-    
 
-    // const response = await fetch(
-    //     url + endpoints.search + "/" + uploadText + "?size=" + size,
-    //     {method: "GET"}
-    // )
-    // .then(response => console.log(response))
-    const data = await axios.get(
-        url + endpoints.search + "/" + uploadText + "size=" + size,
-    )
-    return data.data
-}
+    if (selection == 'recText') uploadData = JSON.stringify({text_field: data})    
+    else if (selection == 'recFile') {
+        uploadData = new FormData();
+        uploadData.append('pdf', data)
+    } else if ( selection == 'standardInfo') uploadData = {}
 
 
-// let headers = new Headers();
-// headers.set('Authorization', 'Basic ' + btoa(username + ":" + password));
-// headers.set('Access-Control-Allow-Origin', "*")
+    const options = {
+        url: url,
+        method: apiValues[selection].method,
+        headers: {},
+        data: uploadData
+    }
+
+    const response = await axios(options)
+    if (response.status == 200) return response.data
+    else return null;
+}   
 
 
-// Fetch request
-// export const apiCheck = async () => {
-//     const headers = {
-//         // 'Authorization': 'Basic ' + btoa(username + ":" + password),
-//         'Access-Control-Allow-Origin': "*"
-//     }
-    
-//     return fetch(url, {
-//         method: "POST",
-//         headers: headers,
-//         // mode: 'cors'
-//     })
-//     .then(response => response.json())
-//     .then(json => console.log(json));
-// }
 
 

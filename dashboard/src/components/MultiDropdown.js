@@ -1,7 +1,7 @@
 import React from 'react';
 import chroma from 'chroma-js';
 
-import { colourOptions } from './../docs/data';
+import { colourOptions } from '../docs/data';
 import Select from 'react-select';
 
 const colourStyles = {
@@ -53,7 +53,7 @@ const colourStyles = {
   }),
 };
 
-const DropdownCheckboxes = (props) => {
+const MultiDropdown = (props) => {
     
     const options = []
     props.values.forEach(d=> {
@@ -79,4 +79,4 @@ const DropdownCheckboxes = (props) => {
     )
 }
 
-export default DropdownCheckboxes;
+export default MultiDropdown;

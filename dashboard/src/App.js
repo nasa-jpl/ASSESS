@@ -1,7 +1,5 @@
 import React from 'react';
 import './App.css';
-import Navigation from './components/Navbar';
-import Routes from './Routes';
 import Dashboard from "./views/Dashboard"
 
 import { transitions, positions, Provider as AlertProvider } from 'react-alert'
