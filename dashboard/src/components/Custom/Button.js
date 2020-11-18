@@ -5,10 +5,13 @@ const Button = styled.a``;
 
 const CustomButton = (props) => {
     return (
-        <div style={{display: props.style.display}}>
+        <div style={{display: props.style.display ? props.style.display : "inline-block"}}>
             <Button 
                 onClick={props.onClick}
                 aria-label={props.label}
+                href={props.href}
+                target={props.target}
+                id={props.id}
             >
                 {<props.icon 
                     className={props.className}
