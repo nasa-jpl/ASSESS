@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import { Router, Switch, Route } from "react-router-dom";
 
-import Report from "./Report/Report";
-import Home from "./Home/Home";
+import Report from "./components/Report";
 import history from './history';
 import PdfViewer from "./components/PdfViewer";
 

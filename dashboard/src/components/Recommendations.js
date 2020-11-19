@@ -1,11 +1,10 @@
 import React from 'react';
 import Standard from "./Standards"
-import styled from  'styled-components';
-
+import SectionHead from './SectionHead';
+import ResultsFilter from "./ResultsFilter";
 
 const Recommendations = (props) => {
-    // state.standards =
-    const recs = props.standards.map((standard) => 
+    const recs = props.displayRecs.map((standard) => 
         <li>
             <Standard 
                 standard={standard}
@@ -15,12 +14,21 @@ const Recommendations = (props) => {
     );
     
     return (
-        <div style={{paddingTop: "30px"}}>
-            <ul style={{marginTop: "15px"}}> {recs} </ul>
+        <div>
+            <SectionHead
+                title="Recommended Standards"
+                tooltipText="Recommended standards are standards suggested using machine learning models"
+            />
+            <ResultsFilter 
+                recs={props.standards}
+                updateDispRecs={props.updateDispRecs}
+            />
+
+            <div style={{paddingTop: "30px"}}>
+                <ul style={{marginTop: "15px", listStyle:"none"}}> {recs} </ul>
+            </div>
         </div>
-        
     )
-    
 }
 
-export default Recommendations
+export default Recommendations;
