@@ -26,6 +26,7 @@ code {
 .rec-title {
   color: #fff;
   font-size: 2rem;
+  display: inline-block;
 }
 
 .report-header {
@@ -55,9 +56,54 @@ code {
   margin: 10px 0;
 }
 
+
+
+.section-description {
+  padding-left: 5vh;
+  font-size: 1.5em;
+}
+
+.info-icon{
+  display: inline-block;
+  font-size: 1.2rem;
+  fill: #ababab;
+}
+
+.info-icon:hover{
+  fill: #fcf8c0;
+}
+
+
+.clarify-tooltip {
+  position: relative;
+  bottom: 10px;
+  left: 15px;
+}
+
+.filters-title{
+  color: rgb(196, 196, 196);
+}
+
+.filters-box{
+  padding: 10px 0px 10px 12%;
+}
+
 .start-over-btn {
-  height: 60px;
   margin: 0 auto;
   width: 100%;
   font-size: 1.5rem !important;
+}
+
+
+
+@media only screen and (max-width: 992px){
+  .start-over-btn {
+    margin-top: 50px;
+  }
+}
+
+@media only screen and (max-width: 1200px){
+  .dropdown-menu-box {
+    margin-bottom: 20px;
+  }
 }

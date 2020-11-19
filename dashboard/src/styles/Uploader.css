@@ -1,6 +1,7 @@
 .uploader-menu {
     background-color: #343d4c;
-    height: 100px;
+    margin: 0px;
+    padding: 0px;
 }
 
 .text-button {
@@ -11,7 +12,23 @@
     height: 100%;
     margin-left: 30px;
     color: #c9c9c9;
-    font-size: 1.5em;
+    padding: 30px 35px;
+    font-size: 2.5em;
+    width: 100%;
+    opacity: 0.5
+}
+
+.text-button-selected {
+    border: none;
+    background-color: inherit;
+    cursor: pointer;
+    display: inline-block;
+    height: 100%;
+    margin-left: 30px;
+    color: #ebebeb;
+    padding: 30px 35px;
+    font-size: 2.5em;
+    width: 100%;
 }
 
 .form-button {
@@ -27,18 +44,16 @@
 
 
 
-.text-button:hover {
-    color: #fff;
+.text-button:hover{
+    color: rgb(179, 248, 253);
 }
 
-.text-button {
-    padding: 30px 35px;
-    font-size: 2.5em;
+.text-button-selected:hover{
+    color: rgb(179, 248, 253);
 }
 
 .uploader {
     background-color: #d1d9e5;
-    height: 50vh;
     width: 100%;
     padding: 15px;
 }
@@ -47,9 +62,9 @@
     border: 1px dashed rgb(105, 105, 105);
     border-radius: 10px;
     width: 100%;
-    height: 45vh;
+    height: 40vh;
     font-family: sans-serif;
-    padding: 30px;
+    padding: 20vh 0px 0px 0px;
     background-color: #fafafa;
     display: table;
     text-align: center;
@@ -107,7 +122,7 @@ p {
   
 .center-text {
     font-size: 2em;
-    padding: 15%;
+    /* padding: calc(20vh - 30px) 0px; */
 }
 
 .upload-title {
