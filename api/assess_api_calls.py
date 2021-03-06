@@ -3,8 +3,8 @@ import json
 import time
 
 # Define endpoints
-root = "https://assess-api.jpl.nasa.gov/"
-# root = "http://0.0.0.0:8080/"
+# root = "https://assess-api.jpl.nasa.gov/"
+root = "http://0.0.0.0:8080/"
 urlRec = root + "recommend_text"
 urlRecFile = root + "recommend_file"
 urlExtract = root + "extract"
@@ -13,29 +13,25 @@ urlAdd = root + "add_standards"
 urlStandardInfo = root + "standard_info"
 urlSelect = root + "select_standards"
 urlSet = root + "set_standards"
+
 # Specify file location of an SOW.
-# files = {'pdf': open('/Users/user/prog/assess-root/test.pdf', 'rb')}
+files = {"pdf": open("/Users/vishall/prog/assess-root/test.pdf", "rb")}
 
-# ## Get request to root endpoint.
-# print("Testing root.")
-# r = requests.get(root)
-# print(r.text)
+# Recommend SoW given string "This is for airplanes".
+print("Testing recommend_text.")
+jsonLoad = {"text_field": "This is for airplanes"}
+r = requests.post(urlRec, json=jsonLoad)
+print(r.text)
 
-# # Recommend SoW given string "This is for airplanes".
-# print("Testing recommend_text.")
-# jsonLoad = {"text_field": "This is for airplanes"}
-# r = requests.post(urlRec, json=jsonLoad)
-# print(r.text)
+# Recommend an SoW given a PDF.
+print("Testing recommend_file.")
+r = requests.post(urlRecFile, files=files)
+print(r.text)
 
-# # Recommend an SoW given a PDF.
-# print("Testing recommend_file.")
-# r = requests.post(urlRecFile, files=files)
-# print(r.text)
-
-# # Extract standard reference from PDF.
-# print("Testing extract.")
-# r = requests.post(urlExtract, files=files)
-# print(r.text)
+# Extract standard reference from PDF.
+print("Testing extract.")
+r = requests.post(urlExtract, files=files)
+print(r.text)
 
 # Get standard references.
 print("Testing search.")
