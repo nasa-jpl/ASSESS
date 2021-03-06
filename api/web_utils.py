@@ -9,10 +9,10 @@ import json
 
 
 def connect_to_es():
-    with open("conf.yaml", 'r') as stream:
+    with open("conf.yaml", "r") as stream:
         conf = yaml.safe_load(stream)
     # print(conf['es_index'][0])
-    es = Elasticsearch([conf['es_server'][0]])
+    es = Elasticsearch([conf["es_server"][0]])
     es_index_1 = conf["es_index_main"][0]
     es_index_2 = conf["es_index_logs"][0]
     es_index_3 = conf["es_index_stats"][0]
