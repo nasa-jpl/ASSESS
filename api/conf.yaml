@@ -1,8 +1,8 @@
-redis:
-  - localhost:9080
-es_server: 
+#redis:
+#  - localhost:9080
+es_server:
   #- localhost
-  #- 172.19.0.2
+  - elasticsearch-1
 es_index_main:
   #- test-csv
   - iso_final_clean
