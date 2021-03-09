@@ -1,23 +1,4 @@
-FROM python:3.8
-
-# Install dependencies
-RUN apt-get update \
-    && apt-get upgrade -y \
-    && apt-get autoremove -y \
-    && apt-get install -y \
-        gcc \
-        build-essential \
-        zlib1g-dev \
-        wget \
-        unzip \
-        cmake \
-        python3-dev \
-        gfortran \
-        libblas-dev \
-        liblapack-dev \
-        libatlas-base-dev \
-        install libc-dev \
-    && apt-get clean
+FROM ubuntu:latest
 
 # Set working directory
 WORKDIR /app
@@ -25,10 +6,34 @@ WORKDIR /app
 # Add app to Docker
 COPY ./ ./
 
-# Install dependencies
-RUN pip install --upgrade pip; \
-    pip install --no-cache -r requirements.txt 
+ARG DEBIAN_FRONTEND=noninteractive
 
-WORKDIR /api
+# Install dependencies
+RUN apt-get update
+RUN apt-get -y upgrade 
+
+RUN apt-get -y install python3 \
+    python3-pip 
+
+
+RUN apt-get -y install gfortran \
+    gcc \
+    build-essential \
+    zlib1g-dev \
+    wget \
+    unzip \
+    cmake \
+    python3-dev \
+    libblas-dev \
+    liblapack-dev \
+    libatlas-base-dev \
+    libc-dev
+
+# Install dependencies
+RUN pip3 install --upgrade pip
+RUN pip3 install --upgrade pip setuptools wheel
+RUN pip3 install --upgrade -r requirements.txt 
+
+WORKDIR /app
 # Run FastAPI service
-RUN python fastapp.py --reload
+#RUN python fastapp.py --reload
