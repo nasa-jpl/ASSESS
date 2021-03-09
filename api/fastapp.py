@@ -81,47 +81,6 @@ def log_stats(request, data=None, user=None):
     return
 
 
-# @app.get("/", response_class=HTMLResponse)
-# async def index(request: Request):
-#     host = request.url
-#     recc_text_url = str(host) + "recommend_text"
-#     recc_file_url = str(host) + "recommend_file"
-#     extract_url = str(host) + "extract"
-#     st_info_url = str(host) + "standard_info"
-#     search_url = str(host) + "search"
-#     add_url = str(host) + "add_standards"
-#     content = """
-#     <html>
-#         <head>
-#             <title>ASSESS API</title>
-#         </head>
-#         <body>
-#             <h1>Welcome to the ASSESS API </h1>
-#             <h2>Functional API Endpoints</h2>
-#             <p>{recc_text_url}</p>
-#             <p>{recc_file_url}</p>
-#             <p>{extract_url}</p>
-#             <p>{st_info_url}</p>
-#             <p>{search_url}</p>
-#             <p>{add_url}</p>
-#             <br><br><br>
-#             <h2>Other Links</h2>
-#             <p>https://assess-old.jpl.nasa.gov</p>
-#             <p>https://assess-kb.jpl.nasa.gov</p>
-#             <p>https://assess-api.jpl.nasa.gov/redoc</p>
-#             <p>https://assess-api.jpl.nasa.gov/docs</p>
-#         </body>
-#     </html>""".format(
-#         recc_text_url=recc_text_url,
-#         recc_file_url=recc_file_url,
-#         extract_url=extract_url,
-#         st_info_url=st_info_url,
-#         search_url=search_url,
-#         add_url=add_url,
-#     )
-#     return HTMLResponse(content=content, status_code=200)
-
-
 @app.post("/recommend_text")
 async def recommend_text(request: Request, sow: Sow):
     """Given an input of Statement of Work as text,
@@ -166,7 +125,7 @@ async def standard_info(request: Request, info_key: str, size: int = 1):
     results = {}
     for num, hit in enumerate(res["hits"]["hits"]):
         results[str(num + 1)] = hit["_source"]
-    jsonResults = json.dumps(results, indent=4)
+    jsonResults = json.dumps(results)
     json_compatible_item_data = jsonable_encoder(jsonResults)
     log_stats(request, data=info_key)
     return JSONResponse(content=json_compatible_item_data)
@@ -201,9 +160,7 @@ async def add_standards(request: Request, doc: dict):
 
 @app.post("/select_standards")
 async def select_standards(request: Request, selected: dict):
-    """After a use likes a standard, this endpoint captures the selected standards
-    into the database. Selecting a standard is an end user functionality that we define as
-    a user saying that a recommended or extracted standard will be used by the user."""
+    """After a use likes a standard, this endpoint captures the selected standards into the database"""
     schema = {
         "type": "object",
         "properties": {
@@ -222,8 +179,7 @@ async def select_standards(request: Request, selected: dict):
 
 @app.put("/set_standards")
 async def set_standards(request: Request, set_standards: dict):
-    """Validate and set preference of standards (done by Admin). This functionality
-    is for the admin to set the priority weights of a standards relevance."""
+    """Validate and set preference of standards (done by Admin)."""
     # TODO: Once we are connected to LDAP, add line to verify auth of Admin.
     schema = {
         "type": "object",
