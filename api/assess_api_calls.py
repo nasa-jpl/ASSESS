@@ -1,41 +1,51 @@
-import requests
 import json
 import time
+import requests
+from requests.auth import HTTPBasicAuth
 
-# Define endpoints
+
+# Define username and password:
+username = "INSERT_USERNAME_HERE"
+password = "INSERT_PASSWORD_HERE"
+
 # root = "https://assess-api.jpl.nasa.gov/"
-root = "http://0.0.0.0:8080/"
-urlRec = root + "recommend_text"
-urlRecFile = root + "recommend_file"
-urlExtract = root + "extract"
-urlSearch = root + "search"
-urlAdd = root + "add_standards"
-urlStandardInfo = root + "standard_info"
-urlSelect = root + "select_standards"
-urlSet = root + "set_standards"
+root = "http://0.0.0.0:8080"
+urlRecommendText = root + "/recommend_text"
+urlRecommendFile = root + "/recommend_file"
+urlExtract = root + "/extract"
+urlSearch = root + "/search"
+urlAddStandards = root + "/add_standards"
+urlStandardInfo = root + "/standard_info"
+urlSelectStandards = root + "/select_standards"
+urlSetStandards = root + "/set_standards"
 
 # Specify file location of an SOW.
 files = {"pdf": open("/Users/vishall/prog/assess-root/test.pdf", "rb")}
 
-# Recommend SoW given string "This is for airplanes".
-print("Testing recommend_text.")
-jsonLoad = {"text_field": "This is for airplanes"}
-r = requests.post(urlRec, json=jsonLoad)
+# Recommend SoW given string "Example text about airplanes.".
+print("Sending GET request to `/recommend_text`.")
+jsonLoad = {"text_field": "Example text about airplanes"}
+r = requests.post(
+    urlRecommendText, json=jsonLoad, auth=HTTPBasicAuth(username, password)
+)
 print(r.text)
 
 # Recommend an SoW given a PDF.
-print("Testing recommend_file.")
-r = requests.post(urlRecFile, files=files)
+print("Sending GET request to `/recommend_file` with a PDF.")
+r = requests.post(urlRecommendFile, files=files, auth=HTTPBasicAuth(username, password))
 print(r.text)
 
 # Extract standard reference from PDF.
-print("Testing extract.")
-r = requests.post(urlExtract, files=files)
+print("Sending POST request to `/extract` using a PDF.")
+r = requests.post(urlExtract, files=files, auth=HTTPBasicAuth(username, password))
 print(r.text)
 
 # Get standard references.
-print("Testing search.")
-r = requests.get(urlSearch + "/airplanes%20technology" + "?size=3")
+print("Sending GET request to `/search`.")
+r = requests.get(
+    urlSearch + "/airplanes%20technology" + "?size=3",
+    auth=HTTPBasicAuth(username, password),
+)
 print(r.text)
 
 ## Add/Ingest Standard.
@@ -69,14 +79,14 @@ doc = {
     "url": "https://example.com",
     "description_clean": "Testing index ingestion!",
 }
-print("Testing add_standards")
-r = requests.put(urlAdd, json=doc)
+print("Sending PUT request to `/add_standards`.")
+r = requests.put(urlAddStandards, json=doc, auth=HTTPBasicAuth(username, password))
 print(r.text)
 time.sleep(2)
 
 # Look up newly indexed standard.
-print("Testing standard_info on newly indexed standard")
-r = requests.get(urlStandardInfo + "/111111")
+print("Sending GET request to `/standard_info` on newly indexed standard.")
+r = requests.get(urlStandardInfo + "/111111", auth=HTTPBasicAuth(username, password))
 print(r.text)
 
 # Insert the standard selected by the user into Elasticsearch indices for stats and logs.
@@ -84,8 +94,10 @@ selected = {
     "username": "test_user",
     "standard_key": [1, 2, 3],
 }
-print("Testing user selected standard.")
-r = requests.post(urlSelect, json=selected)
+print("Sending POST request to `/select_standard`.")
+r = requests.post(
+    urlSelectStandards, json=selected, auth=HTTPBasicAuth(username, password)
+)
 print(r.text)
 
 # Insert the standard selected by the admin into Elasticsearch.
@@ -94,6 +106,10 @@ set_standards = {
     "standard_key": 111111,
     "priority": 100,
 }
-print("Testing Admin set standard.")
-r = requests.put(urlSet, json=set_standards)
+
+# Set standards in the database.
+print("Sending PUT request to `set_standard`.")
+r = requests.put(
+    urlSetStandards, json=set_standards, auth=HTTPBasicAuth(username, password)
+)
 print(r.text)
