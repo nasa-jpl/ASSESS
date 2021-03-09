@@ -19,6 +19,11 @@ def connect_to_es():
     return es, es_index_1, es_index_2, es_index_3
 
 
+def format_json(jsonText):
+    parsed = json.loads(jsonText)
+    return json.dumps(parsed, indent=4, sort_keys=True)
+
+
 def read_logs(logFile="log/app.log"):
     with open(logFile) as json_file:
         data = json.load(json_file)

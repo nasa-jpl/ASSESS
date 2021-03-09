@@ -1,5 +1,8 @@
-#redis:
-#  - localhost:9080
+# Enter credentials here
+username:
+password:
+url:
+
 es_server:
   #- localhost
   - elasticsearch-1
