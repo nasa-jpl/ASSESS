@@ -131,7 +131,7 @@ print(format_json(r.text))
 # Insert the standard selected by the admin into Elasticsearch.
 set_standards = {
     "username": "test_user",
-    "standard_key": 111111,
+    "standard_id": 111111,
     "priority": 100,
 }
 
