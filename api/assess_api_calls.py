@@ -33,9 +33,10 @@ urlSelectStandards = root + "/select_standards"
 urlSetStandards = root + "/set_standards"
 
 # Specify file location of an SOW.
-file = {"pdf": open("/Users/vishall/prog/assess-root/test.pdf", "rb")}
+location = "/Users/vishall/prog/assess-root/test.pdf"
+file = {"pdf": open(location, "rb")}
 
-# Recommend SoW given string "Example text about airplanes.".
+# Recommend SoW given text "Example text about airplanes.".
 print("Sending GET request to `/recommend_text`.")
 jsonLoad = {"text_field": "Example text about airplanes"}
 r = requests.post(
@@ -44,28 +45,14 @@ r = requests.post(
 print(format_json(r.text))
 
 # Recommend an SoW given a PDF.
-if path.exists(file):
-    print("Sending GET request to `/recommend_file` with a PDF.")
-    r = requests.post(
-        urlRecommendFile, files=file, auth=HTTPBasicAuth(username, password)
-    )
-    print(format_json(r.text))
-else:
-    print(
-        "*** To test with `/recommend_file`, you need to add the correct `file` variable."
-    )
+print("Sending GET request to `/recommend_file` with a PDF.")
+r = requests.post(urlRecommendFile, files=file, auth=HTTPBasicAuth(username, password))
+print(format_json(r.text))
 
 # Extract standard reference from PDF.
-if path.exists(file):
-    print("Sending POST request to `/extract` using a PDF.")
-    r = requests.post(
-        urlRecommendFile, files=file, auth=HTTPBasicAuth(username, password)
-    )
-    print(format_json(r.text))
-else:
-    print(
-        "*** To test with `/extract`, you need to add the correct `file` variable to the script."
-    )
+print("Sending POST request to `/extract` using a PDF.")
+r = requests.post(urlRecommendFile, files=file, auth=HTTPBasicAuth(username, password))
+print(format_json(r.text))
 
 
 # Get standard references.
@@ -115,9 +102,9 @@ time.sleep(2)
 # Look up newly indexed standard.
 print("Sending GET request to `/standard_info` on newly indexed standard.")
 r = requests.get(urlStandardInfo + "/111111", auth=HTTPBasicAuth(username, password))
-print(format_json(r.text))
+print(r.text)
 
-# Insert the standard selected by the user into Elasticsearch indices for stats and logs.
+# Insert the standard selected by the *user* into Elasticsearch indices. Useful for statistics.
 selected = {
     "username": "test_user",
     "standard_key": [1, 2, 3],
@@ -128,14 +115,14 @@ r = requests.post(
 )
 print(format_json(r.text))
 
-# Insert the standard selected by the admin into Elasticsearch.
+# Set the standard selected by the *admin* into Elasticsearch.
+# Allows an admin to do set a standard as a priority.
 set_standards = {
     "username": "test_user",
     "standard_id": 111111,
     "priority": 100,
 }
 
-# Set standards in the database.
 print("Sending PUT request to `set_standard`.")
 r = requests.put(
     urlSetStandards, json=set_standards, auth=HTTPBasicAuth(username, password)
