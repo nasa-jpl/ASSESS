@@ -130,4 +130,4 @@ print("Sending PUT request to `set_standard`.")
 r = requests.put(
     urlSetStandards, json=set_standards, auth=HTTPBasicAuth(username, password)
 )
-print(r.text)
+print(r.text))
