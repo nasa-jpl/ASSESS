@@ -67,19 +67,19 @@ print(r.text)
 doc = {
     "id": "A123456Z",
     "raw_id": "ICS-TEST",
-    "doc_number": "0",
+    "doc_number": 0,
     "description": "Testing, delete",
     "status": "Awaiting_Removal",
-    "technical_committee": "1.2.3",  # doc["technical_committee"]
+    "technical_committee": "1.2.3",
     "sdo": {
         "ics": {
-            "raw_ics": [1],
+            "raw_ics": None,
             "code": None,
             "field": None,
             "group": None,
             "subgroup": None,
-            "edition": [1],
-            "number_of_pages": [1],
+            "edition": None,
+            "number_of_pages": None,
             "section_titles": None,
             "sections": None,
             "new_standard": None,
@@ -95,7 +95,7 @@ doc = {
     "isbn": None,
     "url": None,
     "ingestion_date": None,
-    "hash": None,  # convert_to_hash(doc["link"]),
+    "hash": None,
 }
 print("Sending PUT request to `/add_standards`.")
 r = requests.put(urlAddStandards, json=doc, auth=HTTPBasicAuth(username, password))
