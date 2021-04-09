@@ -65,34 +65,37 @@ print(r.text)
 
 ## Add/Ingest Standard.
 doc = {
-    "num_id": "111111",
-    "code": "test-delete-later",
-    "field": "test-delete-later",
-    "group": "~1.0",
-    "id": "~1.1.1",
-    "id_": "~6",
-    "link": "test",
-    "new_field": "~6",
-    "new_group": "~6",
-    "new_standard": "1",
-    "new_subgroup": "1",
-    "standard": "",
-    "subgroup": "1",
-    "title": "This is an Example Doc",
-    "type": "test_type",
-    "current_status": "Awaiting_Removal",
-    "datetime": "",
-    "description": "Testing index ingestion!",
-    "edition": "1",
-    "ics": "1.1.1",
-    "number_of_pages": "1",
-    "preview_url": "https://example.com",
-    "publication_date": "",
-    "section_titles": "Test Title",
-    "sections": "",
-    "tc": "",
-    "url": "https://example.com",
-    "description_clean": "Testing index ingestion!",
+    "id": "A123456Z",
+    "raw_id": "ICS-TEST",
+    "doc_number": "0",
+    "description": "Testing, delete",
+    "status": "Awaiting_Removal",
+    "technical_committee": "1.2.3",  # doc["technical_committee"]
+    "sdo": {
+        "ics": {
+            "raw_ics": [1],
+            "code": None,
+            "field": None,
+            "group": None,
+            "subgroup": None,
+            "edition": [1],
+            "number_of_pages": [1],
+            "section_titles": None,
+            "sections": None,
+            "new_standard": None,
+            "new_field": None,
+            "new_group": None,
+            "new_subgroup": None,
+            "type": None,
+            "preview_url": None,
+        }
+    },
+    "title": "Test Title- Delete Later",
+    "published_date": None,
+    "isbn": None,
+    "url": None,
+    "ingestion_date": None,
+    "hash": None,  # convert_to_hash(doc["link"]),
 }
 print("Sending PUT request to `/add_standards`.")
 r = requests.put(urlAddStandards, json=doc, auth=HTTPBasicAuth(username, password))
@@ -101,13 +104,13 @@ time.sleep(2)
 
 # Look up newly indexed standard.
 print("Sending GET request to `/standard_info` on newly indexed standard.")
-r = requests.get(urlStandardInfo + "/111111", auth=HTTPBasicAuth(username, password))
+r = requests.get(urlStandardInfo + "/A123456Z", auth=HTTPBasicAuth(username, password))
 print(r.text)
 
 # Insert the standard selected by the *user* into Elasticsearch indices. Useful for statistics.
 selected = {
     "username": "test_user",
-    "standard_key": [1, 2, 3],
+    "selected_ids": ["A123456Z"],
 }
 print("Sending POST request to `/select_standard`.")
 r = requests.post(
@@ -116,10 +119,10 @@ r = requests.post(
 print(format_json(r.text))
 
 # Set the standard selected by the *admin* into Elasticsearch.
-# Allows an admin to do set a standard as a priority.
+# Allows an admin to give a standard priority.
 set_standards = {
     "username": "test_user",
-    "standard_id": 111111,
+    "standard_id": "A123456Z",
     "priority": 100,
 }
 

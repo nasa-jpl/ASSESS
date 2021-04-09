@@ -115,19 +115,17 @@ async def extract(request: Request, pdf: UploadFile = File(...)):
     return JSONResponse(content=json_compatible_item_data)
 
 
-@app.get("/standard_info/{info_key}", response_class=ORJSONResponse)
+@app.get("/standard_info/{id}", response_class=ORJSONResponse)
 async def standard_info(request: Request, info_key: str, size: int = 1):
     """Given a standard ID, get standard information from Elasticsearch."""
-    res = es.search(
-        index=idx_main, body={"size": size, "query": {"match": {"num_id": info_key}}}
-    )
+    res = es.search(index=idx_main, body={"size": size, "query": {"match": {"id": id}}})
     # print("Got %d Hits:" % res['hits']['total']['value'])
     results = {}
     for num, hit in enumerate(res["hits"]["hits"]):
         results[str(num + 1)] = hit["_source"]
     # jsonResults = json.dumps(results)
     json_compatible_item_data = jsonable_encoder(results)
-    log_stats(request, data=info_key)
+    log_stats(request, data=id)
     return JSONResponse(content=json_compatible_item_data)
 
 
@@ -151,6 +149,7 @@ async def search(
 @app.put("/add_standards", response_class=HTMLResponse)
 async def add_standards(request: Request, doc: dict):
     """Add standards to the main Elasticsearch index by PUTTING a JSON request here."""
+    # TODO: Check Standard body.
     res = es.index(index=idx_main, body=json.dumps(doc))
     print(res)
     json_compatible_item_data = jsonable_encoder(doc)
