@@ -5,6 +5,7 @@ import requests
 import uuid
 import hashlib
 import time
+import pprint
 
 
 def convert_to_hash(url):
@@ -26,7 +27,7 @@ def convert_to_new(doc, client, i, new="assess_remap"):
     mappings = {
         "_id": uuid.uuid4().hex,
         "raw_id": doc["id"].strip("~"),
-        "doc_number": i,
+        "document_number": i,
         "description": doc["description_clean"],
         "status": doc["current_status"],
         "technical_committee": doc["tc"],  # doc["technical_committee"]
@@ -34,7 +35,7 @@ def convert_to_new(doc, client, i, new="assess_remap"):
             "ics": {
                 "code": doc["code"].strip("~"),
                 "field": doc["field"].strip("~"),
-                "group": doc["ground"].strip("~"),
+                "group": doc["group"].strip("~"),
                 "subgroup": doc["subgroup"].strip("~"),
                 "edition": doc["edition"],
                 "number_of_pages": doc["number_of_pages"],
@@ -54,7 +55,7 @@ def convert_to_new(doc, client, i, new="assess_remap"):
         "ingestion_date": timestamp,
         "hash": convert_to_hash(doc["link"]),
     }
-    return
+    return mappings
 
 
 REMOTE_URL = "https://localhost:9200/"
@@ -69,8 +70,11 @@ for doc in scan(client, query={}, index=INDEX):
     # fp.write("\n")
     # fp.flush()  # So you can tail -f the file
     i += 1
-    print(convert_to_new(doc, client, i))
-    if i == 10:
+    print("old")
+    pprint(doc["_source"])
+    print("new")
+    pprint(convert_to_new(doc["_source"], client, i))
+    if i == 50:
         exit()
 
 # fp.close()
