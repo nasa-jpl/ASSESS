@@ -101,10 +101,12 @@ async def recommend_text(request: Request, sow: Sow):
         print(res)
         results = {}
         print("results")
+
         for num, hit in enumerate(res["hits"]["hits"]):
             results[str(num + 1)] = hit["_source"]
         print(results)
         output["query"] = results
+        output["similarity"] = prediction["sim"]
     output["embedded_references"] = predictions["embedded_references"]
     json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=in_text)
@@ -119,14 +121,24 @@ async def recommend_file(request: Request, pdf: UploadFile = File(...)):
     predictions = extract_prep.predict(file=pdf)
     output = {}
     for prediction in predictions["recommendations"]:
+        print("prediction")
+        print(prediction)
         raw_id = prediction["raw_id"]
+        print("raw_id")
+        print(raw_id)
         res = es.search(
             index=idx_main, body={"size": 1, "query": {"match": {"raw_id": raw_id}}}
         )
+        print("res")
+        print(res)
         results = {}
+        print("results")
+
         for num, hit in enumerate(res["hits"]["hits"]):
             results[str(num + 1)] = hit["_source"]
+        print(results)
         output["query"] = results
+        output["similarity"] = prediction["sim"]
     output["embedded_references"] = predictions["embedded_references"]
     json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=pdf.filename)
