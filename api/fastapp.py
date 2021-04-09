@@ -93,7 +93,10 @@ async def recommend_text(request: Request, sow: Sow):
         res = es.search(
             index=idx_main, body={"size": 1, "query": {"match": {"code": code}}}
         )
-        output["query"] = res
+        results = {}
+        for num, hit in enumerate(res["hits"]["hits"]):
+            results[str(num + 1)] = hit["_source"]
+        output["query"] = results
     output["embedded_references"] = predictions["embedded_references"]
     json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=in_text)
@@ -112,7 +115,10 @@ async def recommend_file(request: Request, pdf: UploadFile = File(...)):
         res = es.search(
             index=idx_main, body={"size": 1, "query": {"match": {"code": code}}}
         )
-        output["query"] = res
+        results = {}
+        for num, hit in enumerate(res["hits"]["hits"]):
+            results[str(num + 1)] = hit["_source"]
+        output["query"] = results
     output["embedded_references"] = predictions["embedded_references"]
     json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=pdf.filename)
