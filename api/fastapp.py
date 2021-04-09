@@ -86,8 +86,16 @@ async def recommend_text(request: Request, sow: Sow):
     """Given an input of Statement of Work as text,
     return a JSON of recommended standards."""
     in_text = sow.text_field
-    prediction = extract_prep.predict(in_text=in_text)
-    json_compatible_item_data = jsonable_encoder(prediction)
+    predictions = extract_prep.predict(in_text=in_text)
+    output = {}
+    for prediction in predictions["recomendation"]:
+        code = prediction["code"]
+        res = es.search(
+            index=idx_main, body={"size": 1, "query": {"match": {"code": code}}}
+        )
+        output["query"] = res
+    output["embedded_references"] = predictions["embedded_references"]
+    json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=in_text)
     return JSONResponse(content=json_compatible_item_data)
 
@@ -97,10 +105,19 @@ async def recommend_file(request: Request, pdf: UploadFile = File(...)):
     """Given an input of a Statement of Work as a PDF,
     return a JSON of recommended standards."""
     print("File received")
-    prediction = extract_prep.predict(file=pdf)
+    predictions = extract_prep.predict(file=pdf)
+    output = {}
+    for prediction in predictions["recomendation"]:
+        code = prediction["code"]
+        res = es.search(
+            index=idx_main, body={"size": 1, "query": {"match": {"code": code}}}
+        )
+        output["query"] = res
+    output["embedded_references"] = predictions["embedded_references"]
+    json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=pdf.filename)
     # Add line here to save file?
-    return JSONResponse(content=prediction)
+    return JSONResponse(content=json_compatible_item_data)
 
 
 @app.post("/extract")
