@@ -104,7 +104,7 @@ def predict(file=None, in_text=None):
     # ======================== find the recommended standards
 
     result = {}
-    result["extracted_standards"] = standard_refs
+    result["embedded_references"] = standard_refs
     result["recommendations"] = []
 
     sow = tfidftransformer.transform([new_text])
@@ -144,6 +144,4 @@ def predict(file=None, in_text=None):
                 "type": type_standard,
             }
         )
-    print("testttt")
-    print(result)
     return result
