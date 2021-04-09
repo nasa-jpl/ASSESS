@@ -89,9 +89,9 @@ async def recommend_text(request: Request, sow: Sow):
     predictions = extract_prep.predict(in_text=in_text)
     output = {}
     for prediction in predictions["recommendations"]:
-        code = prediction["code"]
+        code = prediction["id"]
         res = es.search(
-            index=idx_main, body={"size": 1, "query": {"match": {"code": code}}}
+            index=idx_main, body={"size": 1, "query": {"match": {"id": id}}}
         )
         results = {}
         for num, hit in enumerate(res["hits"]["hits"]):
@@ -111,9 +111,9 @@ async def recommend_file(request: Request, pdf: UploadFile = File(...)):
     predictions = extract_prep.predict(file=pdf)
     output = {}
     for prediction in predictions["recommendations"]:
-        code = prediction["code"]
+        code = prediction["id"]
         res = es.search(
-            index=idx_main, body={"size": 1, "query": {"match": {"code": code}}}
+            index=idx_main, body={"size": 1, "query": {"match": {"id": id}}}
         )
         results = {}
         for num, hit in enumerate(res["hits"]["hits"]):
@@ -139,7 +139,7 @@ async def extract(request: Request, pdf: UploadFile = File(...)):
 
 
 @app.get("/standard_info/{id}", response_class=ORJSONResponse)
-async def standard_info(request: Request, info_key: str, size: int = 1):
+async def standard_info(request: Request, id: str, size: int = 1):
     """Given a standard ID, get standard information from Elasticsearch."""
     res = es.search(index=idx_main, body={"size": size, "query": {"match": {"id": id}}})
     # print("Got %d Hits:" % res['hits']['total']['value'])
@@ -207,7 +207,7 @@ async def set_standards(request: Request, set_standards: dict):
         "type": "object",
         "properties": {
             "username": {"type": "string"},
-            "standard_key": {"type": "number"},
+            "standard_id": {"type": "number"},
             "priority": {"type": "number"},
         },
     }
