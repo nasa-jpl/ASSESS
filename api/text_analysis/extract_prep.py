@@ -104,8 +104,8 @@ def predict(file=None, in_text=None):
     # ======================== find the recommended standards
 
     result = {}
-    result["refs"] = standard_refs
-    result["recc"] = []
+    result["extracted_standards"] = standard_refs
+    result["recommendations"] = []
 
     sow = tfidftransformer.transform([new_text])
     sow = normalize(sow, norm="l2", axis=1)
@@ -136,15 +136,9 @@ def predict(file=None, in_text=None):
         #     for i in set(sow.indices).intersection(X[indx].indices)]
         # print(' || '.join(to_print), '\n')
 
-        result["recc"].append(
+        result["recommendations"].append(
             {
-                "title": title + " (" + standard_code.replace("~", "") + ")",
-                "description": description,
-                "url": link,
                 "sim": 100 * round(1 - dist, 2),
-                "id": standard_id,
-                "code": code,
-                "tc": tc,
                 "type": type_standard,
             }
         )
