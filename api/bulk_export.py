@@ -53,7 +53,7 @@ def convert_to_new(doc, client, i, new="assess_remap"):
     if doc["datetime"]:
         timestamp = doc["datetime"]
     else:
-        timestamp = time.strftime("%Y/%m/%d %H:%M:%S")  # 2018-03-10 01:23:27
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")  # 2018-03-10 01:23:27
     if doc["current_status"] == "Awaiting_Removal":
         return
 
@@ -91,7 +91,7 @@ def convert_to_new(doc, client, i, new="assess_remap"):
         "isbn": None,
         "url": doc["link"],
         "ingestion_date": timestamp,
-        # "hash": convert_to_hash(doc["link"]),
+        "hash": None,  # convert_to_hash(doc["link"]),
     }
     return mappings
 
