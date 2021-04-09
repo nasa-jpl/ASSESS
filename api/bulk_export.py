@@ -18,6 +18,14 @@ def convert_to_hash(url):
     return None
 
 
+def strip_number(txt):
+    return [int(s) for s in txt.split() if s.isdigit()]
+
+
+def clean_sections(txt):
+    pass
+
+
 def convert_to_new(doc, client, i, new="assess_remap"):
     if doc["datetime"]:
         timestamp = doc["datetime"]
@@ -27,8 +35,8 @@ def convert_to_new(doc, client, i, new="assess_remap"):
     mappings = {
         "_id": uuid.uuid4().hex,
         "raw_id": doc["id"].strip("~"),
-        "document_number": i,
-        "description": doc["description_clean"],
+        "doc_number": i,
+        "description": doc["description"],
         "status": doc["current_status"],
         "technical_committee": doc["tc"],  # doc["technical_committee"]
         "sdo": {
@@ -37,8 +45,8 @@ def convert_to_new(doc, client, i, new="assess_remap"):
                 "field": doc["field"].strip("~"),
                 "group": doc["group"].strip("~"),
                 "subgroup": doc["subgroup"].strip("~"),
-                "edition": doc["edition"],
-                "number_of_pages": doc["number_of_pages"],
+                "edition": strip_number(doc["edition"]),
+                "number_of_pages": strip_number(doc["number_of_pages"]),
                 "section_titles": doc["section_titles"],
                 "sections": doc["sections"],
                 "new_standard": doc["new_standard"].strip("~"),
@@ -46,6 +54,7 @@ def convert_to_new(doc, client, i, new="assess_remap"):
                 "new_group": doc["new_group"].strip("~"),
                 "new_subgroup": doc["new_subgroup"].strip("~"),
                 "type": doc["type"],
+                "preview_url": doc["preview_url"],
             }
         },
         "title": doc["title"].strip("~"),
@@ -55,6 +64,7 @@ def convert_to_new(doc, client, i, new="assess_remap"):
         "ingestion_date": timestamp,
         "hash": convert_to_hash(doc["link"]),
     }
+    print(doc["sections"])
     return mappings
 
 
