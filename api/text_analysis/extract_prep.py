@@ -139,6 +139,8 @@ def predict(file=None, in_text=None):
         result["recommendations"].append(
             {
                 "sim": 100 * round(1 - dist, 2),
+                "raw_id": standard_id,
+                "code": code,
                 "type": type_standard,
             }
         )
