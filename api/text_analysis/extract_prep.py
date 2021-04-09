@@ -139,7 +139,7 @@ def predict(file=None, in_text=None):
         result["recommendations"].append(
             {
                 "similarity": 100 * round(1 - dist, 2),
-                "code": code,
+                "raw_id": standard_id,
                 "type": type_standard,
             }
         )
