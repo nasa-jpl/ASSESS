@@ -42,12 +42,12 @@ jsonLoad = {"text_field": "Example text about airplanes"}
 r = requests.post(
     urlRecommendText, json=jsonLoad, auth=HTTPBasicAuth(username, password)
 )
-print(r.text)
+print(format_json(r.text))
 
 # Recommend an SoW given a PDF.
 print("Sending GET request to `/recommend_file` with a PDF.")
 r = requests.post(urlRecommendFile, files=file, auth=HTTPBasicAuth(username, password))
-print(r.text)
+print(format_json(r.text))
 
 # Extract standard reference from PDF.
 print("Sending POST request to `/extract` using a PDF.")
@@ -61,7 +61,7 @@ r = requests.get(
     urlSearch + "/airplanes%20technology" + "?size=3",
     auth=HTTPBasicAuth(username, password),
 )
-print(r.text)
+print(format_json(r.text))
 
 ## Add/Ingest Standard.
 doc = {
@@ -130,4 +130,4 @@ print("Sending PUT request to `set_standard`.")
 r = requests.put(
     urlSetStandards, json=set_standards, auth=HTTPBasicAuth(username, password)
 )
-print(r.text)
+print(format_json(r.text))
