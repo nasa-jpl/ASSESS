@@ -52,15 +52,15 @@ def convert_to_new(doc, client, i, new="assess_remap"):
         "technical_committee": doc["tc"],  # doc["technical_committee"]
         "sdo": {
             "ics": {
-                "raw_ics": list(doc["ics"]),
+                "raw_ics": (doc["ics"]),
                 "code": doc["code"].strip("~"),
                 "field": doc["field"].strip("~"),
                 "group": doc["group"].strip("~"),
                 "subgroup": doc["subgroup"].strip("~"),
                 "edition": strip_number(doc["edition"]),
                 "number_of_pages": strip_number(doc["number_of_pages"]),
-                "section_titles": list(doc["section_titles"]),
-                "sections": list(doc["sections"]),
+                "section_titles": doc["section_titles"],
+                "sections": doc["sections"],
                 "new_standard": doc["new_standard"].strip("~"),
                 "new_field": doc["new_field"].strip("~"),
                 "new_group": doc["new_group"].strip("~"),
@@ -74,7 +74,7 @@ def convert_to_new(doc, client, i, new="assess_remap"):
         "isbn": None,
         "url": doc["link"],
         "ingestion_date": timestamp,
-        "hash": convert_to_hash(doc["link"]),
+        # "hash": convert_to_hash(doc["link"]),
     }
     print(doc["sections"])
     return mappings
@@ -93,10 +93,10 @@ for doc in scan(client, query={}, index=INDEX):
     # fp.write("\n")
     # fp.flush()  # So you can tail -f the file
     i += 1
-    print("old")
+    #   print("old")
     pprint(i)
     print("new")
-    pprint(convert_to_new(doc["_source"], client, i))
+    print(convert_to_new(doc["_source"], client, i))
     if i % 1000 == 0:
         print("Finished +1000")
 end = time.time() - start
