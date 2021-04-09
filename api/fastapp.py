@@ -88,7 +88,7 @@ async def recommend_text(request: Request, sow: Sow):
     in_text = sow.text_field
     predictions = extract_prep.predict(in_text=in_text)
     output = {}
-    for prediction in predictions["recomendation"]:
+    for prediction in predictions["recommendations"]:
         code = prediction["code"]
         res = es.search(
             index=idx_main, body={"size": 1, "query": {"match": {"code": code}}}
@@ -107,7 +107,7 @@ async def recommend_file(request: Request, pdf: UploadFile = File(...)):
     print("File received")
     predictions = extract_prep.predict(file=pdf)
     output = {}
-    for prediction in predictions["recomendation"]:
+    for prediction in predictions["recommendations"]:
         code = prediction["code"]
         res = es.search(
             index=idx_main, body={"size": 1, "query": {"match": {"code": code}}}
