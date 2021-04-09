@@ -6,6 +6,7 @@ import uuid
 import hashlib
 import time
 from pprint import pprint
+import ast
 
 
 def convert_to_hash(url):
@@ -20,6 +21,14 @@ def convert_to_hash(url):
 
 def strip_number(txt):
     return [int(s) for s in txt.split() if s.isdigit()]
+
+
+def literal_to_list(val):
+    val = val.replace("'", '"')
+    val = val.replace("\\n", "")
+    val = val.replace("\n", "")
+    res = ast.literal_eval(val)
+    return res
 
 
 def clean_sections(txt):
@@ -42,6 +51,11 @@ def convert_to_new(doc, client, i, new="assess_remap"):
         timestamp = doc["datetime"]
     else:
         timestamp = time.strftime("%Y/%m/%d %H:%M:%S")  # 2018-03-10 01:23:27
+    if doc["current_status"] == "Awaiting_Removal":
+        return
+
+    section_titles = literal_to_list(doc["section_titles"])
+    sections = literal_to_list(doc["sections"])
 
     mappings = {
         "_id": uuid.uuid4().hex,
@@ -59,8 +73,8 @@ def convert_to_new(doc, client, i, new="assess_remap"):
                 "subgroup": doc["subgroup"].strip("~"),
                 "edition": strip_number(doc["edition"]),
                 "number_of_pages": strip_number(doc["number_of_pages"]),
-                "section_titles": doc["section_titles"],
-                "sections": doc["sections"],
+                "section_titles": section_titles,
+                "sections": sections,
                 "new_standard": doc["new_standard"].strip("~"),
                 "new_field": doc["new_field"].strip("~"),
                 "new_group": doc["new_group"].strip("~"),
@@ -83,6 +97,7 @@ def convert_to_new(doc, client, i, new="assess_remap"):
 REMOTE_URL = "https://localhost:9200/"
 LOCAL_FILE = "elasticsearch-dump.txt"
 INDEX = "iso_final_clean"
+NEW_INDEX = "assess_remap"
 client = Elasticsearch()
 
 # fp = open(LOCAL_FILE, "w")
@@ -96,9 +111,10 @@ for doc in scan(client, query={}, index=INDEX):
     #   print("old")
     pprint(i)
     print("new")
-    print(convert_to_new(doc["_source"], client, i))
+    new_doc = convert_to_new(doc["_source"], client, i)
     if i % 1000 == 0:
         print("Finished +1000")
+    res = client.index(index=NEW_INDEX, body=json.dumps(new_doc))
 end = time.time() - start
 print(end)
 # fp.close()
