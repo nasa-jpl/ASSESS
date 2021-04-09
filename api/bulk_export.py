@@ -24,11 +24,14 @@ def strip_number(txt):
 
 
 def literal_to_list(val):
-    val = val.replace("'", '"')
-    val = val.replace("\\n", "")
-    val = val.replace("\n", "")
-    res = ast.literal_eval(val)
-    return res
+    try:
+        val = val.replace("'", '"')
+        val = val.replace("\\n", "\n")
+        val = val.replace("\n", " ")
+        res = ast.literal_eval(val)
+        return res
+    except Exception:
+        return
 
 
 def clean_sections(txt):
@@ -90,7 +93,6 @@ def convert_to_new(doc, client, i, new="assess_remap"):
         "ingestion_date": timestamp,
         # "hash": convert_to_hash(doc["link"]),
     }
-    print(doc["sections"])
     return mappings
 
 
@@ -110,11 +112,8 @@ for doc in scan(client, query={}, index=INDEX):
     i += 1
     #   print("old")
     pprint(i)
-    print("new")
     new_doc = convert_to_new(doc["_source"], client, i)
-    if i % 1000 == 0:
-        print("Finished +1000")
-    res = client.index(index=NEW_INDEX, body=json.dumps(new_doc))
+    # res = client.index(index=NEW_INDEX, body=json.dumps(new_doc))
 end = time.time() - start
 print(end)
 # fp.close()
