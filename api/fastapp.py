@@ -207,7 +207,7 @@ async def set_standards(request: Request, set_standards: dict):
         "type": "object",
         "properties": {
             "username": {"type": "string"},
-            "standard_id": {"type": "number"},
+            "standard_id": {"type": "string"},
             "priority": {"type": "number"},
         },
     }

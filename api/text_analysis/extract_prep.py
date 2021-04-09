@@ -143,5 +143,6 @@ def predict(file=None, in_text=None):
                 "type": type_standard,
             }
         )
-
+    print("test")
+    print(result)
     return result
