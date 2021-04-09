@@ -88,7 +88,9 @@ async def recommend_text(request: Request, sow: Sow):
     in_text = sow.text_field
     predictions = extract_prep.predict(in_text=in_text)
     output = {}
+    i = 0
     for prediction in predictions["recommendations"]:
+        i += 1
         print("prediction")
         print(prediction)
         raw_id = prediction["raw_id"]
@@ -99,15 +101,13 @@ async def recommend_text(request: Request, sow: Sow):
         )
         print("res")
         print(res)
-        results = {}
         print("results")
-
-        for num, hit in enumerate(res["hits"]["hits"]):
-            results[str(num + 1)] = hit["_source"]
+        for hit in res["hits"]["hits"]:
+            results = hit["_source"]
+        output[i] = results
+        output[i]["similarity"] = prediction["sim"]
+        output[i]["embedded_references"] = prediction["embedded_references"]
         print(results)
-        output["query"] = results
-        output["similarity"] = prediction["sim"]
-    output["embedded_references"] = predictions["embedded_references"]
     json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=in_text)
     return JSONResponse(content=json_compatible_item_data)
@@ -120,7 +120,9 @@ async def recommend_file(request: Request, pdf: UploadFile = File(...)):
     print("File received")
     predictions = extract_prep.predict(file=pdf)
     output = {}
+    i = 0
     for prediction in predictions["recommendations"]:
+        i += 1
         print("prediction")
         print(prediction)
         raw_id = prediction["raw_id"]
@@ -131,15 +133,13 @@ async def recommend_file(request: Request, pdf: UploadFile = File(...)):
         )
         print("res")
         print(res)
-        results = {}
         print("results")
-
-        for num, hit in enumerate(res["hits"]["hits"]):
-            results[str(num + 1)] = hit["_source"]
+        for hit in res["hits"]["hits"]:
+            results = hit["_source"]
+        output[i] = results
+        output[i]["similarity"] = prediction["sim"]
+        output[i]["embedded_references"] = prediction["embedded_references"]
         print(results)
-        output["query"] = results
-        output["similarity"] = prediction["sim"]
-    output["embedded_references"] = predictions["embedded_references"]
     json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=pdf.filename)
     # Add line here to save file?
