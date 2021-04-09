@@ -5,7 +5,7 @@ import requests
 import uuid
 import hashlib
 import time
-import pprint
+from pprint import pprint
 
 
 def convert_to_hash(url):
