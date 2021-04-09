@@ -24,6 +24,8 @@ def strip_number(txt):
 
 def clean_sections(txt):
     res = {}
+    if len(txt) == 1:
+        txt = str(txt[0])
     for section in txt:
         try:
             spl = section.split("\n")
