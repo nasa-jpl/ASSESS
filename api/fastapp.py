@@ -106,8 +106,8 @@ async def recommend_text(request: Request, sow: Sow):
             results = hit["_source"]
         output[i] = results
         output[i]["similarity"] = prediction["sim"]
-        output[i]["embedded_references"] = prediction["embedded_references"]
         print(results)
+    output["embedded_references"] = predictions["embedded_references"]
     json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=in_text)
     return JSONResponse(content=json_compatible_item_data)
