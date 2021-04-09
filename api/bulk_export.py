@@ -23,6 +23,7 @@ def strip_number(txt):
 
 
 def clean_sections(txt):
+    # TODO: Fix.
     res = {}
     if len(txt) == 1:
         txt = str(txt[0])
@@ -30,6 +31,7 @@ def clean_sections(txt):
         try:
             spl = section.split("\n")
             res[spl[0]] = spl[1]
+            return res
         except Exception:
             return None
     return res
@@ -58,7 +60,7 @@ def convert_to_new(doc, client, i, new="assess_remap"):
                 "edition": strip_number(doc["edition"]),
                 "number_of_pages": strip_number(doc["number_of_pages"]),
                 "section_titles": list(doc["section_titles"]),
-                "sections": clean_sections(list(doc["sections"])),
+                "sections": list(doc["sections"]),
                 "new_standard": doc["new_standard"].strip("~"),
                 "new_field": doc["new_field"].strip("~"),
                 "new_group": doc["new_group"].strip("~"),
@@ -85,16 +87,18 @@ client = Elasticsearch()
 
 # fp = open(LOCAL_FILE, "w")
 i = 0
+start = time.time()
 for doc in scan(client, query={}, index=INDEX):
     # json.dump(row, fp)
     # fp.write("\n")
     # fp.flush()  # So you can tail -f the file
     i += 1
     print("old")
-    pprint(doc["_source"])
+    pprint(i)
     print("new")
     pprint(convert_to_new(doc["_source"], client, i))
-    if i == 50:
-        exit()
-
+    if i % 1000 == 0:
+        print("Finished +1000")
+end = time.time() - start
+print(end)
 # fp.close()
