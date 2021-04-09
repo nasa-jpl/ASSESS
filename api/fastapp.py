@@ -89,13 +89,21 @@ async def recommend_text(request: Request, sow: Sow):
     predictions = extract_prep.predict(in_text=in_text)
     output = {}
     for prediction in predictions["recommendations"]:
+        print("prediction")
+        print(prediction)
         raw_id = prediction["raw_id"]
+        print("raw_id")
+        print(raw_id)
         res = es.search(
             index=idx_main, body={"size": 1, "query": {"match": {"raw_id": raw_id}}}
         )
+        print("res")
+        print(res)
         results = {}
+        print("results")
         for num, hit in enumerate(res["hits"]["hits"]):
             results[str(num + 1)] = hit["_source"]
+        print(results)
         output["query"] = results
     output["embedded_references"] = predictions["embedded_references"]
     json_compatible_item_data = jsonable_encoder(output)
