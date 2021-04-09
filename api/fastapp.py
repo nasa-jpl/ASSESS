@@ -207,7 +207,7 @@ async def select_standards(request: Request, selected: dict):
         "type": "object",
         "properties": {
             "username": {"type": "string"},
-            "standard_key": {"type": "array"},
+            "standard_id": {"type": "array"},
         },
     }
     # validate(instance={"username" : "user123", "selected" : [1, 2 ,3]}, schema=schema)
