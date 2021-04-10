@@ -180,7 +180,12 @@ async def standard_info(
     raw_id: Optional[str] = None,
     isbn: Optional[str] = None,
     doc_number: Optional[int] = None,
+    status: Optional[str] = None,
     technical_committee: Optional[str] = None,
+    published_date: Optional[str] = None,
+    ingestion_date: Optional[str] = None,
+    title: Optional[str] = None,
+    hash: Optional[str] = None,
     size: int = 1,
 ):
     """Given a standard ID, get standard information from Elasticsearch."""
@@ -201,6 +206,11 @@ async def standard_info(
             index=idx_main,
             body={"size": size, "query": {"match": {"doc_number": doc_number}}},
         )
+    elif status:
+        res = es.search(
+            index=idx_main,
+            body={"size": size, "query": {"match": {"status": status}}},
+        )
     elif technical_committee:
         res = es.search(
             index=idx_main,
@@ -208,6 +218,26 @@ async def standard_info(
                 "size": size,
                 "query": {"match": {"technical_committee": technical_committee}},
             },
+        )
+    elif published_date:
+        res = es.search(
+            index=idx_main,
+            body={"size": size, "query": {"match": {"published_date": published_date}}},
+        )
+    elif ingestion_date:
+        res = es.search(
+            index=idx_main,
+            body={"size": size, "query": {"match": {"ingestion_date": ingestion_date}}},
+        )
+    elif title:
+        res = es.search(
+            index=idx_main,
+            body={"size": size, "query": {"match": {"title": title}}},
+        )
+    elif hash:
+        res = es.search(
+            index=idx_main,
+            body={"size": size, "query": {"match": {"hash": hash}}},
         )
     else:
         print("Checking all fields.")
