@@ -103,9 +103,19 @@ print(format_json(r.text))
 time.sleep(2)
 
 # Look up newly indexed standard.
+# You can search by `id`, `raw_id`, `isbn`, `doc_number`, or `technical committee` individually
+# as a query parameter. You can also specify a size for the query in the results
+print("Sending GET request to `/standard_info` on newly indexed standard.")
+r = requests.get(
+    urlStandardInfo + "/?id=A123456Z", auth=HTTPBasicAuth(username, password)
+)
+print(r.text)
+
+# Look up newly indexed standard.
 print("Sending GET request to `/standard_info` on newly indexed standard.")
 r = requests.get(urlStandardInfo + "/A123456Z", auth=HTTPBasicAuth(username, password))
 print(r.text)
+
 
 # Insert the standard selected by the *user* into Elasticsearch indices. Useful for statistics.
 selected = {
