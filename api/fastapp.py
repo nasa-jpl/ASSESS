@@ -158,10 +158,61 @@ async def extract(request: Request, pdf: UploadFile = File(...)):
     return JSONResponse(content=json_compatible_item_data)
 
 
-@app.get("/standard_info/{id}", response_class=ORJSONResponse)
-async def standard_info(request: Request, id: str, size: int = 1):
+# @app.get("/standard_info/{id}", response_class=ORJSONResponse)
+# async def standard_info(request: Request, id: str, size: int = 1):
+#     """Given a standard ID, get standard information from Elasticsearch."""
+#     res = es.search(index=idx_main, body={"size": size, "query": {"match": {"id": id}}})
+#     # print("Got %d Hits:" % res['hits']['total']['value'])
+#     results = {}
+#     for num, hit in enumerate(res["hits"]["hits"]):
+#         results[str(num + 1)] = hit["_source"]
+#     # jsonResults = json.dumps(results)
+#     json_compatible_item_data = jsonable_encoder(results)
+#     log_stats(request, data=id)
+#     return JSONResponse(content=json_compatible_item_data)
+
+
+@app.get("/standard_info/", response_class=ORJSONResponse)
+async def standard_info(
+    request: Request,
+    id: str,
+    raw_id: str,
+    isbn: str,
+    doc_number: int,
+    technical_committee: str,
+    size: int = 1,
+):
     """Given a standard ID, get standard information from Elasticsearch."""
-    res = es.search(index=idx_main, body={"size": size, "query": {"match": {"id": id}}})
+    if id:
+        res = es.search(
+            index=idx_main, body={"size": size, "query": {"match": {"id": id}}}
+        )
+    elif raw_id:
+        res = es.search(
+            index=idx_main, body={"size": size, "query": {"match": {"raw_id": raw_id}}}
+        )
+    elif isbn:
+        res = es.search(
+            index=idx_main, body={"size": size, "query": {"match": {"isbn": isbn}}}
+        )
+    elif doc_number:
+        res = es.search(
+            index=idx_main,
+            body={"size": size, "query": {"match": {"doc_number": doc_number}}},
+        )
+    elif technical_committee:
+        res = es.search(
+            index=idx_main,
+            body={
+                "size": size,
+                "query": {"match": {"technical_committee": technical_committee}},
+            },
+        )
+    else:
+        print("Checking all fields.")
+        res = es.search(
+            index=idx_main, body={"size": size, "query": {"match": {"_all": id}}}
+        )
     # print("Got %d Hits:" % res['hits']['total']['value'])
     results = {}
     for num, hit in enumerate(res["hits"]["hits"]):
