@@ -103,8 +103,9 @@ print(format_json(r.text))
 time.sleep(2)
 
 # Look up newly indexed standard.
-# You can search by `id`, `raw_id`, `isbn`, `doc_number`, or `technical committee` individually
-# as a query parameter. You can also specify a size for the query in the results
+# You can search by `id`, `raw_id`, `isbn`, `doc_number`, `technical committee`, `status`,
+# `published_date`, `ingestion_date`, `title`, and `hash` individually as a query parameter.
+# You can also specify a `size` for the query in the results.
 print("Sending GET request to `/standard_info` on ID just added.")
 r = requests.get(
     urlStandardInfo + "/?id=A123456Z", auth=HTTPBasicAuth(username, password)
