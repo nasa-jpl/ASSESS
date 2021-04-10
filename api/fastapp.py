@@ -16,6 +16,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, ORJSONResponse, JSONResponse
 from fastapi import FastAPI, File, Form, UploadFile, Request, Body
 from fastapi.encoders import jsonable_encoder
+from typing import Optional
 import requests
 from starlette.requests import Request
 from starlette.responses import Response
@@ -175,11 +176,11 @@ async def extract(request: Request, pdf: UploadFile = File(...)):
 @app.get("/standard_info/", response_class=ORJSONResponse)
 async def standard_info(
     request: Request,
-    id: str,
-    raw_id: str,
-    isbn: str,
-    doc_number: int,
-    technical_committee: str,
+    id: Optional[str] = None,
+    raw_id: Optional[str] = None,
+    isbn: Optional[str] = None,
+    doc_number: Optional[int] = None,
+    technical_committee: Optional[str] = None,
     size: int = 1,
 ):
     """Given a standard ID, get standard information from Elasticsearch."""
