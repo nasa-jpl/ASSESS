@@ -239,11 +239,6 @@ async def standard_info(
             index=idx_main,
             body={"size": size, "query": {"match": {"hash": hash}}},
         )
-    else:
-        print("Checking all fields.")
-        res = es.search(
-            index=idx_main, body={"size": size, "query": {"match": {"_all": id}}}
-        )
     # print("Got %d Hits:" % res['hits']['total']['value'])
     results = {}
     for num, hit in enumerate(res["hits"]["hits"]):

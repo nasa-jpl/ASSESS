@@ -105,33 +105,33 @@ urlSetStandards = root + "/set_standards"
 # Look up newly indexed standard.
 # You can search by `id`, `raw_id`, `isbn`, `doc_number`, or `technical committee` individually
 # as a query parameter. You can also specify a size for the query in the results
-print("Sending GET request to `/standard_info` on newly indexed standard.")
+print("Sending GET request to `/standard_info` on ID just added.")
 r = requests.get(
     urlStandardInfo + "/?id=A123456Z", auth=HTTPBasicAuth(username, password)
 )
-print(r.text)
+print(format_json(r.text))
 
 # Search by raw_id
-print("Sending GET request to `/standard_info` on newly indexed standard.")
+print("Sending GET request to `/standard_info` using raw_id.")
 r = requests.get(
     urlStandardInfo + "/?raw_id=ICS-TEST", auth=HTTPBasicAuth(username, password)
 )
-print(r.text)
+print(format_json(r.text))
 
 # Search by doc_number
-print("Sending GET request to `/standard_info` on newly indexed standard.")
+print("Sending GET request to `/standard_info` using doc_number field.")
 r = requests.get(
     urlStandardInfo + "/?doc_number=200", auth=HTTPBasicAuth(username, password)
 )
-print(r.text)
+print(format_json(r.text))
 
 # Search by status with size 10
-print("Sending GET request to `/standard_info` on newly indexed standard.")
+print("Sending GET request to `/standard_info` using published field.")
 r = requests.get(
-    urlStandardInfo + "/?status=Awaiting_Removal?size=10",
+    urlStandardInfo + "/?status=Published?size=10",
     auth=HTTPBasicAuth(username, password),
 )
-print(r.text)
+print(format_json(r.text))
 
 # # Insert the standard selected by the *user* into Elasticsearch indices. Useful for statistics.
 # selected = {
