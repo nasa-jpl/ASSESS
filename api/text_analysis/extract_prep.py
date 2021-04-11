@@ -34,6 +34,71 @@ def parse_text(filepath):
     return str(output)
 
 
+def transfrom(df):
+    df = df[df["type"] == "standard"].reset_index(drop=True)
+    df.fillna("", inplace=True)
+    tfidftransformer = TfidfVectorizer(
+        ngram_range=(1, 1), stop_words=text.ENGLISH_STOP_WORDS
+    )
+    X = tfidftransformer.fit_transform(
+        [m + " " + n for m, n in zip(df["description_clean"], df["title"])]
+    )
+    X = normalize(X, norm="l2", axis=1)
+    nbrs_brute = NearestNeighbors(
+        n_neighbors=X.shape[0], algorithm="brute", metric="cosine"
+    )
+    nbrs_brute.fit(X.todense())
+    return tfidftransformer, X, nbrs_brute
+
+
+def predict_from_es(file, text):
+    if file:
+        if file.filename == "":
+            return "No selected file!"
+        new_text = parse_text(file.filename)
+
+    else:
+        # Get text from form
+        new_text = text
+        file = open("temp_text", "w")
+        file.write(str(new_text.encode("utf-8", "ignore")))
+        file.flush()
+        file.close()
+    res = es.search(index=idx_main, body={"query": {"match_all": {}}})
+    df = pd.concat(map(pd.DataFrame.from_dict, res), axis=1)["fields"].T
+    print(df)
+    exit()
+    tfidftransformer, X, nbrs_brute = transfrom(df)
+
+    standard_refs = find_standard_ref(new_text)
+    result = {}
+    result["embedded_references"] = standard_refs
+    result["recommendations"] = []
+    sow = tfidftransformer.transform([new_text])
+    sow = normalize(sow, norm="l2", axis=1)
+
+    distances, indices = nbrs_brute.kneighbors(sow.todense())
+    distances = list(distances[0])
+    indices = list(indices[0])
+
+    for indx, dist in zip(indices[:10], distances[:10]):
+        title = df.iloc[indx]["title"]
+        description = df.iloc[indx]["description"]
+        link = df.iloc[indx]["link"]
+        standard_code = df.iloc[indx]["standard"]
+        standard_id = df.iloc[indx]["id"]
+        code = df.iloc[indx]["code"]
+        tc = df.iloc[indx]["tc"]
+    result["recommendations"].append(
+        {
+            "sim": 100.0 * round(1 - dist, 2),
+            "raw_id": standard_id,
+            "code": code,
+        }
+    )
+    return result
+
+
 def predict(file=None, in_text=None):
     dirPath = str(pathlib.Path(__file__).parent.absolute())
 
@@ -41,8 +106,6 @@ def predict(file=None, in_text=None):
     json_output_dir = "output"
     models_dir = "models"
 
-    res = es.search(index=idx_main, body={"query": {"match_all": {}}})
-    print(res)
     # TODO: Fix this line
     # df = pd.concat(map(pd.DataFrame.from_dict, res), axis=1)
     df = pd.read_csv(

@@ -49,19 +49,17 @@ def clean_sections(txt):
     return res
 
 
-def convert_to_new(doc, client, i, new="assess_remap"):
+def convert_to_new(doc, client, i, new_index):
     if doc["datetime"]:
         timestamp = doc["datetime"]
     else:
         timestamp = time.strftime("%Y-%m-%d %H:%M:%S")  # 2018-03-10 01:23:27
     if doc["current_status"] == "Awaiting_Removal":
         return
-
     section_titles = literal_to_list(doc["section_titles"])
     sections = literal_to_list(doc["sections"])
-
     mappings = {
-        "_id": uuid.uuid4().hex,
+        "id": uuid.uuid4().hex,
         "raw_id": doc["id"].strip("~"),
         "doc_number": i,
         "description": doc["description"],
@@ -96,24 +94,40 @@ def convert_to_new(doc, client, i, new="assess_remap"):
     return mappings
 
 
+def export(client, local_file, index):
+    i = 0
+    start = time.time()
+    fp = open(local_file, "w")
+    for doc in scan(client, query={}, index=index):
+        json.dump(doc, fp)
+        fp.write("\n")
+        fp.flush()  # So you can tail -f the file
+        i += 1
+        pprint(i)
+    end = time.time() - start
+    fp.close()
+    return
+
+
+def migrate(client, local_file, index, new_index):
+    i = 0
+    start = time.time()
+    for doc in scan(client, query={}, index=INDEX):
+        i += 1
+        pprint(i)
+        new_doc = convert_to_new(doc["_source"], client, i, new_index)
+    end = time.time() - start
+    print(end)
+    return
+
+
 REMOTE_URL = "https://localhost:9200/"
 LOCAL_FILE = "elasticsearch-dump.txt"
 INDEX = "iso_final_clean"
 NEW_INDEX = "assess_remap"
 client = Elasticsearch()
 
-# fp = open(LOCAL_FILE, "w")
-i = 0
-start = time.time()
-for doc in scan(client, query={}, index=INDEX):
-    # json.dump(row, fp)
-    # fp.write("\n")
-    # fp.flush()  # So you can tail -f the file
-    i += 1
-    #   print("old")
-    pprint(i)
-    new_doc = convert_to_new(doc["_source"], client, i)
-    # res = client.index(index=NEW_INDEX, body=json.dumps(new_doc))
-end = time.time() - start
-print(end)
-# fp.close()
+
+
+# migrate(client, local_file, index, new_index)
+export(client, LOCAL_FILE, INDEX)
