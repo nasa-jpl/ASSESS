@@ -92,22 +92,14 @@ async def recommend_text(request: Request, sow: Sow):
     i = 0
     for prediction in predictions["recommendations"]:
         i += 1
-        print("prediction")
-        print(prediction)
         raw_id = prediction["raw_id"]
-        print("raw_id")
-        print(raw_id)
         res = es.search(
             index=idx_main, body={"size": 1, "query": {"match": {"raw_id": raw_id}}}
         )
-        print("res")
-        print(res)
-        print("results")
         for hit in res["hits"]["hits"]:
             results = hit["_source"]
         output[i] = results
         output[i]["similarity"] = prediction["sim"]
-        print(results)
     output["embedded_references"] = predictions["embedded_references"]
     json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=in_text)
@@ -124,22 +116,14 @@ async def recommend_file(request: Request, pdf: UploadFile = File(...)):
     i = 0
     for prediction in predictions["recommendations"]:
         i += 1
-        print("prediction")
-        print(prediction)
         raw_id = prediction["raw_id"]
-        print("raw_id")
-        print(raw_id)
         res = es.search(
             index=idx_main, body={"size": 1, "query": {"match": {"raw_id": raw_id}}}
         )
-        print("res")
-        print(res)
-        print("results")
         for hit in res["hits"]["hits"]:
             results = hit["_source"]
         output[i] = results
         output[i]["similarity"] = prediction["sim"]
-        print(results)
     output["embedded_references"] = predictions["embedded_references"]
     json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=pdf.filename)
@@ -157,20 +141,6 @@ async def extract(request: Request, pdf: UploadFile = File(...)):
     json_compatible_item_data = jsonable_encoder(refs)
     log_stats(request, data={"refs": refs, "text": text, "filename": pdf.filename})
     return JSONResponse(content=json_compatible_item_data)
-
-
-# @app.get("/standard_info/{id}", response_class=ORJSONResponse)
-# async def standard_info(request: Request, id: str, size: int = 1):
-#     """Given a standard ID, get standard information from Elasticsearch."""
-#     res = es.search(index=idx_main, body={"size": size, "query": {"match": {"id": id}}})
-#     # print("Got %d Hits:" % res['hits']['total']['value'])
-#     results = {}
-#     for num, hit in enumerate(res["hits"]["hits"]):
-#         results[str(num + 1)] = hit["_source"]
-#     # jsonResults = json.dumps(results)
-#     json_compatible_item_data = jsonable_encoder(results)
-#     log_stats(request, data=id)
-#     return JSONResponse(content=json_compatible_item_data)
 
 
 @app.get("/standard_info/", response_class=ORJSONResponse)
