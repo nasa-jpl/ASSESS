@@ -155,6 +155,7 @@ async def standard_info(
     published_date: Optional[str] = None,
     ingestion_date: Optional[str] = None,
     title: Optional[str] = None,
+    sdo: Optional[str] = None,
     hash: Optional[str] = None,
     size: int = 1,
 ):
@@ -203,6 +204,11 @@ async def standard_info(
         res = es.search(
             index=idx_main,
             body={"size": size, "query": {"match": {"title": title}}},
+        )
+    elif sdo:
+        res = es.search(
+            index=idx_main,
+            body={"size": size, "query": {"exists": {"field": sdo}}},
         )
     elif hash:
         res = es.search(

@@ -99,6 +99,22 @@ def predict_from_es(file, text):
     return result
 
 
+def predict_test(file=None, in_text=None):
+    dirPath = str(pathlib.Path(__file__).parent.absolute())
+
+    standards_dir = dirPath + "/../standards/data"
+    json_output_dir = "output"
+    models_dir = "models"
+
+    # TODO: Fix this line
+    # df = pd.concat(map(pd.DataFrame.from_dict, res), axis=1)
+    df = pd.read_csv(
+        os.path.join(standards_dir, "iso_final_all_clean_text.csv"), index_col=0
+    )
+    print(df)
+    exit()
+
+
 def predict(file=None, in_text=None):
     dirPath = str(pathlib.Path(__file__).parent.absolute())
 
