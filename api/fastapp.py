@@ -94,9 +94,15 @@ async def recommend_text(request: Request, sow: Sow):
     for prediction in predictions["recommendations"]:
         i += 1
         raw_id = prediction["raw_id"]
-        res = es.search(
+        code = prediction["code"]
+        res1 = es.search(
             index=idx_main, body={"size": 1, "query": {"match": {"raw_id": raw_id}}}
         )
+        res2 = es.search(
+            index=idx_main, body={"size": 1, "query": {"match": {"code": code}}}
+        )
+        print(res1)
+        print(res2)
         for hit in res["hits"]["hits"]:
             results = hit["_source"]
         output[i] = results
