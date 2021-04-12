@@ -89,6 +89,7 @@ async def recommend_text(request: Request, sow: Sow):
     in_text = sow.text_field
     predictions = extract_prep.predict(in_text=in_text)
     output = {}
+    results = []
     i = 0
     for prediction in predictions["recommendations"]:
         i += 1
@@ -113,6 +114,7 @@ async def recommend_file(request: Request, pdf: UploadFile = File(...)):
     print("File received")
     predictions = extract_prep.predict(file=pdf)
     output = {}
+    results = []
     i = 0
     for prediction in predictions["recommendations"]:
         i += 1
