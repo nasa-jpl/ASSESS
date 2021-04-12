@@ -101,9 +101,11 @@ async def recommend_text(request: Request, sow: Sow):
         res2 = es.search(
             index=idx_main, body={"size": 1, "query": {"match": {"code": code}}}
         )
+        print("result 1")
         print(res1)
+        print("result 2")
         print(res2)
-        for hit in res["hits"]["hits"]:
+        for hit in res1["hits"]["hits"]:
             results = hit["_source"]
         output[i] = results
         output[i]["similarity"] = prediction["sim"]
