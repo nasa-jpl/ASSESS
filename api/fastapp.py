@@ -140,8 +140,14 @@ async def extract(request: Request, pdf: UploadFile = File(...)):
     return a JSON of extracted standards that are embedded within the SoW."""
     # filepath = save_upload_file_tmp(pdf)
     text = extract_prep.parse_text(pdf.filename)
+    print("test extract @@@@@@@@@")
+    print(text)
     refs = find_standard_ref(text)
-    json_compatible_item_data = jsonable_encoder(refs)
+    out = {}
+    out["embedded_references"] = refs
+    out["filename"] = pdf.filename
+    out["text"] = text
+    json_compatible_item_data = jsonable_encoder(out)
     log_stats(request, data={"refs": refs, "text": text, "filename": pdf.filename})
     return JSONResponse(content=json_compatible_item_data)
 
