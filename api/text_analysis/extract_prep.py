@@ -215,7 +215,7 @@ def predict(file=None, in_text=None):
         #     str(abs(np.array(sow[0].todense()).flatten()[i] - np.array(X[indx].todense()).flatten()[i]))
         #     for i in set(sow.indices).intersection(X[indx].indices)]
         # print(' || '.join(to_print), '\n')
-    
+
         result["recommendations"].append(
             {
                 "sim": 100 * round(1 - dist, 2),
@@ -224,4 +224,6 @@ def predict(file=None, in_text=None):
                 "type": type_standard,
             }
         )
+        print("Make sure it's an error here and not in ES.")
+        print(result)
     return result
