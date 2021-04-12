@@ -78,6 +78,7 @@ def predict_from_es(file, text):
     sow = normalize(sow, norm="l2", axis=1)
 
     distances, indices = nbrs_brute.kneighbors(sow.todense())
+    print(distances)
     distances = list(distances[0])
     indices = list(indices[0])
 
@@ -214,7 +215,7 @@ def predict(file=None, in_text=None):
         #     str(abs(np.array(sow[0].todense()).flatten()[i] - np.array(X[indx].todense()).flatten()[i]))
         #     for i in set(sow.indices).intersection(X[indx].indices)]
         # print(' || '.join(to_print), '\n')
-
+    
         result["recommendations"].append(
             {
                 "sim": 100 * round(1 - dist, 2),
