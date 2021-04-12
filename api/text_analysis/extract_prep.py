@@ -221,7 +221,6 @@ def predict(file=None, in_text=None):
                 "sim": 100 * round(1 - dist, 2),
                 "raw_id": standard_id,
                 "code": code,
-                "type": type_standard,
             }
         )
         print("Make sure it's an error here and not in ES.")
