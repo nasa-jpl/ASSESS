@@ -114,7 +114,7 @@ async def recommend_file(request: Request, pdf: UploadFile = File(...)):
     print("File received")
     predictions = extract_prep.predict(file=pdf)
     output = {}
-    results = []
+    results = {}
     i = 0
     for prediction in predictions["recommendations"]:
         i += 1
