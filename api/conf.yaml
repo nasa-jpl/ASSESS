@@ -8,7 +8,8 @@ es_server:
   - elasticsearch-1
 es_index_main:
   #- test-csv
-  - iso_final_clean
+  #- iso_final_clean
+  - assess_remap
 es_index_logs:
   - sys_logs
 es_index_stats:
