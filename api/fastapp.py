@@ -89,7 +89,7 @@ async def recommend_text(request: Request, sow: Sow):
     in_text = sow.text_field
     predictions = extract_prep.predict(in_text=in_text)
     output = {}
-    results = []
+    results = {}
     i = 0
     for prediction in predictions["recommendations"]:
         i += 1
