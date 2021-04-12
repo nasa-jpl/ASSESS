@@ -113,6 +113,7 @@ def migrate(client, local_file, index, new_index):
         i += 1
         pprint(i)
         new_doc = convert_to_new(doc["_source"], client, i, new_index)
+        res = client.index(index=NEW_INDEX, body=json.dumps(new_doc))
     end = time.time() - start
     print(end)
     return

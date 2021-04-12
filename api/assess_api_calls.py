@@ -43,7 +43,7 @@ r = requests.post(
     urlRecommendText, json=jsonLoad, auth=HTTPBasicAuth(username, password)
 )
 print(format_json(r.text))
-
+exit()
 # Recommend an SoW given a PDF.
 print("Sending GET request to `/recommend_file` with a PDF.")
 r = requests.post(urlRecommendFile, files=file, auth=HTTPBasicAuth(username, password))
