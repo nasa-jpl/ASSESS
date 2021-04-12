@@ -64,7 +64,7 @@ def convert_to_new(doc, client, i, new_index):
         "doc_number": i,
         "description": doc["description"],
         "status": doc["current_status"],
-        "technical_committee": doc["tc"],  # doc["technical_committee"]
+        "technical_committee": doc["tc"],
         "sdo": {
             "ics": {
                 "raw_ics": (doc["ics"]),
@@ -76,14 +76,11 @@ def convert_to_new(doc, client, i, new_index):
                 "number_of_pages": strip_number(doc["number_of_pages"]),
                 "section_titles": section_titles,
                 "sections": sections,
-                "new_standard": doc["new_standard"].strip("~"),
-                "new_field": doc["new_field"].strip("~"),
-                "new_group": doc["new_group"].strip("~"),
-                "new_subgroup": doc["new_subgroup"].strip("~"),
                 "type": doc["type"],
                 "preview_url": doc["preview_url"],
             }
         },
+        "text": "description",  # Change to which field is used for analysis
         "title": doc["title"].strip("~"),
         "published_date": doc["publication_date"],
         "isbn": None,
@@ -128,6 +125,5 @@ NEW_INDEX = "assess_remap"
 client = Elasticsearch()
 
 
-
-# migrate(client, local_file, index, new_index)
-export(client, LOCAL_FILE, INDEX)
+migrate(client, LOCAL_FILE, INDEX, NEW_INDEX)
+# export(client, LOCAL_FILE, INDEX)
