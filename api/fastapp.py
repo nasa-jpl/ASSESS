@@ -142,8 +142,6 @@ async def extract(request: Request, pdf: UploadFile = File(...)):
     # filepath = save_upload_file_tmp(pdf)
     print("test pdf@@@@@@@@@")
     print(pdf)
-    print("test text")
-    print(text)
     print("file test")
     file_location = f"{pdf.filename}"
     with open(file_location, "wb+") as file_object:
