@@ -220,7 +220,12 @@ async def standard_info(
     elif sdo:
         res = es.search(
             index=idx_main,
-            body={"size": size, "query": {"match": {"sdo": sdo}}},
+            body={
+                "size": size,
+                "query": {
+                    "nested": {"path": "sdo", "query": {{"match": {"sdo": sdo}}}}
+                },
+            },
         )
     elif hash:
         res = es.search(
