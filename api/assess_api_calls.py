@@ -37,128 +37,136 @@ location = "/Users/vishall/prog/assess-root/test2.pdf"
 file = {"pdf": open(location, "rb")}
 
 # Recommend SoW given text "Example text about airplanes.".
-print("Sending GET request to `/recommend_text`.")
-jsonLoad = {"text_field": "Example text about airplanes"}
-r = requests.post(
-    urlRecommendText, json=jsonLoad, auth=HTTPBasicAuth(username, password)
-)
-print(format_json(r.text))
-# Recommend an SoW given a PDF.
-print("Sending GET request to `/recommend_file` with a PDF.")
-r = requests.post(urlRecommendFile, files=file, auth=HTTPBasicAuth(username, password))
-print(format_json(r.text))
+# print("Sending GET request to `/recommend_text`.")
+# jsonLoad = {"text_field": "Example text about airplanes"}
+# r = requests.post(
+#     urlRecommendText, json=jsonLoad, auth=HTTPBasicAuth(username, password)
+# )
+# print(format_json(r.text))
+# # Recommend an SoW given a PDF.
+# print("Sending GET request to `/recommend_file` with a PDF.")
+# r = requests.post(urlRecommendFile, files=file, auth=HTTPBasicAuth(username, password))
+# print(format_json(r.text))
 
-# Extract standard reference from PDF.
-print("Sending POST request to `/extract` using a PDF.")
-r = requests.post(urlExtract, files=file, auth=HTTPBasicAuth(username, password))
-print(format_json(r.text))
+# # Extract standard reference from PDF.
+# print("Sending POST request to `/extract` using a PDF.")
+# r = requests.post(urlExtract, files=file, auth=HTTPBasicAuth(username, password))
+# print(format_json(r.text))
 
-# Get standard references.
-print("Sending GET request to `/search`.")
-r = requests.get(
-    urlSearch + "/airplanes%20technology" + "?size=3",
-    auth=HTTPBasicAuth(username, password),
-)
-print(format_json(r.text))
+# # Get standard references.
+# print("Sending GET request to `/search`.")
+# r = requests.get(
+#     urlSearch + "/airplanes%20technology" + "?size=3",
+#     auth=HTTPBasicAuth(username, password),
+# )
+# print(format_json(r.text))
 
-## Add/Ingest Standard.
-doc = {
-    "id": "x0288b9ed144439f8ad8fa017d604eac",
-    "raw_id": "ISO 44-2:2015",
-    "description": "ISO 000 is a dummy standard I am adding that is made up.",
-    "ingestion_date": "2018-03-10 13:07:45",
-    "hash": "7c8dc19cfbb38a573090c4b0b2c6d3b4f4d68f98ed55506aed936f78cfc71590",
-    "published_date": "2020-12",
-    "isbn": None,
-    "text": ["description"],
-    "status": "TO_DELETE",
-    "technical_committee": "ISO/TC 1111",
-    "title": "This is dummy data",
-    "url": "https://www.iso.org/standard/123123.html",
-    "sdo": {
-        "ics": {
-            "code": "0.30.010.10.ISO/IEC 10592:1992",
-            "edition": [
-                2,
-            ],
-            "field": "1",
-            "group": "1.1",
-            "number_of_pages": [1],
-            "preview_url": "https://www.iso.org/obp/ui/#!iso:std:123123:en",
-            "raw_ics": "['1.1.1']",
-            "section_titles": [
-                "Foreword",
-                "Introduction",
-                "1   Scope",
-                "2   Normative references",
-                "3   Terms and definitions",
-            ],
-            "sections": None,
-            "subgroup": "1.1.1",
-            "type": "standard",
-        }
-    },
-}
+# ## Add/Ingest Standard.
+# doc = {
+#     "id": "x0288b9ed144439f8ad8fa017d604eac",
+#     "raw_id": "ISO 44-2:2015",
+#     "description": "ISO 000 is a dummy standard I am adding that is made up.",
+#     "ingestion_date": "2018-03-10 13:07:45",
+#     "hash": "7c8dc19cfbb38a573090c4b0b2c6d3b4f4d68f98ed55506aed936f78cfc71590",
+#     "published_date": "2020-12",
+#     "isbn": None,
+#     "text": ["description"],
+#     "status": "TO_DELETE",
+#     "technical_committee": "ISO/TC 1111",
+#     "title": "This is dummy data",
+#     "url": "https://www.iso.org/standard/123123.html",
+#     "sdo": {
+#         "ics": {
+#             "code": "0.30.010.10.ISO/IEC 10592:1992",
+#             "edition": [
+#                 2,
+#             ],
+#             "field": "1",
+#             "group": "1.1",
+#             "number_of_pages": [1],
+#             "preview_url": "https://www.iso.org/obp/ui/#!iso:std:123123:en",
+#             "raw_ics": "['1.1.1']",
+#             "section_titles": [
+#                 "Foreword",
+#                 "Introduction",
+#                 "1   Scope",
+#                 "2   Normative references",
+#                 "3   Terms and definitions",
+#             ],
+#             "sections": None,
+#             "subgroup": "1.1.1",
+#             "type": "standard",
+#         }
+#     },
+# }
 
-print("Sending PUT request to `/add_standards`.")
-r = requests.put(urlAddStandards, json=doc, auth=HTTPBasicAuth(username, password))
-print(format_json(r.text))
-time.sleep(2)
+# print("Sending PUT request to `/add_standards`.")
+# r = requests.put(urlAddStandards, json=doc, auth=HTTPBasicAuth(username, password))
+# print(format_json(r.text))
+# time.sleep(2)
 
 # Look up newly indexed standard.
 # You can search by `id`, `raw_id`, `isbn`, `doc_number`, `technical committee`, `status`,
 # `published_date`, `ingestion_date`, `title`, and `hash` individually as a query parameter.
 # You can also specify a `size` for the query in the results.
-print("Sending GET request to `/standard_info` on ID just added.")
-r = requests.get(
-    urlStandardInfo + "/?id=x0288b9ed144439f8ad8fa017d604eac",
-    auth=HTTPBasicAuth(username, password),
-)
-print(format_json(r.text))
+# print("Sending GET request to `/standard_info` on ID just added.")
+# r = requests.get(
+#     urlStandardInfo + "/?id=x0288b9ed144439f8ad8fa017d604eac",
+#     auth=HTTPBasicAuth(username, password),
+# )
+# print(format_json(r.text))
 
-# Search by raw_id
-print("Sending GET request to `/standard_info` using raw_id.")
-r = requests.get(
-    urlStandardInfo + "/?raw_id=ISO%2044-2:2015", auth=HTTPBasicAuth(username, password)
-)
-print(format_json(r.text))
+# # Search by raw_id
+# print("Sending GET request to `/standard_info` using raw_id.")
+# r = requests.get(
+#     urlStandardInfo + "/?raw_id=ISO%2044-2:2015", auth=HTTPBasicAuth(username, password)
+# )
+# print(format_json(r.text))
 
-# Search by doc_number
-print("Sending GET request to `/standard_info` using doc_number field.")
-r = requests.get(
-    urlStandardInfo + "/?doc_number=200", auth=HTTPBasicAuth(username, password)
-)
-print(format_json(r.text))
+# # Search by doc_number
+# print("Sending GET request to `/standard_info` using doc_number field.")
+# r = requests.get(
+#     urlStandardInfo + "/?doc_number=200", auth=HTTPBasicAuth(username, password)
+# )
+# print(format_json(r.text))
 
-# Search by status with size 10
+# # Search by status with size 10
+# print("Sending GET request to `/standard_info` using published field.")
+# r = requests.get(
+#     urlStandardInfo + "/?status=Published&size=10",
+#     auth=HTTPBasicAuth(username, password),
+# )
+# print(format_json(r.text))
+
+# Search by status with sdo ics
 print("Sending GET request to `/standard_info` using published field.")
 r = requests.get(
-    urlStandardInfo + "/?status=Published&size=10",
+    urlStandardInfo + "/?sdo=ics&size=10",
     auth=HTTPBasicAuth(username, password),
 )
 print(format_json(r.text))
 
-# Insert the standard selected by the *user* into Elasticsearch indices. Useful for statistics.
-selected = {
-    "username": "test_user",
-    "selected_ids": ["x0288b9ed144439f8ad8fa017d604eac"],
-}
-print("Sending POST request to `/select_standard`.")
-r = requests.post(
-    urlSelectStandards, json=selected, auth=HTTPBasicAuth(username, password)
-)
-print(format_json(r.text))
+# # Insert the standard selected by the *user* into Elasticsearch indices. Useful for statistics.
+# selected = {
+#     "username": "test_user",
+#     "selected_ids": ["x0288b9ed144439f8ad8fa017d604eac"],
+# }
+# print("Sending POST request to `/select_standard`.")
+# r = requests.post(
+#     urlSelectStandards, json=selected, auth=HTTPBasicAuth(username, password)
+# )
+# print(format_json(r.text))
 
-# Set the standard selected by the *admin* into Elasticsearch.
-# Allows an admin to give a standard priority.
-set_standards = {
-    "username": "test_user",
-    "standard_id": "x0288b9ed144439f8ad8fa017d604eac",
-    "priority": 100,
-}
+# # Set the standard selected by the *admin* into Elasticsearch.
+# # Allows an admin to give a standard priority.
+# set_standards = {
+#     "username": "test_user",
+#     "standard_id": "x0288b9ed144439f8ad8fa017d604eac",
+#     "priority": 100,
+# }
 
-print("Sending PUT request to `set_standard`.")
-r = requests.put(
-    urlSetStandards, json=set_standards, auth=HTTPBasicAuth(username, password)
-)
-print(format_json(r.text))
+# print("Sending PUT request to `set_standard`.")
+# r = requests.put(
+#     urlSetStandards, json=set_standards, auth=HTTPBasicAuth(username, password)
+# )
+# print(format_json(r.text))
