@@ -141,16 +141,10 @@ async def extract(request: Request, pdf: UploadFile = File(...)):
     """Given an input of a Statement of Work (SoW) as a PDF,
     return a JSON of extracted standards that are embedded within the SoW."""
     # filepath = save_upload_file_tmp(pdf)
-    print("test pdf@@@@@@@@@")
-    print(pdf)
-    print("file test")
     file_location = f"{pdf.filename}"
     with open(file_location, "wb+") as file_object:
         shutil.copyfileobj(pdf.file, file_object)
     print({"info": f"file '{pdf.filename}' saved at '{file_location}'"})
-    print({pdf.filename})
-    print(file_location)
-    print(os.path.isfile(file_location))
     text = extract_prep.parse_text(file_location)
     refs = find_standard_ref(text)
     out = {}
@@ -158,7 +152,7 @@ async def extract(request: Request, pdf: UploadFile = File(...)):
     out["filename"] = pdf.filename
     out["text"] = text
     json_compatible_item_data = jsonable_encoder(out)
-    log_stats(request, data={"refs": refs, "text": text, "filename": pdf.filename})
+    log_stats(request, data={"refs": refs, "filename": pdf.filename})
     return JSONResponse(content=json_compatible_item_data)
 
 
