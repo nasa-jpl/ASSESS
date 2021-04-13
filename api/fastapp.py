@@ -104,7 +104,7 @@ async def recommend_text(request: Request, sow: Sow):
             results = hit["_source"]
         output[i] = results
         output[i]["similarity"] = prediction["sim"]
-    output["embedded_references"] = predictions["embedded_references"]
+    # output["embedded_references"] = predictions["embedded_references"]
     json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=in_text)
     return JSONResponse(content=json_compatible_item_data)
@@ -129,7 +129,7 @@ async def recommend_file(request: Request, pdf: UploadFile = File(...)):
             results = hit["_source"]
         output[i] = results
         output[i]["similarity"] = prediction["sim"]
-    output["embedded_references"] = predictions["embedded_references"]
+    # output["embedded_references"] = predictions["embedded_references"]
     json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=pdf.filename)
     # Add line here to save file?
