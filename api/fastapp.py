@@ -30,6 +30,7 @@ import logging
 from jsonschema import validate
 import time
 import shutil
+import os.path
 
 app = FastAPI()
 origins = [
@@ -148,7 +149,9 @@ async def extract(request: Request, pdf: UploadFile = File(...)):
         shutil.copyfileobj(pdf.file, file_object)
     print({"info": f"file '{pdf.filename}' saved at '{file_location}'"})
     print({pdf.filename})
-    text = extract_prep.parse_text(str({pdf.filename}))
+    print(file_location)
+    print(os.path.isfile(file_location))
+    text = extract_prep.parse_text(file_location)
     refs = find_standard_ref(text)
     out = {}
     out["embedded_references"] = refs
