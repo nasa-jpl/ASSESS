@@ -147,7 +147,8 @@ async def extract(request: Request, pdf: UploadFile = File(...)):
     with open(file_location, "wb+") as file_object:
         shutil.copyfileobj(pdf.file, file_object)
     print({"info": f"file '{pdf.filename}' saved at '{file_location}'"})
-    text = extract_prep.parse_text({pdf.filename})
+    print({pdf.filename})
+    text = extract_prep.parse_text(str({pdf.filename}))
     refs = find_standard_ref(text)
     out = {}
     out["embedded_references"] = refs
