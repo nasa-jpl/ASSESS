@@ -29,7 +29,7 @@ from logging.handlers import RotatingFileHandler
 import logging
 from jsonschema import validate
 import time
-import shututil
+import shutil
 
 app = FastAPI()
 origins = [
