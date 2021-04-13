@@ -145,7 +145,7 @@ async def extract(request: Request, pdf: UploadFile = File(...)):
     print("test text")
     print(text)
     print("file test")
-    file_location = f"files/{pdf.filename}"
+    file_location = f"~/{pdf.filename}"
     with open(file_location, "wb+") as file_object:
         shutil.copyfileobj(pdf.file, file_object)
     print({"info": f"file '{pdf.filename}' saved at '{file_location}'"})
