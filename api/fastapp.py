@@ -150,7 +150,6 @@ async def extract(request: Request, pdf: UploadFile = File(...)):
     out = {}
     out["embedded_references"] = refs
     out["filename"] = pdf.filename
-    out["text"] = text
     json_compatible_item_data = jsonable_encoder(out)
     log_stats(request, data={"refs": refs, "filename": pdf.filename})
     return JSONResponse(content=json_compatible_item_data)
