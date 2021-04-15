@@ -66,8 +66,7 @@ def convert_to_new(doc, client, i, new_index):
         "status": doc["current_status"],
         "technical_committee": doc["tc"],
         "sdo": {
-            "ics": {
-                "raw_ics": (doc["ics"]),
+            "iso": {
                 "code": doc["code"].strip("~"),
                 "field": doc["field"].strip("~"),
                 "group": doc["group"].strip("~"),
@@ -80,6 +79,7 @@ def convert_to_new(doc, client, i, new_index):
                 "preview_url": doc["preview_url"],
             }
         },
+        "category": {"ics": doc["ics"]},
         "text": ["description"],  # Change to which field is used for analysis
         "title": doc["title"].strip("~"),
         "published_date": doc["publication_date"],
