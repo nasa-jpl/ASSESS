@@ -85,7 +85,7 @@ def log_stats(request, data=None, user=None):
 
 
 @app.post("/recommend_text")
-async def recommend_text(request: Request, sow: Sow, size=10):
+async def recommend_text(request: Request, sow: Sow, size: int = 10):
     """Given an input of Statement of Work as text,
     return a JSON of recommended standards."""
     in_text = sow.text_field
@@ -111,7 +111,7 @@ async def recommend_text(request: Request, sow: Sow, size=10):
 
 
 @app.post("/recommend_file")
-async def recommend_file(request: Request, pdf: UploadFile = File(...), size=10):
+async def recommend_file(request: Request, pdf: UploadFile = File(...), size: int = 10):
     """Given an input of a Statement of Work as a PDF,
     return a JSON of recommended standards."""
     print("File received")
