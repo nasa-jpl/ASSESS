@@ -51,7 +51,7 @@ def transfrom(df):
     return tfidftransformer, X, nbrs_brute
 
 
-def predict_from_es(file, text):
+def predict_from_es(file=None, text=None, size=10):
     if file:
         if file.filename == "":
             return "No selected file!"
@@ -82,7 +82,7 @@ def predict_from_es(file, text):
     distances = list(distances[0])
     indices = list(indices[0])
 
-    for indx, dist in zip(indices[:10], distances[:10]):
+    for indx, dist in zip(indices[:size], distances[:size]):
         title = df.iloc[indx]["title"]
         description = df.iloc[indx]["description"]
         link = df.iloc[indx]["link"]
@@ -116,7 +116,7 @@ def predict_test(file=None, in_text=None):
     exit()
 
 
-def predict(file=None, in_text=None):
+def predict(file=None, in_text=None, size=10):
     dirPath = str(pathlib.Path(__file__).parent.absolute())
 
     standards_dir = dirPath + "/../standards/data"
@@ -195,7 +195,7 @@ def predict(file=None, in_text=None):
     distances = list(distances[0])
     indices = list(indices[0])
 
-    for indx, dist in zip(indices[:10], distances[:10]):
+    for indx, dist in zip(indices[:size], distances[:size]):
         title = df.iloc[indx]["title"]
         description = df.iloc[indx]["description"]
         link = df.iloc[indx]["link"]
@@ -218,7 +218,7 @@ def predict(file=None, in_text=None):
 
         result["recommendations"].append(
             {
-                "sim": 100 * round(1 - dist, 2),
+                "sim": 100 * round(1 - dist, 21),
                 "raw_id": standard_id,
                 "code": code,
             }

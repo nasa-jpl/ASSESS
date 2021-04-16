@@ -1,4 +1,4 @@
-from extract_prep import predict, predict_from_es
+from extract_prep import predict_test, predict_from_es
 
-print(predict_from_es("test test"))
-print(predict_test("test test"))
+print(predict_from_es(text="test test"))
+print(predict_test(text="test test"))

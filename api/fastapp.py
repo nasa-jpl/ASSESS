@@ -85,11 +85,11 @@ def log_stats(request, data=None, user=None):
 
 
 @app.post("/recommend_text")
-async def recommend_text(request: Request, sow: Sow):
+async def recommend_text(request: Request, sow: Sow, size=10):
     """Given an input of Statement of Work as text,
     return a JSON of recommended standards."""
     in_text = sow.text_field
-    predictions = extract_prep.predict(in_text=in_text)
+    predictions = extract_prep.predict(in_text=in_text, size=size)
     output = {}
     results = {}
     i = 0
@@ -111,11 +111,11 @@ async def recommend_text(request: Request, sow: Sow):
 
 
 @app.post("/recommend_file")
-async def recommend_file(request: Request, pdf: UploadFile = File(...)):
+async def recommend_file(request: Request, pdf: UploadFile = File(...), size=10):
     """Given an input of a Statement of Work as a PDF,
     return a JSON of recommended standards."""
     print("File received")
-    predictions = extract_prep.predict(file=pdf)
+    predictions = extract_prep.predict(file=pdf, size=size)
     output = {}
     results = {}
     i = 0
