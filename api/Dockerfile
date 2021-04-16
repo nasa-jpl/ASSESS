@@ -4,7 +4,7 @@ FROM ubuntu:latest
 WORKDIR /app
 
 # Add app to Docker
-COPY ./ ./
+COPY . /app
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -14,7 +14,6 @@ RUN apt-get -y upgrade
 
 RUN apt-get -y install python3 \
     python3-pip 
-
 
 RUN apt-get -y install gfortran \
     gcc \
@@ -36,4 +35,4 @@ RUN pip3 install --upgrade -r requirements.txt
 
 WORKDIR /app
 # Run FastAPI service
-#RUN python fastapp.py --reload
+RUN python fastapp.py --reload

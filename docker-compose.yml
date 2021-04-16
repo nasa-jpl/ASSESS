@@ -3,21 +3,22 @@ services:
   fastapi:
     container_name: fastapi
     build:
-      context: .
-      dockerfile: api/Dockerfile
+      context: api
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     networks:
       - "jointops"
-  react:
-    container_name: react
-    build:
-      context: dashboard/
-      dockerfile: dashboard/Docker-ui/.
-    ports:
-      - "3000:3000"
-    networks:
-      - "jointops"
+  # !React app currently down.
+  # react:
+  #   container_name: react
+  #   build:
+  #     context: dashboard
+  #     dockerfile: Docker-ui/Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - "jointops"
   elasticsearch-1:
     container_name: elasticsearch-1
     image: "docker.elastic.co/elasticsearch/elasticsearch:7.9.2"
@@ -28,19 +29,10 @@ services:
       - "jointops"
   kibana:
     container_name: kibana
-    image: "docker.elastic.co/kibana/kibana:7.9.2 "
+    image: "docker.elastic.co/kibana/kibana:7.12.0"
     ports:
       - "5601:5601"
     networks:
       - "jointops"
-  redis:
-    container_name: redis
-    image: "bitnami/redis:latest"
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-    networks:
-      - "jointops"
-    ports:
-      - "6379:6379"
 networks:
   jointops:

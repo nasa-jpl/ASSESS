@@ -23,7 +23,6 @@ if None in [username, password, root]:
     exit()
 
 # Define API endpoints.
-urlRecommendText = root + "/recommend_text"
 urlRecommendFile = root + "/recommend_file"
 urlExtract = root + "/extract"
 urlSearch = root + "/search"
@@ -40,9 +39,13 @@ file = {"pdf": open(location, "rb")}
 print("Sending GET request to `/recommend_text`.")
 jsonLoad = {"text_field": "Example text about airplanes"}
 r = requests.post(
-    urlRecommendText, json=jsonLoad, auth=HTTPBasicAuth(username, password)
+    f"{root}/recommend_text?size=1",
+    json=jsonLoad,
+    auth=HTTPBasicAuth(username, password),
 )
 print(format_json(r.text))
+exit()
+
 # Recommend an SoW given a PDF.
 print("Sending GET request to `/recommend_file` with a PDF.")
 r = requests.post(urlRecommendFile, files=file, auth=HTTPBasicAuth(username, password))
