@@ -10,12 +10,14 @@ from sklearn.feature_extraction import text
 from standard_extractor import find_standard_ref
 from text_analysis import extract_prep
 import uvicorn
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, ORJSONResponse, JSONResponse
-from fastapi import FastAPI, File, Form, UploadFile, Request, Body
+from fastapi import File, Form, UploadFile, Request, Body
 from fastapi.encoders import jsonable_encoder
+from fastapi_limiter import FastAPILimiter
+from fastapi_limiter.depends import RateLimiter
 from typing import Optional
 import requests
 from starlette.requests import Request
@@ -32,11 +34,11 @@ import time
 import shutil
 import os.path
 
+# Define api settings.
 app = FastAPI()
 origins = [
     "http://localhost",
 ]
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -45,9 +47,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Connect to Elasticsearch
+# Define rate limiter.
+rate_times = 2
+rate_seconds = 5
+# Connect to Elasticsearch.
 es, idx_main, idx_log, idx_stats = connect_to_es()
 
+# Make a log directory.
 if not os.path.exists("log"):
     os.makedirs("log")
 
@@ -58,6 +64,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Create logs.
+formatter = logging.Formatter(
+    '{"time": "%(asctime)s.%(msecs)03d", "type": "%(levelname)s", "thread":[%(thread)d], "msc": %(message)s}',
+    "%Y-%m-%d %H:%M:%S",
+)
+handler = RotatingFileHandler("log/app.log", backupCount=0)
+logging.getLogger().setLevel(logging.DEBUG)
+fastapi_logger.addHandler(handler)
+handler.setFormatter(formatter)
+startMsg = {}
+startMsg["message"] = "*** Starting Server ***"
+fastapi_logger.info(json.dumps(startMsg))
 
 
 class Sow(BaseModel):
@@ -84,7 +103,10 @@ def log_stats(request, data=None, user=None):
     return
 
 
-@app.post("/recommend_text")
+@app.post(
+    "/recommend_text",
+    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+)
 async def recommend_text(request: Request, sow: Sow, size: int = 10):
     """Given an input of Statement of Work as text,
     return a JSON of recommended standards."""
@@ -110,7 +132,10 @@ async def recommend_text(request: Request, sow: Sow, size: int = 10):
     return JSONResponse(content=json_compatible_item_data)
 
 
-@app.post("/recommend_file")
+@app.post(
+    "/recommend_file",
+    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+)
 async def recommend_file(request: Request, pdf: UploadFile = File(...), size: int = 10):
     """Given an input of a Statement of Work as a PDF,
     return a JSON of recommended standards."""
@@ -136,7 +161,10 @@ async def recommend_file(request: Request, pdf: UploadFile = File(...), size: in
     return JSONResponse(content=json_compatible_item_data)
 
 
-@app.post("/extract")
+@app.post(
+    "/extract",
+    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+)
 async def extract(request: Request, pdf: UploadFile = File(...)):
     """Given an input of a Statement of Work (SoW) as a PDF,
     return a JSON of extracted standards that are embedded within the SoW."""
@@ -155,7 +183,11 @@ async def extract(request: Request, pdf: UploadFile = File(...)):
     return JSONResponse(content=json_compatible_item_data)
 
 
-@app.get("/standard_info/", response_class=ORJSONResponse)
+@app.get(
+    "/standard_info/",
+    response_class=ORJSONResponse,
+    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+)
 async def standard_info(
     request: Request,
     id: Optional[str] = None,
@@ -235,7 +267,10 @@ async def standard_info(
     return JSONResponse(content=json_compatible_item_data)
 
 
-@app.get("/search/{searchq}")
+@app.get(
+    "/search/{searchq}",
+    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+)
 async def search(
     request: Request, searchq: str = Field(example="Airplanes"), size: int = 10
 ):
@@ -252,7 +287,11 @@ async def search(
     return JSONResponse(content=results)
 
 
-@app.put("/add_standards", response_class=HTMLResponse)
+@app.put(
+    "/add_standards",
+    response_class=HTMLResponse,
+    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+)
 async def add_standards(request: Request, doc: dict):
     """Add standards to the main Elasticsearch index by PUTTING a JSON request here."""
     # TODO: Check Standard body.
@@ -263,7 +302,10 @@ async def add_standards(request: Request, doc: dict):
     return JSONResponse(content=json_compatible_item_data)
 
 
-@app.post("/select_standards")
+@app.post(
+    "/select_standards",
+    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+)
 async def select_standards(request: Request, selected: dict):
     """After a use likes a standard, this endpoint captures the selected standards into the database"""
     schema = {
@@ -282,7 +324,10 @@ async def select_standards(request: Request, selected: dict):
     return JSONResponse(content=json_compatible_item_data)
 
 
-@app.put("/set_standards")
+@app.put(
+    "/set_standards",
+    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+)
 async def set_standards(request: Request, set_standards: dict):
     """Validate and set preference of standards (done by Admin)."""
     # TODO: Once we are connected to LDAP, add line to verify auth of Admin.
@@ -304,17 +349,5 @@ async def set_standards(request: Request, set_standards: dict):
 
 
 if __name__ == "__main__":
-    formatter = logging.Formatter(
-        '{"time": "%(asctime)s.%(msecs)03d", "type": "%(levelname)s", "thread":[%(thread)d], "msc": %(message)s}',
-        "%Y-%m-%d %H:%M:%S",
-    )
-    handler = RotatingFileHandler("log/app.log", backupCount=0)
-    logging.getLogger().setLevel(logging.DEBUG)
-    fastapi_logger.addHandler(handler)
-    handler.setFormatter(formatter)
-    startMsg = {}
-    startMsg["message"] = "*** Starting Server ***"
-    print(json.dumps(startMsg))
-    fastapi_logger.info(json.dumps(startMsg))
     # read_logs()
     uvicorn.run(app, host="0.0.0.0", port=8080)
