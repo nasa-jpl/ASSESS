@@ -153,7 +153,7 @@ selected = {
 }
 print("Sending POST request to `/select_standard`.")
 r = requests.post(
-    f"{root}/select_standard", json=selected, auth=HTTPBasicAuth(username, password)
+    f"{root}/select_standards", json=selected, auth=HTTPBasicAuth(username, password)
 )
 pp.pprint(r.text)
 
@@ -167,6 +167,6 @@ set_standards = {
 
 print("Sending PUT request to `set_standard`.")
 r = requests.put(
-    f"{root}/set_standard", json=set_standards, auth=HTTPBasicAuth(username, password)
+    f"{root}/set_standards", json=set_standards, auth=HTTPBasicAuth(username, password)
 )
 pp.pprint(r.text)
