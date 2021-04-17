@@ -28,6 +28,7 @@ from fastapi.logger import logger as fastapi_logger
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse, ORJSONResponse
 from fastapi.staticfiles import StaticFiles
+import aioredis
 from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import RateLimiter
 from jsonschema import validate
@@ -79,7 +80,10 @@ fastapi_logger.info(json.dumps(startMsg))
 
 @app.on_event("startup")
 async def startup():
-    redis = await aioredis.create_redis_pool("redis://localhost")
+    with open("conf.yaml", "r") as stream:
+        conf = yaml.safe_load(stream)
+    host = conf["redis"][0]
+    redis = await aioredis.create_redis_pool(f"redis://{host}")
     FastAPILimiter.init(redis)
 
 
