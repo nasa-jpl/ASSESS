@@ -77,6 +77,12 @@ startMsg["message"] = "*** Starting Server ***"
 fastapi_logger.info(json.dumps(startMsg))
 
 
+@app.on_event("startup")
+async def startup():
+    redis = await aioredis.create_redis_pool("redis://localhost")
+    FastAPILimiter.init(redis)
+
+
 class Sow(BaseModel):
     text_field: str = Field(example="Airplanes are complex.")
 
