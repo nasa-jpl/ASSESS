@@ -1,4 +1,5 @@
 #FROM ubuntu:latest
+# For prodcution
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
 
 # Set working directory
@@ -29,10 +30,11 @@ RUN apt-get -y install gfortran \
     libatlas-base-dev \
     libc-dev
 
-# # Install dependencies
+# Install dependencies
 RUN pip3 install --upgrade pip
 RUN pip3 install --upgrade pip setuptools wheel
 RUN pip3 install --upgrade -r requirements.txt 
 
-# # Run FastAPI service
+EXPOSE 8080
+# Run FastAPI service
 #CMD python3 main.py --reload

@@ -6,7 +6,7 @@ services:
       context: api
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8080:80"
     networks:
       - "jointops"
   # !React app currently down.
@@ -20,7 +20,6 @@ services:
   #   networks:
   #     - "jointops"
   elasticsearch-1:
-    - "ES_JAVA_OPTS=-Xms512m -Xmx512m -XX:-UseConcMarkSweepGC"
     container_name: elasticsearch-1
     image: "docker.elastic.co/elasticsearch/elasticsearch:7.12.0"
     ports:
