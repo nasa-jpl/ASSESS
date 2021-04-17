@@ -34,5 +34,14 @@ services:
       - "5601:5601"
     networks:
       - "jointops"
+  redis:
+    container_name: redis-1
+    image: "bitnami/redis:latest"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - "jointops"
+    ports:
+      - "6379:6379"
 networks:
   jointops:

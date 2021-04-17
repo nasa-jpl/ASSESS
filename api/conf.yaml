@@ -14,3 +14,5 @@ es_index_logs:
   - sys_logs
 es_index_stats:
   - user_stats
+redis:
+  - redis-1
