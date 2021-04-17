@@ -1,44 +1,50 @@
-import os
 import json
+import logging
+import os
+import os.path
+import shutil
 import subprocess
-from sklearn.neighbors import NearestNeighbors
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.preprocessing import normalize
+import time
+from logging.handlers import RotatingFileHandler
+from typing import Optional
+
 import dill
 import pandas as pd
-from sklearn.feature_extraction import text
-from standard_extractor import find_standard_ref
-from text_analysis import extract_prep
+import requests
 import uvicorn
-from fastapi import Depends, FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, ORJSONResponse, JSONResponse
-from fastapi import File, Form, UploadFile, Request, Body
+from elasticsearch import Elasticsearch
+from fastapi import (
+    Body,
+    Depends,
+    FastAPI,
+    File,
+    Form,
+    HTTPException,
+    Request,
+    UploadFile,
+)
 from fastapi.encoders import jsonable_encoder
+from fastapi.logger import logger as fastapi_logger
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, JSONResponse, ORJSONResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import RateLimiter
-from typing import Optional
-import requests
+from jsonschema import validate
+from pydantic import BaseModel, Field
 from starlette.requests import Request
 from starlette.responses import Response
-from pydantic import BaseModel, Field
-from elasticsearch import Elasticsearch
+
+from standard_extractor import find_standard_ref
+from text_analysis import extract_prep
 from web_utils import connect_to_es, read_logs
-from fastapi import FastAPI, HTTPException
-from fastapi.logger import logger as fastapi_logger
-from logging.handlers import RotatingFileHandler
-import logging
-from jsonschema import validate
-import time
-import shutil
-import os.path
 
 # Define api settings.
 app = FastAPI()
 origins = [
     "http://localhost",
 ]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -48,22 +54,14 @@ app.add_middleware(
 )
 
 # Define rate limiter.
-rate_times = 2
-rate_seconds = 5
+rate_times = 15
+rate_seconds = 20
 # Connect to Elasticsearch.
 es, idx_main, idx_log, idx_stats = connect_to_es()
 
 # Make a log directory.
 if not os.path.exists("log"):
     os.makedirs("log")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # Create logs.
 formatter = logging.Formatter(
@@ -87,8 +85,7 @@ def log_stats(request, data=None, user=None):
     """Log detailed data in JSON for incoming/outgoing API request."""
     client_host = request.client.host
     msg = {}
-    # TODO: Log user once authentication is connected.
-    # msg["user"] = str(user)
+    # TODO: Log user once authentication is connected. msg["user"] = str(user)
     # request.state.time_started = time.time()
     msg["time_started"] = str(time.time())
     msg["method"] = str(request.method)
@@ -109,7 +106,8 @@ def log_stats(request, data=None, user=None):
 )
 async def recommend_text(request: Request, sow: Sow, size: int = 10):
     """Given an input of Statement of Work as text,
-    return a JSON of recommended standards."""
+    return a JSON of recommended standards.
+    """
     in_text = sow.text_field
     predictions = extract_prep.predict(in_text=in_text, size=size)
     output = {}
@@ -138,7 +136,8 @@ async def recommend_text(request: Request, sow: Sow, size: int = 10):
 )
 async def recommend_file(request: Request, pdf: UploadFile = File(...), size: int = 10):
     """Given an input of a Statement of Work as a PDF,
-    return a JSON of recommended standards."""
+    return a JSON of recommended standards.
+    """
     print("File received")
     predictions = extract_prep.predict(file=pdf, size=size)
     output = {}
@@ -307,7 +306,7 @@ async def add_standards(request: Request, doc: dict):
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
 async def select_standards(request: Request, selected: dict):
-    """After a use likes a standard, this endpoint captures the selected standards into the database"""
+    """After a use likes a standard, this endpoint captures the selected standards into the database."""
     schema = {
         "type": "object",
         "properties": {
@@ -342,8 +341,6 @@ async def set_standards(request: Request, set_standards: dict):
     validate(instance=set_standards, schema=schema)
     json_compatible_item_data = jsonable_encoder(set_standards)
     es.index(index=idx_stats, body=json.dumps(set_standards))
-    # TODO: Update the priority of the selected standards, ES code to update an item to {"priority": 100}
-    # es.index(index=idx_main, body=json.dumps(selected))
     log_stats(request, data=set_standards)
     return JSONResponse(content=json_compatible_item_data)
 

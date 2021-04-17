@@ -1,11 +1,12 @@
 import json
-import time
-import requests
-from requests.auth import HTTPBasicAuth
-import yaml
 import os.path
+import pprint
+import time
 from os import path
-from web_utils import format_json
+
+import requests
+import yaml
+from requests.auth import HTTPBasicAuth
 
 # Insert username, password, and ASSESS root url into `conf.yaml`
 with open("conf.yaml", "r") as stream:
@@ -13,23 +14,15 @@ with open("conf.yaml", "r") as stream:
 username = conf.get("username")
 password = conf.get("password")
 root = conf.get("url")
+pp = pprint.PrettyPrinter(indent=4)
+
 print(
     "Running with username: %s, password: %s, and root_url: %s"
     % (username, password, root)
 )
 
 if None in [username, password, root]:
-    print("Define variables in ./conf.yaml. Exiting.")
-    exit()
-
-# Define API endpoints.
-urlRecommendFile = root + "/recommend_file"
-urlExtract = root + "/extract"
-urlSearch = root + "/search"
-urlAddStandards = root + "/add_standards"
-urlStandardInfo = root + "/standard_info"
-urlSelectStandards = root + "/select_standards"
-urlSetStandards = root + "/set_standards"
+    raise Exception("Define variables in ./conf.yaml. Exiting.")
 
 # Specify file location of an SOW.
 location = "/Users/vishall/prog/assess-root/test2.pdf"
@@ -43,26 +36,27 @@ r = requests.post(
     json=jsonLoad,
     auth=HTTPBasicAuth(username, password),
 )
-print(format_json(r.text))
-exit()
+pp.pprint(r.text)
 
 # Recommend an SoW given a PDF.
 print("Sending GET request to `/recommend_file` with a PDF.")
-r = requests.post(urlRecommendFile, files=file, auth=HTTPBasicAuth(username, password))
-print(format_json(r.text))
+r = requests.post(
+    f"{root}/recommend_file", files=file, auth=HTTPBasicAuth(username, password)
+)
+pp.pprint(r.text)
 
 # Extract standard reference from PDF.
 print("Sending POST request to `/extract` using a PDF.")
-r = requests.post(urlExtract, files=file, auth=HTTPBasicAuth(username, password))
-print(format_json(r.text))
+r = requests.post(f"{root}/extract", files=file, auth=HTTPBasicAuth(username, password))
+pp.pprint(r.text)
 
 # Get standard references.
 print("Sending GET request to `/search`.")
 r = requests.get(
-    urlSearch + "/airplanes%20technology" + "?size=3",
+    f"{root}/search/airplanes%20technology?size=3",
     auth=HTTPBasicAuth(username, password),
 )
-print(format_json(r.text))
+pp.pprint(r.text)
 
 ## Add/Ingest Standard.
 doc = {
@@ -104,9 +98,11 @@ doc = {
 }
 
 print("Sending PUT request to `/add_standards`.")
-r = requests.put(urlAddStandards, json=doc, auth=HTTPBasicAuth(username, password))
-print(format_json(r.text))
-time.sleep(2)
+r = requests.put(
+    f"{root}/add_standards", json=doc, auth=HTTPBasicAuth(username, password)
+)
+pp.pprint(r.text)
+time.sleep(1)
 
 # Look up newly indexed standard.
 # You can search by `id`, `raw_id`, `isbn`, `doc_number`, `technical committee`, `status`,
@@ -114,40 +110,41 @@ time.sleep(2)
 # You can also specify a `size` for the query in the results.
 print("Sending GET request to `/standard_info` on ID just added.")
 r = requests.get(
-    urlStandardInfo + "/?id=x0288b9ed144439f8ad8fa017d604eac",
+    f"{root}/standard_info/?id=x0288b9ed144439f8ad8fa017d604eac",
     auth=HTTPBasicAuth(username, password),
 )
-print(format_json(r.text))
+pp.pprint(r.text)
 
 # Search by raw_id
 print("Sending GET request to `/standard_info` using raw_id.")
 r = requests.get(
-    urlStandardInfo + "/?raw_id=ISO%2044-2:2015", auth=HTTPBasicAuth(username, password)
+    f"{root}/standard_info/?raw_id=ISO%2044-2:2015",
+    auth=HTTPBasicAuth(username, password),
 )
-print(format_json(r.text))
+pp.pprint(r.text)
 
 # Search by doc_number
 print("Sending GET request to `/standard_info` using doc_number field.")
 r = requests.get(
-    urlStandardInfo + "/?doc_number=200", auth=HTTPBasicAuth(username, password)
+    f"{root}/standard_info/?doc_number=200", auth=HTTPBasicAuth(username, password)
 )
-print(format_json(r.text))
+pp.pprint(r.text)
 
 # Search by status with size 10
 print("Sending GET request to `/standard_info` using published field.")
 r = requests.get(
-    urlStandardInfo + "/?status=Published&size=10",
+    f"{root}/standard_info/?status=Published&size=10",
     auth=HTTPBasicAuth(username, password),
 )
-print(format_json(r.text))
+pp.pprint(r.text)
 
 # Search by status with SDO ICS and return 10
 print("Sending GET request to `/standard_info` using sdo == `ics` Key.")
 r = requests.get(
-    urlStandardInfo + "/?sdo=ics&size=10",
+    f"{root}/standard_info/?sdo=ics&size=10",
     auth=HTTPBasicAuth(username, password),
 )
-print(format_json(r.text))
+pp.pprint(r.text)
 
 # Insert the standard selected by the *user* into Elasticsearch indices. Useful for statistics.
 selected = {
@@ -156,9 +153,9 @@ selected = {
 }
 print("Sending POST request to `/select_standard`.")
 r = requests.post(
-    urlSelectStandards, json=selected, auth=HTTPBasicAuth(username, password)
+    f"{root}/select_standard", json=selected, auth=HTTPBasicAuth(username, password)
 )
-print(format_json(r.text))
+pp.pprint(r.text)
 
 # Set the standard selected by the *admin* into Elasticsearch.
 # Allows an admin to give a standard priority.
@@ -170,6 +167,6 @@ set_standards = {
 
 print("Sending PUT request to `set_standard`.")
 r = requests.put(
-    urlSetStandards, json=set_standards, auth=HTTPBasicAuth(username, password)
+    f"{root}/set_standard", json=set_standards, auth=HTTPBasicAuth(username, password)
 )
-print(format_json(r.text))
+pp.pprint(r.text)
