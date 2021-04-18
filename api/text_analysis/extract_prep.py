@@ -3,7 +3,7 @@ import os
 import pathlib
 import subprocess
 from collections import deque
-
+import numpy as np
 import dill
 import pandas as pd
 from elasticsearch import Elasticsearch
@@ -48,7 +48,7 @@ def transfrom(df):
     )
     X = normalize(X, norm="l2", axis=1)
     nbrs_brute = NearestNeighbors(
-        n_neighbors=X.shape[0], algorithm="brute", metric="cosine"
+        n_neighbors=X.shape[0], algorithm="auto", metric="cosine"
     )
     nbrs_brute.fit(X.todense())
     return tfidftransformer, X, nbrs_brute
@@ -108,6 +108,7 @@ def predict(file=None, in_text=None, size=10):
     sow = tfidftransformer.transform([new_text])
     sow = normalize(sow, norm="l2", axis=1)
 
+    # This is memory intensive.
     distances, indices = nbrs_brute.kneighbors(sow.todense())
     print(distances)
     distances = list(distances[0])
