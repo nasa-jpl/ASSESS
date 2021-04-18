@@ -140,6 +140,35 @@ async def recommend_text(request: Request, sow: Sow, size: int = 10):
 
 
 @app.post(
+    "/recommend_text_new",
+    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+)
+async def recommend_text(request: Request, sow: Sow, size: int = 10):
+    """Given an input of Statement of Work as text,
+    return a JSON of recommended standards.
+    """
+    in_text = sow.text_field
+    predictions = extract_prep.predict(in_text=in_text, size=size)
+    output = {}
+    results = {}
+    i = 0
+    for prediction in predictions["recommendations"]:
+        i += 1
+        raw_id = prediction["id"]
+        res = es.search(
+            index=idx_main, body={"size": size, "query": {"match": {"id": id}}}
+        )
+        for hit in res["hits"]["hits"]:
+            results = hit["_source"]
+        output[i] = results
+        output[i]["similarity"] = prediction["sim"]
+    # output["embedded_references"] = predictions["embedded_references"]
+    json_compatible_item_data = jsonable_encoder(output)
+    log_stats(request, data=in_text)
+    return JSONResponse(content=json_compatible_item_data)
+
+
+@app.post(
     "/recommend_file",
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )

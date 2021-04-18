@@ -40,6 +40,8 @@ def parse_text(filepath):
 def transfrom(df):
     df = df[df["sdo.iso.type"] == "standard"].reset_index(drop=True)
     df.fillna("", inplace=True)
+    print("shape")
+    print(df.shape)
     tfidftransformer = TfidfVectorizer(
         ngram_range=(1, 1), stop_words=text.ENGLISH_STOP_WORDS
     )
