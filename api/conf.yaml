@@ -7,8 +7,6 @@ es_server:
   #- localhost
   - elasticsearch-1
 es_index_main:
-  #- test-csv
-  #- iso_final_clean
   - assess_remap
 es_index_logs:
   - sys_logs

@@ -7,6 +7,7 @@ import hashlib
 import time
 from pprint import pprint
 import ast
+from collections import deque
 
 
 def convert_to_hash(url):
