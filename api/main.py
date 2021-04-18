@@ -119,7 +119,7 @@ async def recommend_text(request: Request, sow: Sow, size: int = 10):
     return a JSON of recommended standards.
     """
     in_text = sow.text_field
-    predictions = extract_prep.predict(in_text=in_text, size=size)
+    predictions = extract_prep.predict(text=text, size=size)
     output = {}
     results = {}
     i = 0

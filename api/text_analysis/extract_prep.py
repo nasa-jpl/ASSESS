@@ -1,18 +1,20 @@
-import os
 import json
+import os
+import pathlib
 import subprocess
-from sklearn.neighbors import NearestNeighbors
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.preprocessing import normalize
+from collections import deque
+
 import dill
 import pandas as pd
-from sklearn.feature_extraction import text
-from standard_extractor import find_standard_ref
-import pathlib
 from elasticsearch import Elasticsearch
-from web_utils import connect_to_es
+from elasticsearch.helpers import scan
 from pandas.io.json import json_normalize
-from collections import deque
+from sklearn.feature_extraction import text
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.neighbors import NearestNeighbors
+from sklearn.preprocessing import normalize
+from standard_extractor import find_standard_ref
+from web_utils import connect_to_es
 
 # Connect to Elasticsearch
 es, idx_main, idx_log, idx_stats = connect_to_es()
@@ -54,7 +56,7 @@ def transfrom(df):
 
 def predict(file=None, text=None, size=10):
     """
-    Predict recommendations given text.
+    Predict recommendations given text or pdf file.
     Fields in the dataframe:
     ['id',
     'raw_id',
