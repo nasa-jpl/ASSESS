@@ -47,13 +47,12 @@ def transfrom(df):
     tfidftransformer = TfidfVectorizer(
         ngram_range=(1, 1), stop_words=text.ENGLISH_STOP_WORDS
     )
-    start = time.time()
-    df["description_clean"] = df["description"].apply(
-        lambda x: " ".join(clean_ngram(x))
-    )
-    end = time.time() - start
-    print("TIME")
-    print(end)
+    # start = time.time()
+    # df["description_clean"] = df["description"].apply(
+    #     lambda x: " ".join(clean_ngram(x))
+    # )
+    # end = time.time() - start
+    # print(end)
     X = tfidftransformer.fit_transform(
         [m + " " + n for m, n in zip(df["description_clean"], df["title"])]
     )
@@ -120,7 +119,6 @@ def predict(file=None, in_text=None, size=10):
     sow = normalize(sow, norm="l2", axis=1)
 
     # This is memory intensive.
-
     distances, indices = nbrs_brute.kneighbors(sow.todense())
     print(distances)
     distances = list(distances[0])

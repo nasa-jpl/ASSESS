@@ -7,7 +7,6 @@ import hashlib
 import time
 from pprint import pprint
 import ast
-from collections import deque
 
 
 def convert_to_hash(url):
@@ -63,7 +62,7 @@ def convert_to_new(doc, client, i, new_index):
         "id": uuid.uuid4().hex,
         "raw_id": doc["id"].strip("~"),
         "doc_number": i,
-        "description": doc["description"],
+        "description": doc["description_clean"],
         "status": doc["current_status"],
         "technical_committee": doc["tc"],
         "sdo": {
