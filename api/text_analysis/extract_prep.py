@@ -15,6 +15,8 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import normalize
 from standard_extractor import find_standard_ref
 from web_utils import connect_to_es
+from prepare_h_cat.py import clean_ngram
+import time
 
 # Connect to Elasticsearch
 es, idx_main, idx_log, idx_stats = connect_to_es()
@@ -45,8 +47,15 @@ def transfrom(df):
     tfidftransformer = TfidfVectorizer(
         ngram_range=(1, 1), stop_words=text.ENGLISH_STOP_WORDS
     )
+    start = time.time()
+    df["description_clean"] = df["description"].apply(
+        lambda x: " ".join(clean_ngram(x))
+    )
+    end = time.time() - start
+    print("TIME")
+    print(end)
     X = tfidftransformer.fit_transform(
-        [m + " " + n for m, n in zip(df["description"], df["title"])]
+        [m + " " + n for m, n in zip(df["description_clean"], df["title"])]
     )
     X = normalize(X, norm="l2", axis=1)
     nbrs_brute = NearestNeighbors(
@@ -111,6 +120,7 @@ def predict(file=None, in_text=None, size=10):
     sow = normalize(sow, norm="l2", axis=1)
 
     # This is memory intensive.
+
     distances, indices = nbrs_brute.kneighbors(sow.todense())
     print(distances)
     distances = list(distances[0])
