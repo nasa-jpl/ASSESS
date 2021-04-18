@@ -37,7 +37,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from standard_extractor import find_standard_ref
-from text_analysis import old_extract_prep, extract_prep
+from text_analysis import extract_prep
 from web_utils import connect_to_es, read_logs
 
 # Define api settings.
@@ -110,39 +110,39 @@ def log_stats(request, data=None, user=None):
     return
 
 
+# @app.post(
+#     "/recommend_text",
+#     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+# )
+# async def recommend_text(request: Request, sow: Sow, size: int = 10):
+#     """Given an input of Statement of Work as text,
+#     return a JSON of recommended standards.
+#     """
+#     start = time.time()
+#     in_text = sow.text_field
+#     predictions = old_extract_prep.predict(in_text=in_text, size=size)
+#     output = {}
+#     results = {}
+#     i = 0
+#     for prediction in predictions["recommendations"]:
+#         i += 1
+#         raw_id = prediction["raw_id"]
+#         res = es.search(
+#             index=idx_main, body={"size": 1, "query": {"match": {"raw_id": raw_id}}}
+#         )
+#         for hit in res["hits"]["hits"]:
+#             results = hit["_source"]
+#         output[i] = results
+#         output[i]["similarity"] = prediction["sim"]
+#     # output["embedded_references"] = predictions["embedded_references"]
+#     json_compatible_item_data = jsonable_encoder(output)
+#     log_stats(request, data=in_text)
+#     print(f"{time.time() - start}")
+#     return JSONResponse(content=json_compatible_item_data)
+
+
 @app.post(
     "/recommend_text",
-    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
-)
-async def recommend_text(request: Request, sow: Sow, size: int = 10):
-    """Given an input of Statement of Work as text,
-    return a JSON of recommended standards.
-    """
-    start = time.time()
-    in_text = sow.text_field
-    predictions = old_extract_prep.predict(in_text=in_text, size=size)
-    output = {}
-    results = {}
-    i = 0
-    for prediction in predictions["recommendations"]:
-        i += 1
-        raw_id = prediction["raw_id"]
-        res = es.search(
-            index=idx_main, body={"size": 1, "query": {"match": {"raw_id": raw_id}}}
-        )
-        for hit in res["hits"]["hits"]:
-            results = hit["_source"]
-        output[i] = results
-        output[i]["similarity"] = prediction["sim"]
-    # output["embedded_references"] = predictions["embedded_references"]
-    json_compatible_item_data = jsonable_encoder(output)
-    log_stats(request, data=in_text)
-    print(f"{time.time() - start}")
-    return JSONResponse(content=json_compatible_item_data)
-
-
-@app.post(
-    "/recommend_text_new",
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
 async def recommend_text(request: Request, sow: Sow, size: int = 10):
