@@ -54,7 +54,7 @@ def transfrom(df):
     return tfidftransformer, X, nbrs_brute
 
 
-def predict(file=None, text=None, size=10):
+def predict(file=None, in_text=None, size=10):
     """
     Predict recommendations given text or pdf file.
     Fields in the dataframe:
@@ -90,7 +90,7 @@ def predict(file=None, text=None, size=10):
 
     else:
         # Get text from form
-        new_text = text
+        new_text = in_text
         file = open("temp_text", "w")
         file.write(str(new_text.encode("utf-8", "ignore")))
         file.flush()

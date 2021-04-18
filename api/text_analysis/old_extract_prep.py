@@ -116,7 +116,7 @@ def predict_test(file=None, in_text=None):
     exit()
 
 
-def predict(file=None, text=None, size=10):
+def predict(file=None, in_text=None, size=10):
     dirPath = str(pathlib.Path(__file__).parent.absolute())
 
     standards_dir = dirPath + "/../standards/data"
@@ -170,7 +170,7 @@ def predict(file=None, text=None, size=10):
             print("parsed")
     else:
         # get text from form
-        new_text = text
+        new_text = in_text
         file = open(filename, "w")
         file.write(str(new_text.encode("utf-8", "ignore")))
         file.flush()

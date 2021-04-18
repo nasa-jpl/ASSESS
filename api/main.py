@@ -37,7 +37,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from standard_extractor import find_standard_ref
-from text_analysis import old_extract_prep
+from text_analysis import old_extract_prep, extract_prep
 from web_utils import connect_to_es, read_logs
 
 # Define api settings.
