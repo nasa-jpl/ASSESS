@@ -126,7 +126,6 @@ async def recommend_text(request: Request, sow: Sow, size: int = 10):
     for prediction in predictions["recommendations"]:
         i += 1
         raw_id = prediction["raw_id"]
-        code = prediction["code"]
         res = es.search(
             index=idx_main, body={"size": size, "query": {"match": {"raw_id": raw_id}}}
         )
