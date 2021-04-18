@@ -7,7 +7,7 @@ import subprocess
 import time
 from logging.handlers import RotatingFileHandler
 from typing import Optional
-
+import yaml
 import dill
 import pandas as pd
 import requests
