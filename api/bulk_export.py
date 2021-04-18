@@ -106,8 +106,8 @@ def export(es, local_file, index):
     return
 
 
-def es_to_feather(es):
-    res = list(scan(es, query={}, index=idx_main))
+def es_to_feather(es, index):
+    res = list(scan(es, query={}, index=index))
     output_all = deque()
     output_all.extend([x["_source"] for x in res])
     df = json_normalize(output_all)
@@ -118,23 +118,23 @@ def es_to_feather(es):
 def migrate(es, local_file, index, new_index):
     i = 0
     start = time.time()
-    for doc in scan(es, query={}, index=INDEX):
+    for doc in scan(es, query={}, index=index):
         i += 1
         pprint(i)
         new_doc = convert_to_new(doc["_source"], es, i, new_index)
-        res = es.index(index=NEW_INDEX, body=json.dumps(new_doc))
+        res = es.index(index=new_index, body=json.dumps(new_doc))
     end = time.time() - start
     print(end)
     return
 
 
-REMOTE_URL = "https://localhost:9200/"
-LOCAL_FILE = "elasticsearch-dump.txt"
-INDEX = "iso_final_clean"
-NEW_INDEX = "assess_remap"
+remote_url = "https://localhost:9200/"
+local_file = "elasticsearch-dump.txt"
+index = "iso_final_clean"
+new_index = "assess_remap"
 es = Elasticsearch()
 
 
-# migrate(es, LOCAL_FILE, INDEX, NEW_INDEX)
-# export(es, LOCAL_FILE, INDEX)
-es_to_feather(es)
+# migrate(es, local_file, index, new_index)
+# export(es, local_file, index)
+es_to_feather(es, new_index)
