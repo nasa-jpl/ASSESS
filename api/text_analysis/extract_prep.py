@@ -47,9 +47,7 @@ def transfrom(df):
         [m + " " + n for m, n in zip(df["description"], df["title"])]
     )
     X = normalize(X, norm="l2", axis=1)
-    nbrs_brute = NearestNeighbors(
-        n_neighbors=X.shape[0], algorithm="kd_tree", metric="cosine"
-    )
+    nbrs_brute = NearestNeighbors(n_neighbors=X.shape[0], algorithm="kd_tree")
     nbrs_brute.fit(X.todense())
     return tfidftransformer, X, nbrs_brute
 
