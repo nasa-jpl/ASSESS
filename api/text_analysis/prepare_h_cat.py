@@ -108,39 +108,41 @@ def hierarchy_pos(G, root, levels=None, width=1.0, height=1.0):
 # ================================= create an graph/tree (DAG) using the data in csv
 
 
-df = pd.read_csv("iso_final_all.csv", index_col=0)
-ics_dict_general = loadmodel("ics_dict_general")
+def main():
+    df = pd.read_csv("iso_final_all.csv", index_col=0)
+    ics_dict_general = loadmodel("ics_dict_general")
 
-graph = nx.DiGraph()
-for k, v in ics_dict_general.items():
-    for v_ in v:
-        graph.add_edge(k, v_)
-        entry = df[df["id_"] == k].values
-        info = {}
-        if len(entry) != 0:
-            info = {key: val for key, val in zip(df.columns, entry[0])}
-        nx.set_node_attributes(graph, {k: info})
+    graph = nx.DiGraph()
+    for k, v in ics_dict_general.items():
+        for v_ in v:
+            graph.add_edge(k, v_)
+            entry = df[df["id_"] == k].values
+            info = {}
+            if len(entry) != 0:
+                info = {key: val for key, val in zip(df.columns, entry[0])}
+            nx.set_node_attributes(graph, {k: info})
 
-        entry = df[df["id_"] == v_].values
-        info = {}
-        if len(entry) != 0:
-            info = {key: val for key, val in zip(df.columns, entry[0])}
-        nx.set_node_attributes(graph, {v_: info})
+            entry = df[df["id_"] == v_].values
+            info = {}
+            if len(entry) != 0:
+                info = {key: val for key, val in zip(df.columns, entry[0])}
+            nx.set_node_attributes(graph, {v_: info})
 
-savemodel(graph, "graph")
-# print(graph.nodes(data=True))
+    savemodel(graph, "graph")
+    # print(graph.nodes(data=True))
 
-# ================================= plot the positions for each node and edge (hierarchical plot)
-pos = hierarchy_pos(graph, "~-1")
-savemodel(pos, "pos_")
-# print(pos)
+    # ================================= plot the positions for each node and edge (hierarchical plot)
+    pos = hierarchy_pos(graph, "~-1")
+    savemodel(pos, "pos_")
+    # print(pos)
 
-exit()
+    exit()
 
-
-# ============================== clean the descriptions and add to the csv
-df = pd.read_csv("iso_final_all.csv", index_col=0)
-df.fillna("", inplace=True)
-df["description_clean"] = df["description"].apply(lambda x: " ".join(clean_ngram(x)))
-df.to_csv("iso_final_all_clean_text.csv")
-exit()
+    # ============================== clean the descriptions and add to the csv
+    df = pd.read_csv("iso_final_all.csv", index_col=0)
+    df.fillna("", inplace=True)
+    df["description_clean"] = df["description"].apply(
+        lambda x: " ".join(clean_ngram(x))
+    )
+    df.to_csv("iso_final_all_clean_text.csv")
+    exit()
