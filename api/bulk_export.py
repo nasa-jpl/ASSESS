@@ -7,6 +7,8 @@ import hashlib
 import time
 from pprint import pprint
 import ast
+from collections import deque
+from pandas.io.json import json_normalize
 
 
 def convert_to_hash(url):
