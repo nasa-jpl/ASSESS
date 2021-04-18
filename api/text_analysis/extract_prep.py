@@ -15,7 +15,7 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import normalize
 from standard_extractor import find_standard_ref
 from web_utils import connect_to_es
-from text_analysis.prepare_h_cat.py import clean_ngram
+from text_analysis.prepare_h_cat import clean_ngram
 import time
 
 # Connect to Elasticsearch
