@@ -154,9 +154,9 @@ async def recommend_text(request: Request, sow: Sow, size: int = 10):
     i = 0
     for prediction in predictions["recommendations"]:
         i += 1
-        raw_id = prediction["id"]
+        st_id = prediction["id"]
         res = es.search(
-            index=idx_main, body={"size": size, "query": {"match": {"id": id}}}
+            index=idx_main, body={"size": size, "query": {"match": {"id": st_id}}}
         )
         for hit in res["hits"]["hits"]:
             results = hit["_source"]
