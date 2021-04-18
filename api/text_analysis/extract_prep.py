@@ -54,8 +54,9 @@ def transfrom(df):
     # end = time.time() - start
     # print(end)
     X = tfidftransformer.fit_transform(
-        [m + " " + n for m, n in zip(df["description_clean"], df["title"])]
+        [m + " " + n for m, n in zip(df["description"], df["title"])]
     )
+    print("shape", X.shape)
     X = normalize(X, norm="l2", axis=1)
     nbrs_brute = NearestNeighbors(
         n_neighbors=X.shape[0], algorithm="brute", metric="cosine"
