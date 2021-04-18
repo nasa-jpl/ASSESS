@@ -118,7 +118,7 @@ async def recommend_text(request: Request, sow: Sow, size: int = 10):
     """Given an input of Statement of Work as text,
     return a JSON of recommended standards.
     """
-    in_text = sow.text_field
+    text = sow.text_field
     predictions = extract_prep.predict(text=text, size=size)
     output = {}
     results = {}

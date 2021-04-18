@@ -95,7 +95,7 @@ def predict(file=None, text=None, size=10):
         file.write(str(new_text.encode("utf-8", "ignore")))
         file.flush()
         file.close()
-    res = list(scan(client, query={}, index=idx_main))
+    res = list(scan(es, query={}, index=idx_main))
     output_all = deque()
     output_all.extend([x["_source"] for x in res])
     df = json_normalize(output_all)
