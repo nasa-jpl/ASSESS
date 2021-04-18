@@ -67,9 +67,7 @@ def transfrom(df):
     return tfidftransformer, X, nbrs_brute
 
 
-def predict(
-    file=None, in_text=None, size=10, read_es=False, read_feather=True, save=False
-):
+def predict(file=None, in_text=None, size=10, read="feather"):
     """
     Predict recommendations given text or pdf file.
     Fields in the dataframe:
@@ -110,15 +108,12 @@ def predict(
         file.write(str(new_text.encode("utf-8", "ignore")))
         file.flush()
         file.close()
-    if read_es:
+    if read == "es":
         res = list(scan(es, query={}, index=idx_main))
         output_all = deque()
         output_all.extend([x["_source"] for x in res])
         df = json_normalize(output_all)
-        if save:
-            df.to_feather("../../feather_text")
-            exit()
-    if read_feather:
+    if read == "feather":
         df = pd.read_feather("../../feather_text")
 
     tfidftransformer, X, nbrs_brute = transfrom(df)

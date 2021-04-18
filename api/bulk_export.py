@@ -49,7 +49,7 @@ def clean_sections(txt):
     return res
 
 
-def convert_to_new(doc, client, i, new_index):
+def convert_to_new(doc, es, i, new_index):
     if doc["datetime"]:
         timestamp = doc["datetime"]
     else:
@@ -62,7 +62,7 @@ def convert_to_new(doc, client, i, new_index):
         "id": uuid.uuid4().hex,
         "raw_id": doc["id"].strip("~"),
         "doc_number": i,
-        "description": doc["description_clean"],
+        "description": doc["description"],  # doc["description_clean"]
         "status": doc["current_status"],
         "technical_committee": doc["tc"],
         "sdo": {
@@ -91,11 +91,11 @@ def convert_to_new(doc, client, i, new_index):
     return mappings
 
 
-def export(client, local_file, index):
+def export(es, local_file, index):
     i = 0
     start = time.time()
     fp = open(local_file, "w")
-    for doc in scan(client, query={}, index=index):
+    for doc in scan(es, query={}, index=index):
         json.dump(doc, fp)
         fp.write("\n")
         fp.flush()  # So you can tail -f the file
@@ -106,14 +106,23 @@ def export(client, local_file, index):
     return
 
 
-def migrate(client, local_file, index, new_index):
+def es_to_feather(es):
+    res = list(scan(es, query={}, index=idx_main))
+    output_all = deque()
+    output_all.extend([x["_source"] for x in res])
+    df = json_normalize(output_all)
+    df.to_feather("../../feather_text")
+    return
+
+
+def migrate(es, local_file, index, new_index):
     i = 0
     start = time.time()
-    for doc in scan(client, query={}, index=INDEX):
+    for doc in scan(es, query={}, index=INDEX):
         i += 1
         pprint(i)
-        new_doc = convert_to_new(doc["_source"], client, i, new_index)
-        res = client.index(index=NEW_INDEX, body=json.dumps(new_doc))
+        new_doc = convert_to_new(doc["_source"], es, i, new_index)
+        res = es.index(index=NEW_INDEX, body=json.dumps(new_doc))
     end = time.time() - start
     print(end)
     return
@@ -123,8 +132,9 @@ REMOTE_URL = "https://localhost:9200/"
 LOCAL_FILE = "elasticsearch-dump.txt"
 INDEX = "iso_final_clean"
 NEW_INDEX = "assess_remap"
-client = Elasticsearch()
+es = Elasticsearch()
 
 
-migrate(client, LOCAL_FILE, INDEX, NEW_INDEX)
-# export(client, LOCAL_FILE, INDEX)
+# migrate(es, LOCAL_FILE, INDEX, NEW_INDEX)
+# export(es, LOCAL_FILE, INDEX)
+es_to_feather(es)
