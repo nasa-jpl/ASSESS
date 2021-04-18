@@ -118,6 +118,7 @@ async def recommend_text(request: Request, sow: Sow, size: int = 10):
     """Given an input of Statement of Work as text,
     return a JSON of recommended standards.
     """
+    start = time.time()
     in_text = sow.text_field
     predictions = old_extract_prep.predict(in_text=in_text, size=size)
     output = {}
@@ -136,6 +137,7 @@ async def recommend_text(request: Request, sow: Sow, size: int = 10):
     # output["embedded_references"] = predictions["embedded_references"]
     json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=in_text)
+    print(f"{time.time() - start}")
     return JSONResponse(content=json_compatible_item_data)
 
 
@@ -147,6 +149,7 @@ async def recommend_text(request: Request, sow: Sow, size: int = 10):
     """Given an input of Statement of Work as text,
     return a JSON of recommended standards.
     """
+    start = time.time()
     in_text = sow.text_field
     predictions = extract_prep.predict(in_text=in_text, size=size)
     output = {}
@@ -165,6 +168,7 @@ async def recommend_text(request: Request, sow: Sow, size: int = 10):
     # output["embedded_references"] = predictions["embedded_references"]
     json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=in_text)
+    print(f"{time.time() - start}")
     return JSONResponse(content=json_compatible_item_data)
 
 
