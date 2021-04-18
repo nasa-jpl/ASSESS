@@ -47,8 +47,12 @@ def transfrom(df):
         [m + " " + n for m, n in zip(df["description"], df["title"])]
     )
     X = normalize(X, norm="l2", axis=1)
-    nbrs_brute = NearestNeighbors(n_neighbors=X.shape[0], algorithm="kd_tree")
+    nbrs_brute = NearestNeighbors(
+        n_neighbors=X.shape[0], algorithm="brute", metric="cosine"
+    )
+    print("fitting")
     nbrs_brute.fit(X.todense())
+    print("fitted")
     return tfidftransformer, X, nbrs_brute
 
 
@@ -99,9 +103,7 @@ def predict(file=None, in_text=None, size=10):
     df = json_normalize(output_all)
     tfidftransformer, X, nbrs_brute = transfrom(df)
 
-    standard_refs = find_standard_ref(new_text)
     result = {}
-    result["embedded_references"] = standard_refs
     result["recommendations"] = []
     sow = tfidftransformer.transform([new_text])
     sow = normalize(sow, norm="l2", axis=1)
@@ -121,4 +123,4 @@ def predict(file=None, in_text=None, size=10):
             }
         )
         print(st_id)
-        return result
+    return result
