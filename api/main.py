@@ -37,7 +37,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from standard_extractor import find_standard_ref
-from text_analysis import extract_prep
+from text_analysis import old_extract_prep
 from web_utils import connect_to_es, read_logs
 
 # Define api settings.
@@ -119,16 +119,16 @@ async def recommend_text(request: Request, sow: Sow, size: int = 10):
     return a JSON of recommended standards.
     """
     text = sow.text_field
-    predictions = extract_prep.predict(text=text, size=size)
+    predictions = old_extract_prep.predict(text=text, size=size)
     output = {}
     results = {}
     i = 0
     for prediction in predictions["recommendations"]:
         i += 1
-        raw_id = prediction["id"]
+        raw_id = prediction["raw_id"]
         code = prediction["code"]
         res = es.search(
-            index=idx_main, body={"size": size, "query": {"match": {"id": id}}}
+            index=idx_main, body={"size": size, "query": {"match": {"raw_id": raw_id}}}
         )
         for hit in res["hits"]["hits"]:
             results = hit["_source"]
