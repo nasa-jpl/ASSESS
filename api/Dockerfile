@@ -29,7 +29,8 @@ RUN apt-get -y install gfortran \
     libblas-dev \
     liblapack-dev \
     libatlas-base-dev \
-    libc-dev
+    libc-dev \
+    openjdk-11-jdk 
 
 # Install dependencies
 RUN pip3 install --upgrade pip
