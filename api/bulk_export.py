@@ -81,7 +81,7 @@ def convert_to_new(doc, es, i, new_index):
                 "preview_url": doc["preview_url"],
             }
         },
-        "category": {"ics": literal_to_list(doc["ics"])},
+        "category": {"ics": doc["ics"]},  # literal_to_list(doc["ics"])},
         "text": ["description", "title"],  # Change to which field is used for analysis
         "title": doc["title"].strip("~"),
         "published_date": doc["publication_date"],
