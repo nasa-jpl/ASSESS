@@ -114,7 +114,7 @@ def predict(file=None, in_text=None, size=10, read="feather"):
         output_all.extend([x["_source"] for x in res])
         df = json_normalize(output_all)
     if read == "feather":
-        df = pd.read_feather("../../feather_text")
+        df = pd.read_feather("../data/feather_text")
 
     tfidftransformer, X, nbrs_brute = transfrom(df)
 

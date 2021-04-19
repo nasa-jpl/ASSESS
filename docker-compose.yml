@@ -9,6 +9,13 @@ services:
       - "8080:80"
     networks:
       - "jointops"
+    volumes:
+      - type: bind
+        source: api/data
+        target: /app/data
+  #      - type: volume
+  #        source: mydata
+  #        target: /container/location
   # !React app currently down.
   # react:
   #   container_name: react
@@ -45,3 +52,5 @@ services:
       - "6379:6379"
 networks:
   jointops:
+# volumes:
+#   mydata:
