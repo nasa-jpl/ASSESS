@@ -113,6 +113,7 @@ def es_to_feather(es, index):
     output_all = deque()
     output_all.extend([x["_source"] for x in res])
     df = json_normalize(output_all)
+    # pyarrow.lib.ArrowInvalid: ('cannot mix list and non-list, non-null values', 'Conversion failed for column category.ics with type object')
     df.to_feather("../../feather_text")
     return
 
