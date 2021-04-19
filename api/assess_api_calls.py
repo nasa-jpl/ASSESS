@@ -8,6 +8,12 @@ import requests
 import yaml
 from requests.auth import HTTPBasicAuth
 
+
+def format_json(jsonText):
+    parsed = json.loads(jsonText)
+    return json.dumps(parsed, indent=4)
+
+
 # Insert username, password, and ASSESS root url into `conf.yaml`
 with open("conf.yaml", "r") as stream:
     conf = yaml.safe_load(stream)
@@ -28,27 +34,27 @@ if None in [username, password, root]:
 location = "/Users/vishall/prog/assess-root/test2.pdf"
 file = {"pdf": open(location, "rb")}
 
-# Recommend SoW given text "Example text about airplanes.".
+# # Recommend SoW given text "Example text about airplanes.".
 print("Sending GET request to `/recommend_text`.")
 jsonLoad = {"text_field": "Example text about airplanes"}
 r = requests.post(
-    f"{root}/recommend_text?size=1",
+    f"{root}/recommend_text?size=10",
     json=jsonLoad,
     auth=HTTPBasicAuth(username, password),
 )
-pp.pprint(r.text)
+print(format_json(r.text))
 
 # Recommend an SoW given a PDF.
 print("Sending GET request to `/recommend_file` with a PDF.")
 r = requests.post(
     f"{root}/recommend_file", files=file, auth=HTTPBasicAuth(username, password)
 )
-pp.pprint(r.text)
+print(format_json(r.text))
 
 # Extract standard reference from PDF.
 print("Sending POST request to `/extract` using a PDF.")
 r = requests.post(f"{root}/extract", files=file, auth=HTTPBasicAuth(username, password))
-pp.pprint(r.text)
+print(format_json(r.text))
 
 # Get standard references.
 print("Sending GET request to `/search`.")
@@ -56,7 +62,7 @@ r = requests.get(
     f"{root}/search/airplanes%20technology?size=3",
     auth=HTTPBasicAuth(username, password),
 )
-pp.pprint(r.text)
+print(format_json(r.text))
 
 ## Add/Ingest Standard.
 doc = {
@@ -101,7 +107,7 @@ print("Sending PUT request to `/add_standards`.")
 r = requests.put(
     f"{root}/add_standards", json=doc, auth=HTTPBasicAuth(username, password)
 )
-pp.pprint(r.text)
+print(format_json(r.text))
 time.sleep(1)
 
 # Look up newly indexed standard.
@@ -113,7 +119,7 @@ r = requests.get(
     f"{root}/standard_info/?id=x0288b9ed144439f8ad8fa017d604eac",
     auth=HTTPBasicAuth(username, password),
 )
-pp.pprint(r.text)
+print(format_json(r.text))
 
 # Search by raw_id
 print("Sending GET request to `/standard_info` using raw_id.")
@@ -121,14 +127,14 @@ r = requests.get(
     f"{root}/standard_info/?raw_id=ISO%2044-2:2015",
     auth=HTTPBasicAuth(username, password),
 )
-pp.pprint(r.text)
+print(format_json(r.text))
 
 # Search by doc_number
 print("Sending GET request to `/standard_info` using doc_number field.")
 r = requests.get(
     f"{root}/standard_info/?doc_number=200", auth=HTTPBasicAuth(username, password)
 )
-pp.pprint(r.text)
+print(format_json(r.text))
 
 # Search by status with size 10
 print("Sending GET request to `/standard_info` using published field.")
@@ -136,15 +142,15 @@ r = requests.get(
     f"{root}/standard_info/?status=Published&size=10",
     auth=HTTPBasicAuth(username, password),
 )
-pp.pprint(r.text)
+print(format_json(r.text))
 
-# Search by status with SDO ICS and return 10
-print("Sending GET request to `/standard_info` using sdo == `ics` Key.")
+# Search by status with SDO ISO and return 10
+print("Sending GET request to `/standard_info` using sdo == `iso` Key.")
 r = requests.get(
     f"{root}/standard_info/?sdo=ics&size=10",
     auth=HTTPBasicAuth(username, password),
 )
-pp.pprint(r.text)
+print(format_json(r.text))
 
 # Insert the standard selected by the *user* into Elasticsearch indices. Useful for statistics.
 selected = {
@@ -155,7 +161,7 @@ print("Sending POST request to `/select_standard`.")
 r = requests.post(
     f"{root}/select_standards", json=selected, auth=HTTPBasicAuth(username, password)
 )
-pp.pprint(r.text)
+print(format_json(r.text))
 
 # Set the standard selected by the *admin* into Elasticsearch.
 # Allows an admin to give a standard priority.
@@ -169,4 +175,4 @@ print("Sending PUT request to `set_standard`.")
 r = requests.put(
     f"{root}/set_standards", json=set_standards, auth=HTTPBasicAuth(username, password)
 )
-pp.pprint(r.text)
+print(format_json(r.text))

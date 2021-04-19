@@ -4,7 +4,7 @@ from tempfile import NamedTemporaryFile
 from typing import Callable
 import yaml
 from elasticsearch import Elasticsearch
-from fastapi import FastAPI, File, Form, UploadFile
+from fastapi import File, Form, UploadFile
 import json
 
 
@@ -17,11 +17,6 @@ def connect_to_es():
     es_index_2 = conf["es_index_logs"][0]
     es_index_3 = conf["es_index_stats"][0]
     return es, es_index_1, es_index_2, es_index_3
-
-
-def format_json(jsonText):
-    parsed = json.loads(jsonText)
-    return json.dumps(parsed, indent=4, sort_keys=True)
 
 
 def read_logs(logFile="log/app.log"):
