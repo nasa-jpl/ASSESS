@@ -130,11 +130,11 @@ def predict(file=None, in_text=None, size=10, read="feather"):
     indices = list(indices[0])
 
     for indx, dist in zip(indices[:size], distances[:size]):
-        st_id = df.iloc[indx]["id"]
+        st_id = df.iloc[indx]["raw_id"]
         result["recommendations"].append(
             {
                 "sim": 100 * round(1 - dist, 21),
-                "id": st_id,
+                "raw_id": st_id,
             }
         )
         print(st_id)
