@@ -134,8 +134,10 @@ def predict(file=None, in_text=None, size=10, read="feather"):
         result["recommendations"].append(
             {
                 "sim": 100 * round(1 - dist, 21),
-                "id": str(st_id),
+                "id": st_id,
             }
         )
         print(st_id)
+    print("debugging...")
+    print(result)
     return result
