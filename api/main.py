@@ -157,9 +157,9 @@ async def recommend_text(request: Request, sow: Sow, size: int = 10):
     i = 0
     for prediction in predictions["recommendations"]:
         i += 1
-        st_id = prediction["id"]
+        st_id = prediction["raw_id"]
         res = es.search(
-            index=idx_main, body={"size": 1, "query": {"match": {"id": st_id}}}
+            index=idx_main, body={"size": 1, "query": {"match": {"raw_id": raw_id}}}
         )
         for hit in res["hits"]["hits"]:
             results = hit["_source"]
@@ -187,9 +187,9 @@ async def recommend_file(request: Request, pdf: UploadFile = File(...), size: in
     i = 0
     for prediction in predictions["recommendations"]:
         i += 1
-        st_id = prediction["id"]
+        st_id = prediction["raw_id"]
         res = es.search(
-            index=idx_main, body={"size": 1, "query": {"match": {"id": st_id}}}
+            index=idx_main, body={"size": 1, "query": {"match": {"raw_id": raw_id}}}
         )
         for hit in res["hits"]["hits"]:
             results = hit["_source"]
