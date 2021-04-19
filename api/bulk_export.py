@@ -64,7 +64,7 @@ def convert_to_new(doc, es, i, new_index):
         "id": uuid.uuid4().hex,
         "raw_id": doc["id"].strip("~"),
         "doc_number": i,
-        "description": doc["description"],  # doc["description_clean"]
+        "description": doc["description_clean"],  # doc["description_clean"]
         "status": doc["current_status"],
         "technical_committee": doc["tc"],
         "sdo": {
@@ -114,7 +114,7 @@ def es_to_feather(es, index):
     output_all.extend([x["_source"] for x in res])
     df = json_normalize(output_all)
     # pyarrow.lib.ArrowInvalid: ('cannot mix list and non-list, non-null values', 'Conversion failed for column category.ics with type object')
-    df.to_feather("../../feather_text")
+    df.to_feather("feather_text")
     return
 
 
@@ -138,6 +138,6 @@ new_index = "assess_remap"
 es = Elasticsearch()
 
 
-# migrate(es, local_file, index, new_index)
+migrate(es, local_file, index, new_index)
 # export(es, local_file, index)
 es_to_feather(es, new_index)
