@@ -2,20 +2,28 @@ version: "3.8"
 services:
   fastapi:
     container_name: fastapi
+    user: "1001:1001"
     build:
       context: api
       dockerfile: Dockerfile
+    # read_only: true
+    cap_drop:
+      - ALL
     ports:
-      - "8080:80"
+      - "8080:8080"
     networks:
       - "jointops"
     volumes:
-      - type: bind
-        source: ./api/data
-        target: /app/data
+      - "fastapi-data:/app/data"
+      - "fastapi-log:/app/log"
+    # volumes:
+    #   - type: bind
+    #     source: api/data
+    #     target: /app/data
   #      - type: volume
   #        source: mydata
   #        target: /container/location
+
   # !React app currently down.
   # react:
   #   container_name: react
@@ -26,31 +34,48 @@ services:
   #     - "3000:3000"
   #   networks:
   #     - "jointops"
-  elasticsearch-1:
-    container_name: elasticsearch-1
-    image: "docker.elastic.co/elasticsearch/elasticsearch:7.12.0"
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-    networks:
-      - "jointops"
-  kibana:
-    container_name: kibana
-    image: "docker.elastic.co/kibana/kibana:7.12.0"
-    ports:
-      - "5601:5601"
-    networks:
-      - "jointops"
+  # elasticsearch-1:
+  #   container_name: elasticsearch-1
+  #   image: "docker.elastic.co/elasticsearch/elasticsearch:7.12.0"
+  #   ports:
+  #     - "9200:9200"
+  #     - "9300:9300"
+  #   networks:
+  #     - "jointops"
+  # kibana:
+  #   container_name: kibana
+  #   image: "docker.elastic.co/kibana/kibana:7.12.0"
+  #   ports:
+  #     - "5601:5601"
+  #   networks:
+  #     - "jointops"
+
   redis:
     container_name: redis-1
-    image: "bitnami/redis:latest"
+    image: "redis:6.2-alpine"
+    read_only: true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETGID
+      - SETUID
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - "redis-1-data:/data"
     networks:
       - "jointops"
     ports:
       - "6379:6379"
+    # If data integrity is important leave the following,
+    # if not, remove it.
+    command: ["redis-server", "--appendonly", "yes"]
+
 networks:
   jointops:
-# volumes:
-#   mydata:
+  
+volumes:
+  fastapi-data:
+  fastapi-log:
+  redis-1-data:
+  elasticsearch-1-data:
