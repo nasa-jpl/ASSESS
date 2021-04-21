@@ -11,7 +11,7 @@ services:
       - "jointops"
     volumes:
       - type: bind
-        source: api/data
+        source: ./api/data
         target: /app/data
   #      - type: volume
   #        source: mydata
