@@ -31,6 +31,8 @@ services:
     environment:
       SERVER_NAME: *kibana_server
       # ELASTICSEARCH_HOSTS: *es_server
+    cap_drop:
+      - ALL
     ports:
       - "5601:5601"
     networks:
