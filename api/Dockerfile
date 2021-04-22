@@ -2,23 +2,13 @@ FROM python:3.8-slim
 ARG uid
 ARG DEBIAN_FRONTEND=noninteractive
 # Install dependencies
-# RUN apt-get update \
-#     && apt-get -y upgrade 
-
-# RUN apt-get -y install gfortran \
-#     gcc \
-#     build-essential \
-#     zlib1g-dev \
-#     wget \
-#     unzip \
-#     cmake \
-#     libblas-dev \
-#     liblapack-dev \
-#     libatlas-base-dev \
-#     libc-dev
-
-# RUN apt-get -y install    openjdk-11-jre-headless\
-#     openjdk-11-jdk 
+RUN apt-get update\
+    && apt-get -y upgrade\
+    # Stupid base image bug https://stackoverflow.com/a/58503437
+    && mkdir -p /usr/share/man/man1\
+    && apt-get -y --no-install-recommends install openjdk-11-jre-headless\
+    && apt-get clean all\
+    && rm -rf /var/lib/apt/lists/
 
 # the entire magic of the tiangolo containers, without the risk
 ## START
