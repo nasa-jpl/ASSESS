@@ -1,6 +1,5 @@
-#FROM ubuntu:latest
-# For prodcution
 FROM python:3.8-buster
+ARG uid
 ARG DEBIAN_FRONTEND=noninteractive
 # Install dependencies
 # RUN apt-get update \
@@ -37,7 +36,7 @@ RUN chmod +x /start-reload.sh
 # Set working directory
 WORKDIR /app
 RUN mkdir /app/data && mkdir /app/log
-RUN chown 1001:1001 /app/data && chown 1001:1001 /app/log
+RUN chown $uid /app/data && chown $uid /app/log
 
 # Add app to Docker
 COPY . /app
@@ -45,7 +44,7 @@ COPY . /app
 # Install dependencies
 RUN python -m pip install --no-cache-dir --upgrade -r requirements.txt 
 
-USER "1001:1001"
+USER "$uid"
 
 
 # Run FastAPI service

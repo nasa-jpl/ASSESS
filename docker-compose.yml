@@ -64,10 +64,12 @@ services:
 
   fastapi:
     container_name: fastapi
-    user: "1001:1001"
+    user: &uid "1001:1001"
     build:
       context: api
       dockerfile: Dockerfile
+      args:
+        uid: *uid
     environment:
       REDIS_SERVER: *redis_server
       ES_SERVER: *es_server
