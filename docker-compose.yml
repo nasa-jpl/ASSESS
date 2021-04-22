@@ -1,12 +1,80 @@
 version: "3.8"
+
 services:
+  # https://www.elastic.co/guide/en/elasticsearch/reference/7.12/docker.html
+  elasticsearch:
+    container_name: &es_server elasticsearch
+    image: "docker.elastic.co/elasticsearch/elasticsearch:7.12.0"
+    cap_drop:
+      - ALL
+    cap_add:
+      - SYS_CHROOT
+      - SETGID
+      - SETUID
+    environment:
+      discovery.type: "single-node"
+      node.name: *es_server
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - "jointops"
+    volumes:
+      - "elasticsearch-1-data:/usr/share/elasticsearch/data"
+      - "elasticsearch-1-logs:/usr/share/elasticsearch/logs"
+
+  # https://www.elastic.co/guide/en/kibana/7.12/docker.html
+  kibana:
+    container_name: &kibana_server kibana
+    image: "docker.elastic.co/kibana/kibana:7.12.0"
+    environment:
+      SERVER_NAME: *kibana_server
+      # ELASTICSEARCH_HOSTS: *es_server
+    ports:
+      - "5601:5601"
+    networks:
+      - "jointops"
+    depends_on:
+      - elasticsearch
+
+  redis:
+    container_name: &redis_server redis-1
+    image: "redis:6.2-alpine"
+    read_only: true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETGID
+      - SETUID
+      - KILL
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - "redis-1-data:/data"
+    networks:
+      - "jointops"
+
+    ##don't need to expose ports outside of docker network
+    # ports:
+    #   - "6379:6379"
+
+    # If data integrity is important leave the following,
+    # if not, remove it.
+    command: ["redis-server", "--appendonly", "yes"]
+
   fastapi:
     container_name: fastapi
     user: "1001:1001"
     build:
       context: api
       dockerfile: Dockerfile
-    # read_only: true
+    environment:
+      REDIS_SERVER: *redis_server
+      ES_SERVER: *es_server
+      ES_INDEX_MAIN: "assess_remap"
+      ES_INDEX_LOGS: "sys_logs"
+      ES_INDEX_STATS: "user_stats"
+    read_only: true
     cap_drop:
       - ALL
     ports:
@@ -16,13 +84,10 @@ services:
     volumes:
       - "fastapi-data:/app/data"
       - "fastapi-log:/app/log"
-    # volumes:
-    #   - type: bind
-    #     source: api/data
-    #     target: /app/data
-  #      - type: volume
-  #        source: mydata
-  #        target: /container/location
+    depends_on:
+      - redis
+      - elasticsearch
+
 
   # !React app currently down.
   # react:
@@ -34,42 +99,7 @@ services:
   #     - "3000:3000"
   #   networks:
   #     - "jointops"
-  # elasticsearch-1:
-  #   container_name: elasticsearch-1
-  #   image: "docker.elastic.co/elasticsearch/elasticsearch:7.12.0"
-  #   ports:
-  #     - "9200:9200"
-  #     - "9300:9300"
-  #   networks:
-  #     - "jointops"
-  # kibana:
-  #   container_name: kibana
-  #   image: "docker.elastic.co/kibana/kibana:7.12.0"
-  #   ports:
-  #     - "5601:5601"
-  #   networks:
-  #     - "jointops"
 
-  redis:
-    container_name: redis-1
-    image: "redis:6.2-alpine"
-    read_only: true
-    cap_drop:
-      - ALL
-    cap_add:
-      - SETGID
-      - SETUID
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-    volumes:
-      - "redis-1-data:/data"
-    networks:
-      - "jointops"
-    ports:
-      - "6379:6379"
-    # If data integrity is important leave the following,
-    # if not, remove it.
-    command: ["redis-server", "--appendonly", "yes"]
 
 networks:
   jointops:
@@ -79,3 +109,4 @@ volumes:
   fastapi-log:
   redis-1-data:
   elasticsearch-1-data:
+  elasticsearch-1-logs:
