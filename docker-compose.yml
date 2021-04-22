@@ -38,6 +38,7 @@ services:
     depends_on:
       - elasticsearch
 
+  # https://hub.docker.com/_/redis
   redis:
     container_name: &redis_server redis-1
     image: "redis:6.2-alpine"
