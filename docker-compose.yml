@@ -17,7 +17,6 @@ services:
       node.name: *es_server
     ports:
       - "9200:9200"
-      - "9300:9300"
     networks:
       - "jointops"
     volumes:
