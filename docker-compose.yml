@@ -11,6 +11,7 @@ services:
       - SYS_CHROOT
       - SETGID
       - SETUID
+      - KILL
     environment:
       discovery.type: "single-node"
       node.name: *es_server

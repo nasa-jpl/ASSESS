@@ -1,4 +1,4 @@
-FROM python:3.8-buster
+FROM python:3.8-slim
 ARG uid
 ARG DEBIAN_FRONTEND=noninteractive
 # Install dependencies
