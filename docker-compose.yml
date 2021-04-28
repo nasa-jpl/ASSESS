@@ -89,6 +89,7 @@ services:
     volumes:
       - "fastapi-data:/app/data"
       - "fastapi-log:/app/log"
+      - "./api/data:/api/data"
     tmpfs:
       - /tmp
     depends_on:
