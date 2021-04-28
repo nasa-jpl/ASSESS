@@ -14,7 +14,7 @@ RUN apt-get update\
 ## START
 RUN python -m pip install --no-cache-dir "uvicorn[standard]" gunicorn fastapi
 
-COPY ./gunicorn_conf.py /gunicorn_conf.py
+COPY ./gunicorn_conf.py /app/gunicorn.conf.py
 
 COPY ./start.sh /start.sh
 RUN chmod +x /start.sh

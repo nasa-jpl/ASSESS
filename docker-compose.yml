@@ -87,7 +87,6 @@ services:
     networks:
       - "jointops"
     volumes:
-      - "fastapi-data:/app/data"
       - "fastapi-log:/app/log"
       - "./api/data:/api/data"
     tmpfs:
@@ -113,7 +112,7 @@ networks:
   jointops:
   
 volumes:
-  fastapi-data:
+  # fastapi-data:
   fastapi-log:
   redis-1-data:
   elasticsearch-1-data:
