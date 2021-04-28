@@ -82,7 +82,7 @@ fastapi_logger.info(json.dumps(startMsg))
 async def startup():
     with open("conf.yaml", "r") as stream:
         conf = yaml.safe_load(stream)
-    host = conf["redis"][0]
+    host = os.getenv("REDIS_SERVER", conf["redis"][0])
     redis = await aioredis.create_redis_pool(f"redis://{host}")
     FastAPILimiter.init(redis)
 

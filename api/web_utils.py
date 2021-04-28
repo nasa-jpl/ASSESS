@@ -1,3 +1,4 @@
+import os
 import shutil
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -12,10 +13,10 @@ def connect_to_es():
     with open("conf.yaml", "r") as stream:
         conf = yaml.safe_load(stream)
     # print(conf['es_index'][0])
-    es = Elasticsearch([conf["es_server"][0]])
-    es_index_1 = conf["es_index_main"][0]
-    es_index_2 = conf["es_index_logs"][0]
-    es_index_3 = conf["es_index_stats"][0]
+    es = Elasticsearch([os.getenv("ES_SERVER", conf["es_server"][0])])
+    es_index_1 = os.getenv("ES_INDEX_MAIN", conf["es_index_main"][0])
+    es_index_2 = os.getenv("ES_INDEX_LOGS", conf["es_index_logs"][0])
+    es_index_3 = os.getenv("ES_INDEX_STATS", conf["es_index_stats"][0])
     return es, es_index_1, es_index_2, es_index_3
 
 
