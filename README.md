@@ -13,7 +13,7 @@ There are a few main components to ASSESS:
 
 Make sure you edit `api/conf.yaml` with the correct server/port locations for elasticsearch.
 
-To understand the backend code, look at the API in [fastapp.py](https://github.com/nasa-jpl/ASSESS/blob/master/api/fastapp.py)
+To understand the backend code, look at the API in [main.py](https://github.com/nasa-jpl/ASSESS/blob/master/api/main.py)
 
 ## Testing the stack
 
