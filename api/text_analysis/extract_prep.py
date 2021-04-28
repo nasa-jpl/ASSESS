@@ -96,18 +96,18 @@ def predict(file=None, in_text=None, size=10, read="feather"):
     'sdo.iso.preview_url',
     'category.ics']
     """
-    if file:
-        if file.filename == "":
-            return "No selected file!"
-        new_text = parse_text(file.filename)
+    # if file:
+    #     if file.filename == "":
+    #         return "No selected file!"
+    #     new_text = parse_text(file.filename)
 
-    else:
-        # Get text from form
-        new_text = in_text
-        file = open("temp_text", "w")
-        file.write(str(new_text.encode("utf-8", "ignore")))
-        file.flush()
-        file.close()
+    # else:
+    #     # Get text from form
+    #     new_text = in_text
+    #     file = open("temp_text", "w")
+    #     file.write(str(new_text.encode("utf-8", "ignore")))
+    #     file.flush()
+    #     file.close()
     if read == "es":
         res = list(scan(es, query={}, index=idx_main))
         output_all = deque()

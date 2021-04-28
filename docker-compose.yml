@@ -89,6 +89,8 @@ services:
     volumes:
       - "fastapi-data:/app/data"
       - "fastapi-log:/app/log"
+    tmpfs:
+      - /tmp
     depends_on:
       - redis
       - elasticsearch
