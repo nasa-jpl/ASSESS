@@ -96,10 +96,10 @@ def predict(file=None, in_text=None, size=10, read="feather"):
     'sdo.iso.preview_url',
     'category.ics']
     """
-    # if file:
-    #     if file.filename == "":
-    #         return "No selected file!"
-    #     new_text = parse_text(file.filename)
+    if file:
+        if file.filename == "":
+            raise ValueError("No selected file!")
+            in_text = parse_text(file.filename)
 
     # else:
     #     # Get text from form
@@ -120,7 +120,7 @@ def predict(file=None, in_text=None, size=10, read="feather"):
 
     result = {}
     result["recommendations"] = []
-    sow = tfidftransformer.transform([new_text])
+    sow = tfidftransformer.transform([in_text])
     sow = normalize(sow, norm="l2", axis=1)
 
     # This is memory intensive.
