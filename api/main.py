@@ -241,6 +241,9 @@ async def standard_info(
     ingestion_date: Optional[str] = None,
     title: Optional[str] = None,
     sdo: Optional[str] = None,
+    category: Optional[str] = None,
+    text: Optional[str] = None,
+    url: Optional[str] = None,
     hash: Optional[str] = None,
     size: int = 1,
 ):
@@ -291,8 +294,26 @@ async def standard_info(
             body={"size": size, "query": {"match": {"title": title}}},
         )
     elif sdo:
-        sdo_key = f"sdo.{sdo}"
-        res = es.search(index=idx_main, body={"query": {"exists": {"field": sdo_key}}})
+        # res = es.search(index=idx_main, body={"query": {"exists": {"field": sdo_key}}})
+        res = es.search(
+            index=idx_main,
+            body={"size": size, "query": {"match": {"sdo.abbreviation": sdo}}},
+        )
+    elif category:
+        res = es.search(
+            index=idx_main,
+            body={"size": size, "query": {"match": {"category": category}}},
+        )
+    elif text:
+        res = es.search(
+            index=idx_main,
+            body={"size": size, "query": {"match": {"text": text}}},
+        )
+    elif url:
+        res = es.search(
+            index=idx_main,
+            body={"size": size, "query": {"match": {"url": url}}},
+        )
     elif hash:
         res = es.search(
             index=idx_main,
