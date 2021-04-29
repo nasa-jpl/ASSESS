@@ -1,5 +1,5 @@
 from elasticsearch import Elasticsearch
-from elasticsearch.helpers import scan
+from elasticsearch.helpers import scan, bulk
 import json
 import requests
 import uuid
@@ -7,8 +7,20 @@ import hashlib
 import time
 from pprint import pprint
 import ast
-from collections import deque
-from pandas.io.json import json_normalize
+import pyarrow.feather as feather
+
+
+def doc_generator(df, index):
+    df_iter = df.iterrows()
+    for i, document in df_iter:
+        document = document.to_dict()
+        print(i)
+        yield {
+            "_index": index,
+            "_type": "_doc",
+            "_id": document["id"],
+            "_source": document,
+        }
 
 
 def convert_to_hash(url):
@@ -36,22 +48,8 @@ def literal_to_list(val):
         return
 
 
-def clean_sections(txt):
-    # TODO: Fix.
-    res = {}
-    if len(txt) == 1:
-        txt = str(txt[0])
-    for section in txt:
-        try:
-            spl = section.split("\n")
-            res[spl[0]] = spl[1]
-            return res
-        except Exception:
-            return None
-    return res
-
-
-def convert_to_new(doc, es, i, new_index):
+def convert_to_new(doc, client, i, new_index):
+    """Convert old schema to new schema."""
     if doc["datetime"]:
         timestamp = doc["datetime"]
     else:
@@ -64,12 +62,11 @@ def convert_to_new(doc, es, i, new_index):
         "id": uuid.uuid4().hex,
         "raw_id": doc["id"].strip("~"),
         "doc_number": i,
-        "description": doc["description_clean"],  # doc["description_clean"]
+        "description": doc["description"],
         "status": doc["current_status"],
         "technical_committee": doc["tc"],
         "sdo": {
-            "abbreviation": "iso",
-            "data": {
+            "iso": {
                 "code": doc["code"].strip("~"),
                 "field": doc["field"].strip("~"),
                 "group": doc["group"].strip("~"),
@@ -80,9 +77,9 @@ def convert_to_new(doc, es, i, new_index):
                 "sections": sections,
                 "type": doc["type"],
                 "preview_url": doc["preview_url"],
-            },
+            }
         },
-        "category": {"ics": doc["ics"]},  # literal_to_list(doc["ics"])},
+        "category": {"ics": literal_to_list(doc["ics"])},
         "text": ["description", "title"],  # Change to which field is used for analysis
         "title": doc["title"].strip("~"),
         "published_date": doc["publication_date"],
@@ -94,51 +91,50 @@ def convert_to_new(doc, es, i, new_index):
     return mappings
 
 
-def export(es, local_file, index):
+def es_to_json(client, local_file, index):
+    """Export to json file"""
     i = 0
     start = time.time()
     fp = open(local_file, "w")
-    for doc in scan(es, query={}, index=index):
+    for doc in scan(client, query={}, index=index):
         json.dump(doc, fp)
         fp.write("\n")
         fp.flush()  # So you can tail -f the file
         i += 1
         pprint(i)
     end = time.time() - start
+    print(end)
     fp.close()
     return
 
 
-def es_to_feather(es, index):
-    res = list(scan(es, query={}, index=index))
-    output_all = deque()
-    output_all.extend([x["_source"] for x in res])
-    df = json_normalize(output_all)
-    # pyarrow.lib.ArrowInvalid: ('cannot mix list and non-list, non-null values', 'Conversion failed for column category.ics with type object')
-    df.to_feather("data/feather_text")
+def df_to_es(df_path, index, client):
+    """Read dataframe and insert into index."""
+    client.indices.delete(index, ignore=[400, 404])
+    client.indices.create(index, ignore=400)
+    df = feather.read_feather(df_path)
+    bulk(client, doc_generator(df, index))
     return
 
 
-def migrate(es, local_file, index, new_index):
+def es_to_es(client, index, new_index):
+    """Migrate from old Elasticsearch index to new Elasticsearch index."""
     i = 0
     start = time.time()
-    for doc in scan(es, query={}, index=index):
+    for doc in scan(client, query={}, index=INDEX):
         i += 1
         pprint(i)
-        new_doc = convert_to_new(doc["_source"], es, i, new_index)
-        res = es.index(index=new_index, body=json.dumps(new_doc))
+        new_doc = convert_to_new(doc["_source"], client, i, new_index)
+        res = client.index(index=NEW_INDEX, body=json.dumps(new_doc))
     end = time.time() - start
     print(end)
     return
 
 
-remote_url = "https://localhost:9200/"
-local_file = "elasticsearch-dump.txt"
-index = "iso_final_clean"
+old_index = "iso_final_clean"
 new_index = "assess_remap"
-es = Elasticsearch()
-
-
-migrate(es, local_file, index, new_index)
-# export(es, local_file, index)
-es_to_feather(es, new_index)
+client = Elasticsearch()
+df_path = "data/feather_text"
+# es_to_es(client, old_index, new_index)
+# es_to_json(client, "elasticsearch-dump.json", index)
+df_to_es(df_path, new_index, client)

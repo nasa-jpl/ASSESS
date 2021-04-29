@@ -27,9 +27,6 @@ print(
     % (username, password, root)
 )
 
-if None in [username, password, root]:
-    raise Exception("Define variables in ./conf.yaml. Exiting.")
-
 # Specify file location of an SOW.
 location = "/Users/vishall/prog/assess-root/test2.pdf"
 file = {"pdf": open(location, "rb")}

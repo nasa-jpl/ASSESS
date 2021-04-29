@@ -1,11 +1,11 @@
 # Enter credentials here
 username:
 password:
-url:
+url: http://localhost:8080
 
 es_server:
   #- localhost
-  - elasticsearch-1
+  - elasticsearch
 es_index_main:
   - assess_remap
 es_index_logs:
