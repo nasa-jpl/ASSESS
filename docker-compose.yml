@@ -82,7 +82,7 @@ services:
       - "jointops"
     volumes:
       - "fastapi-log:/app/log"
-      - "./api/data:/api/data"
+      - "./api/data:/app/data"
     tmpfs:
       - /tmp:noexec,mode=666
     depends_on:
