@@ -31,9 +31,9 @@ def parse_text(filepath):
     output = ""
     try:
         output = subprocess.check_output(["bash", "-c", bashCommand])
-        file = open(filepath + "_parsed.txt", "wb")
-        file.write(output)
-        file.close()
+        # file = open(filepath + "_parsed.txt", "wb")
+        # file.write(output)
+        # file.close()
     except subprocess.CalledProcessError as e:
         print(e.output)
     return str(output)
