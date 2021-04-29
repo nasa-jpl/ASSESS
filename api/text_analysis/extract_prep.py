@@ -31,9 +31,9 @@ def parse_text(filepath):
     output = ""
     try:
         output = subprocess.check_output(["bash", "-c", bashCommand])
-        file = open(filepath + "_parsed.txt", "wb")
-        file.write(output)
-        file.close()
+        # file = open(filepath + "_parsed.txt", "wb")
+        # file.write(output)
+        # file.close()
     except subprocess.CalledProcessError as e:
         print(e.output)
     return str(output)
@@ -98,16 +98,16 @@ def predict(file=None, in_text=None, size=10, read="feather"):
     """
     if file:
         if file.filename == "":
-            return "No selected file!"
-        new_text = parse_text(file.filename)
+            raise ValueError("No selected file!")
+        in_text = parse_text(file.filename)
 
     else:
         # Get text from form
         new_text = in_text
-        file = open("temp_text", "w")
-        file.write(str(new_text.encode("utf-8", "ignore")))
-        file.flush()
-        file.close()
+    #     file = open("temp_text", "w")
+    #     file.write(str(new_text.encode("utf-8", "ignore")))
+    #     file.flush()
+    #     file.close()
     if read == "es":
         res = list(scan(es, query={}, index=idx_main))
         output_all = deque()
@@ -120,7 +120,7 @@ def predict(file=None, in_text=None, size=10, read="feather"):
 
     result = {}
     result["recommendations"] = []
-    sow = tfidftransformer.transform([new_text])
+    sow = tfidftransformer.transform([in_text])
     sow = normalize(sow, norm="l2", axis=1)
 
     # This is memory intensive.

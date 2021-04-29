@@ -82,7 +82,7 @@ fastapi_logger.info(json.dumps(startMsg))
 async def startup():
     with open("conf.yaml", "r") as stream:
         conf = yaml.safe_load(stream)
-    host = conf["redis"][0]
+    host = os.getenv("REDIS_SERVER", conf["redis"][0])
     redis = await aioredis.create_redis_pool(f"redis://{host}")
     FastAPILimiter.init(redis)
 
@@ -211,8 +211,8 @@ async def extract(request: Request, pdf: UploadFile = File(...)):
     return a JSON of extracted standards that are embedded within the SoW."""
     # filepath = save_upload_file_tmp(pdf)
     file_location = f"{pdf.filename}"
-    with open(file_location, "wb+") as file_object:
-        shutil.copyfileobj(pdf.file, file_object)
+    # with open(file_location, "wb+") as file_object:
+    #    shutil.copyfileobj(pdf.file, file_object)
     print({"info": f"file '{pdf.filename}' saved at '{file_location}'"})
     text = extract_prep.parse_text(file_location)
     refs = find_standard_ref(text)
