@@ -69,10 +69,10 @@ formatter = logging.Formatter(
     '{"time": "%(asctime)s.%(msecs)03d", "type": "%(levelname)s", "thread":[%(thread)d], "msc": %(message)s}',
     "%Y-%m-%d %H:%M:%S",
 )
-handler = RotatingFileHandler("log/app.log", backupCount=0)
+# handler = RotatingFileHandler("log/app.log", backupCount=0)
 logging.getLogger().setLevel(logging.DEBUG)
-fastapi_logger.addHandler(handler)
-handler.setFormatter(formatter)
+# fastapi_logger.addHandler(handler)
+# handler.setFormatter(formatter)
 startMsg = {}
 startMsg["message"] = "*** Starting Server ***"
 fastapi_logger.info(json.dumps(startMsg))
