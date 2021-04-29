@@ -211,8 +211,8 @@ async def extract(request: Request, pdf: UploadFile = File(...)):
     return a JSON of extracted standards that are embedded within the SoW."""
     # filepath = save_upload_file_tmp(pdf)
     file_location = f"{pdf.filename}"
-    with open(file_location, "wb+") as file_object:
-        shutil.copyfileobj(pdf.file, file_object)
+    # with open(file_location, "wb+") as file_object:
+    #    shutil.copyfileobj(pdf.file, file_object)
     print({"info": f"file '{pdf.filename}' saved at '{file_location}'"})
     text = extract_prep.parse_text(file_location)
     refs = find_standard_ref(text)
