@@ -99,11 +99,11 @@ def predict(file=None, in_text=None, size=10, read="feather"):
     if file:
         if file.filename == "":
             raise ValueError("No selected file!")
-            in_text = parse_text(file.filename)
+        in_text = parse_text(file.filename)
 
-    # else:
-    #     # Get text from form
-    #     new_text = in_text
+    else:
+        # Get text from form
+        new_text = in_text
     #     file = open("temp_text", "w")
     #     file.write(str(new_text.encode("utf-8", "ignore")))
     #     file.flush()
