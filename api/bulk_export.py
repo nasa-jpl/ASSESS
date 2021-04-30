@@ -31,18 +31,18 @@ def series_to_json(doc):
         "status": doc["status"],
         "technical_committee": doc["technical_committee"],
         "sdo": {
-            "abbreviation": "iso",
+            "abbreviation": doc["sdo.abbreviation"],
             "data": {
-                "code": doc["sdo.iso.code"],
-                "field": doc["sdo.iso.field"],
-                "group": doc["sdo.iso.subgroup"],
-                "subgroup": doc["sdo.iso.group"],
-                "edition": doc["sdo.iso.edition"],
-                "number_of_pages": doc["sdo.iso.number_of_pages"],
-                "section_titles": doc["sdo.iso.section_titles"],
-                "sections": doc["sdo.iso.sections"],
-                "type": doc["sdo.iso.type"],
-                "preview_url": doc["sdo.iso.preview_url"],
+                "code": doc["sdo.data.code"],
+                "field": doc["sdo.data.field"],
+                "group": doc["sdo.data.subgroup"],
+                "subgroup": doc["sdo.data.group"],
+                "edition": doc["sdo.data.edition"],
+                "number_of_pages": doc["sdo.data.number_of_pages"],
+                "section_titles": doc["sdo.data.section_titles"],
+                "sections": doc["sdo.data.sections"],
+                "type": doc["sdo.data.type"],
+                "preview_url": doc["sdo.data.preview_url"],
             },
         },
         "category": {"ics": doc["category.ics"]},  # literal_to_list(doc["ics"])},
@@ -61,9 +61,9 @@ def doc_generator(df, index):
     df_iter = df.iterrows()
     for i, doc in df_iter:
         print(i)
-        print(doc.to_json())
+        # print(doc.to_json())
         doc = json.loads(doc.to_json())
-        # doc = series_to_json(doc)
+        doc = series_to_json(doc)
         print(json.dumps(doc, indent=4))
         yield {
             "_index": index,

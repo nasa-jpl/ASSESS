@@ -144,7 +144,7 @@ print(format_json(r.text))
 # Search by status with SDO ISO and return 10
 print("Sending GET request to `/standard_info` using sdo == `iso` Key.")
 r = requests.get(
-    f"{root}/standard_info/?sdo=ics&size=10",
+    f"{root}/standard_info/?sdo=iso&size=10",
     auth=HTTPBasicAuth(username, password),
 )
 print(format_json(r.text))
