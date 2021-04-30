@@ -8,18 +8,68 @@ import time
 from pprint import pprint
 import ast
 import pyarrow.feather as feather
+from pandas.io.json import json_normalize
+from collections import deque
+
+
+def es_to_df(es, index, path="data/feather_text"):
+    res = list(scan(es, query={}, index=index))
+    output_all = deque()
+    output_all.extend([x["_source"] for x in res])
+    df = json_normalize(output_all)
+    print(df)
+    df.to_feather(path)
+    return
+
+
+def series_to_json(doc):
+    document_out = {
+        "id": doc["id"],
+        "raw_id": doc["raw_id"],
+        "doc_number": doc["doc_number"],
+        "description": doc["description"],  # doc["description_clean"]
+        "status": doc["status"],
+        "technical_committee": doc["technical_committee"],
+        "sdo": {
+            "abbreviation": "iso",
+            "data": {
+                "code": doc["sdo.iso.code"],
+                "field": doc["sdo.iso.field"],
+                "group": doc["sdo.iso.subgroup"],
+                "subgroup": doc["sdo.iso.group"],
+                "edition": doc["sdo.iso.edition"],
+                "number_of_pages": doc["sdo.iso.number_of_pages"],
+                "section_titles": doc["sdo.iso.section_titles"],
+                "sections": doc["sdo.iso.sections"],
+                "type": doc["sdo.iso.type"],
+                "preview_url": doc["sdo.iso.preview_url"],
+            },
+        },
+        "category": {"ics": doc["category.ics"]},  # literal_to_list(doc["ics"])},
+        "text": ["description", "title"],  # Change to which field is used for analysis
+        "title": doc["title"],
+        "published_date": doc["published_date"],
+        "isbn": doc["isbn"],
+        "url": doc["url"],
+        "ingestion_date": doc["ingestion_date"],
+        "hash": doc["hash"],  # convert_to_hash(doc["link"]),
+    }
+    return document_out
 
 
 def doc_generator(df, index):
     df_iter = df.iterrows()
-    for i, document in df_iter:
-        document = document.to_dict()
+    for i, doc in df_iter:
         print(i)
+        print(doc.to_json())
+        doc = json.loads(doc.to_json())
+        # doc = series_to_json(doc)
+        print(json.dumps(doc, indent=4))
         yield {
             "_index": index,
             "_type": "_doc",
-            "_id": document["id"],
-            "_source": document,
+            "_id": doc["id"],
+            "_source": doc,
         }
 
 
@@ -62,11 +112,12 @@ def convert_to_new(doc, client, i, new_index):
         "id": uuid.uuid4().hex,
         "raw_id": doc["id"].strip("~"),
         "doc_number": i,
-        "description": doc["description"],
+        "description": doc["description_clean"],  # doc["description_clean"]
         "status": doc["current_status"],
         "technical_committee": doc["tc"],
         "sdo": {
-            "iso": {
+            "abbreviation": "iso",
+            "data": {
                 "code": doc["code"].strip("~"),
                 "field": doc["field"].strip("~"),
                 "group": doc["group"].strip("~"),
@@ -77,9 +128,9 @@ def convert_to_new(doc, client, i, new_index):
                 "sections": sections,
                 "type": doc["type"],
                 "preview_url": doc["preview_url"],
-            }
+            },
         },
-        "category": {"ics": literal_to_list(doc["ics"])},
+        "category": {"ics": doc["ics"]},  # literal_to_list(doc["ics"])},
         "text": ["description", "title"],  # Change to which field is used for analysis
         "title": doc["title"].strip("~"),
         "published_date": doc["publication_date"],
@@ -138,3 +189,4 @@ df_path = "data/feather_text"
 # es_to_es(client, old_index, new_index)
 # es_to_json(client, "elasticsearch-dump.json", index)
 df_to_es(df_path, new_index, client)
+# es_to_df(client, new_index)
