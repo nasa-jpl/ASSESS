@@ -4,7 +4,7 @@ services:
   # https://www.elastic.co/guide/en/elasticsearch/reference/7.12/docker.html
   elasticsearch:
     container_name: &es_server elasticsearch
-    image: "docker.elastic.co/elasticsearch/elasticsearch:7.12.0"
+    image: "docker.elastic.co/elasticsearch/elasticsearch:7.12.1"
     cap_drop:
       - ALL
     cap_add:
@@ -13,8 +13,14 @@ services:
       - SETUID
       - KILL
     environment:
-      discovery.type: "single-node"
-      node.name: *es_server
+      - discovery.type=single-node
+      - node.name=*es_server
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - bootstrap.memory_lock=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
     ports:
       - "9200:9200"
     networks:
@@ -26,7 +32,7 @@ services:
   # https://www.elastic.co/guide/en/kibana/7.12/docker.html
   kibana:
     container_name: &kibana_server kibana
-    image: "docker.elastic.co/kibana/kibana:7.12.0"
+    image: "docker.elastic.co/kibana/kibana:7.12.1"
     environment:
       SERVER_NAME: *kibana_server
       # ELASTICSEARCH_HOSTS: *es_server
@@ -57,7 +63,7 @@ services:
 
     # If data integrity is important leave the following,
     # if not, remove it.
-    command: ["redis-server", "--appendonly", "yes"]
+    # command: ["redis-server", "--appendonly", "yes"]
 
   fastapi:
     container_name: fastapi
@@ -83,12 +89,11 @@ services:
     volumes:
       - "fastapi-log:/app/log"
       - "./api/data:/app/data"
-    tmpfs:
-      - /tmp:noexec,mode=666
+    #tmpfs:
+    #  - /tmp:noexec,mode=666
     depends_on:
       - redis
       - elasticsearch
-
 
   # !React app currently down.
   # react:
@@ -101,10 +106,9 @@ services:
   #   networks:
   #     - "jointops"
 
-
 networks:
   jointops:
-  
+
 volumes:
   # fastapi-data:
   fastapi-log:

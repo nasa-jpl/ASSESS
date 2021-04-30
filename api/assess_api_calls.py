@@ -77,7 +77,8 @@ doc = {
     "url": "https://www.iso.org/standard/123123.html",
     "category": {"ics": "['43.060.20']"},
     "sdo": {
-        "iso": {
+        "abbreviation": "iso",
+        "data": {
             "code": "0.30.010.10.ISO/IEC 10592:1992",
             "edition": [
                 2,
@@ -96,7 +97,7 @@ doc = {
             "sections": None,
             "subgroup": "1.1.1",
             "type": "standard",
-        }
+        },
     },
 }
 

@@ -184,7 +184,7 @@ def es_to_es(client, index, new_index):
 
 old_index = "iso_final_clean"
 new_index = "assess_remap"
-client = Elasticsearch()
+client = Elasticsearch(http_compress=True)
 df_path = "data/feather_text"
 # es_to_es(client, old_index, new_index)
 # es_to_json(client, "elasticsearch-dump.json", index)
