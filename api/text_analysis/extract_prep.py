@@ -18,9 +18,6 @@ from web_utils import connect_to_es
 from text_analysis.prepare_h_cat import clean_ngram
 import time
 
-# Connect to Elasticsearch
-es, idx_main, idx_log, idx_stats = connect_to_es()
-
 
 def parse_text(filepath):
     if os.path.exists(filepath + "_parsed.txt"):
@@ -40,7 +37,7 @@ def parse_text(filepath):
 
 
 def transfrom(df):
-    df = df.reset_index(drop=True)
+    df = df[df["sdo.data.type"] == "standard"].reset_index(drop=True)
     df.fillna("", inplace=True)
     print("shape")
     print(df.shape)
@@ -96,19 +93,18 @@ def predict(file=None, in_text=None, size=10, read="feather"):
     'sdo.iso.preview_url',
     'category.ics']
     """
-    if file:
+    if file and not in_text:
         if file.filename == "":
             raise ValueError("No selected file!")
         in_text = parse_text(file.filename)
 
-    else:
-        # Get text from form
-        new_text = in_text
+    # Get text from form
     #     file = open("temp_text", "w")
     #     file.write(str(new_text.encode("utf-8", "ignore")))
     #     file.flush()
     #     file.close()
     if read == "es":
+        es, idx_main, idx_log, idx_stats = connect_to_es()
         res = list(scan(es, query={}, index=idx_main))
         output_all = deque()
         output_all.extend([x["_source"] for x in res])
