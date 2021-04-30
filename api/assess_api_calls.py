@@ -27,9 +27,9 @@ print(
     % (username, password, root)
 )
 
-# Specify file location of an SOW.
-location = "/Users/vishall/prog/assess-root/test2.pdf"
-file = {"pdf": open(location, "rb")}
+# # Specify file location of an SOW.
+# location = "data/example.pdf"
+# file = {"pdf": open(location, "rb")}
 
 # # Recommend SoW given text "Example text about airplanes.".
 print("Sending GET request to `/recommend_text`.")
@@ -41,17 +41,17 @@ r = requests.post(
 )
 print(format_json(r.text))
 
-# Recommend an SoW given a PDF.
-print("Sending GET request to `/recommend_file` with a PDF.")
-r = requests.post(
-    f"{root}/recommend_file", files=file, auth=HTTPBasicAuth(username, password)
-)
-print(format_json(r.text))
+# # Recommend an SoW given a PDF.
+# print("Sending GET request to `/recommend_file` with a PDF.")
+# r = requests.post(
+#     f"{root}/recommend_file", files=file, auth=HTTPBasicAuth(username, password)
+# )
+# print(format_json(r.text))
 
-# Extract standard reference from PDF.
-print("Sending POST request to `/extract` using a PDF.")
-r = requests.post(f"{root}/extract", files=file, auth=HTTPBasicAuth(username, password))
-print(format_json(r.text))
+# # Extract standard reference from PDF.
+# print("Sending POST request to `/extract` using a PDF.")
+# r = requests.post(f"{root}/extract", files=file, auth=HTTPBasicAuth(username, password))
+# print(format_json(r.text))
 
 # Get standard references.
 print("Sending GET request to `/search`.")
