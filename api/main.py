@@ -55,8 +55,8 @@ app.add_middleware(
 )
 
 # Define rate limiter.
-rate_times = 15
-rate_seconds = 20
+rate_times = 50
+rate_seconds = 1
 # Connect to Elasticsearch.
 es, idx_main, idx_log, idx_stats = connect_to_es()
 
