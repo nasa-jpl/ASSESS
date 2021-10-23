@@ -364,6 +364,36 @@ async def add_standards(request: Request, doc: dict):
     return JSONResponse(content=json_compatible_item_data)
 
 
+@app.put(
+    "/edit_standards",
+    response_class=HTMLResponse,
+    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+)
+async def edit_standards(request: Request, doc: dict):
+    """Add standards to the main Elasticsearch index by PUTTING a JSON request here."""
+    # TODO: Check Standard body. Test update.
+    res = es.update(index=idx_main, body=json.dumps(doc))
+    print(res)
+    json_compatible_item_data = jsonable_encoder(doc)
+    log_stats(request, data=doc)
+    return JSONResponse(content=json_compatible_item_data)
+
+
+@app.put(
+    "/delete_standards",
+    response_class=HTMLResponse,
+    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+)
+async def delete_standards(request: Request, doc: dict):
+    """Add standards to the main Elasticsearch index by PUTTING a JSON request here."""
+    # TODO: Check Standard body. Test deletion.
+    res = es.delete(index=idx_main, body=json.dumps(doc))
+    print(res)
+    json_compatible_item_data = jsonable_encoder(doc)
+    log_stats(request, data=doc)
+    return JSONResponse(content=json_compatible_item_data)
+
+
 @app.post(
     "/select_standards",
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
