@@ -1,5 +1,6 @@
 import numpy as np
 from tqdm import tqdm
+import re
 
 def get_sentences(l, n):
     """
@@ -67,3 +68,25 @@ def get_BERT_vectors(list_of_texts, model, tokenizer, layers=None, batch_size=10
     paragraph_vectors = np.array(paragraph_vectors)
 
     return paragraph_vectors
+
+def preprocessor(text):
+    if type(text) == str:
+        text = re.sub('<[^>]*>', '', text)
+        text = re.sub('[\W]+', '', text.lower())
+    return text
+
+def spacy_tokenize_lemmatize_punc_remove(text, nlp):
+
+    processed = nlp(text)
+    lemma_list = []
+    for token in processed:
+        if token.is_stop is False:
+            token_preprocessed = preprocessor(token.lemma_.lower())
+            if token_preprocessed != '':
+                lemma_list.append(token_preprocessed)
+    return lemma_list
+
+"""
+Refs:
+https://towardsdatascience.com/setting-up-text-preprocessing-pipeline-using-scikit-learn-and-spacy-e09b9b76758f
+"""
