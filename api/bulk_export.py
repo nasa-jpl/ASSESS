@@ -172,11 +172,11 @@ def es_to_es(client, index, new_index):
     """Migrate from old Elasticsearch index to new Elasticsearch index."""
     i = 0
     start = time.time()
-    for doc in scan(client, query={}, index=INDEX):
+    for doc in scan(client, query={}, index=index):
         i += 1
         pprint(i)
         new_doc = convert_to_new(doc["_source"], client, i, new_index)
-        res = client.index(index=NEW_INDEX, body=json.dumps(new_doc))
+        res = client.index(index=new_index, body=json.dumps(new_doc))
     end = time.time() - start
     print(end)
     return
