@@ -3,128 +3,202 @@ import pandas as pd
 import datetime
 
 
-def train_vectorizers(list_of_texts, type, vectorizers: PluginCollection, fresh=False, name=None):
+def train_vectorizers(
+    list_of_texts, type, vectorizers: PluginCollection, fresh=False, name=None
+):
     if name is None:
         name = type
-    model_exists = vectorizers.apply('plugins.Vectorizer', type, 'exists_on_disk', {'target_path': name})
+    model_exists = vectorizers.apply(
+        "plugins.Vectorizer", type, "exists_on_disk", {"target_path": name}
+    )
     if fresh or not model_exists:
-        vectorizers.apply('plugins.Vectorizer', type, 'train', {'list_of_texts': list_of_texts})
-        vectorizers.apply('plugins.Vectorizer', type, 'save_to_disk', {'target_path': name})
-    vectorizers.apply('plugins.Vectorizer', type, 'load_from_disk', {'target_path': name})
+        vectorizers.apply(
+            "plugins.Vectorizer", type, "train", {"list_of_texts": list_of_texts}
+        )
+        vectorizers.apply(
+            "plugins.Vectorizer", type, "save_to_disk", {"target_path": name}
+        )
+    vectorizers.apply(
+        "plugins.Vectorizer", type, "load_from_disk", {"target_path": name}
+    )
 
 
 def create_vectors(list_of_texts, type, vectorizers: PluginCollection):
-    vectors = vectorizers.apply('plugins.Vectorizer', type, 'vectorize', {'list_of_texts': list_of_texts})
+    vectors = vectorizers.apply(
+        "plugins.Vectorizer", type, "vectorize", {"list_of_texts": list_of_texts}
+    )
     return vectors
 
 
 def create_indexes(vectors, type, indexes: PluginCollection, fresh=False, name=None):
     if name is None:
         name = type
-    model_exists = indexes.apply('plugins.Index', type, 'exists_on_disk', {'target_path': name})
+    model_exists = indexes.apply(
+        "plugins.Index", type, "exists_on_disk", {"target_path": name}
+    )
     if fresh or not model_exists:
-        indexes.apply('plugins.Index', type, 'create_index', {'vectors': vectors})
-        indexes.apply('plugins.Index', type, 'save_to_disk', {'target_path': name})
-    indexes.apply('plugins.Index', type, 'load_from_disk', {'target_path': name})
+        indexes.apply("plugins.Index", type, "create_index", {"vectors": vectors})
+        indexes.apply("plugins.Index", type, "save_to_disk", {"target_path": name})
+    indexes.apply("plugins.Index", type, "load_from_disk", {"target_path": name})
 
 
 def get_top_n(target_vector, n, type, indexes: PluginCollection):
-    top_n = indexes.apply('plugins.Index', type, 'get_top_n', {'target_vector': target_vector, 'n': n})
+    top_n = indexes.apply(
+        "plugins.Index", type, "get_top_n", {"target_vector": target_vector, "n": n}
+    )
     return top_n
 
 
-# TEST CODE:
-if __name__ == "__main__":
+def load_into_memory(index_types, vector_types):
+    # ==== load vectorizers from disk
+    vectorizers = PluginCollection()
+    print("\nLoading Vectorizers...")
+    for vectorizer_type in vectorizer_types:
+        print("vectorizer_type:", vectorizer_type)
+        train_vectorizers(
+            [], type=vectorizer_type, vectorizers=vectorizers, fresh=False
+        )
 
-    train = False
-    index_types = ['flat', 'flat_sklearn']
-    vectorizer_types = ['tf_idf']
+    # ==== Init Vector Storage from disk (will load from disk automatically when it is called the first time)
+    vector_storage = PluginCollection()
+    print("\nInitialized the Vector Storage.")
 
-    # read the ISO data
-    iso_data = pd.read_feather('data/feather_text')
-    print(iso_data.columns)
-    list_of_texts = list(iso_data['title'] + '. ' + iso_data['description'])
-    # list_of_texts=['computer science', 'space science', 'global summit for dummies', 'deep neural nets', 'technology consultants',
-    #                'space science', 'global summit for dummies', 'deep neural nets', 'technology consultants',
-    #                '', '', '', '']
-    print('Number of Standards text to process:', len(list_of_texts))
+    # ==== load indexes from disk
+    vector_indexes = {}
+    print("\nLoading Indexes...")
+    for vectorizer_type in vectorizer_types:
+        indexes = PluginCollection()
+        for index_type in index_types:
+            print("vectorizer_type:", vectorizer_type, "|| index_type:", index_type)
+            create_indexes(
+                [],
+                type=index_type,
+                indexes=indexes,
+                name=vectorizer_type + "_" + index_type,
+                fresh=False,
+            )
+        vector_indexes[vectorizer_type] = indexes
+    return vectorizers, vector_storage, vector_indexes
 
-    if train:
 
-        # ==== train vectorizers (needs to train on all standards in the corpus)
-        vectorizers = PluginCollection()
-        print('\nTraining Vectorizers...')
-        for vectorizer_type in vectorizer_types:
-            print('vectorizer_type:', vectorizer_type)
-            train_vectorizers(list_of_texts, type=vectorizer_type, vectorizers=vectorizers)
+def train(index_types, vectorizer_types, list_of_texts):
+    # ==== train vectorizers (needs to train on all standards in the corpus)
+    vectorizers = PluginCollection()
+    print("\nTraining Vectorizers...")
+    for vectorizer_type in vectorizer_types:
+        print("vectorizer_type:", vectorizer_type)
+        train_vectorizers(list_of_texts, type=vectorizer_type, vectorizers=vectorizers)
 
-        # ==== create vectors and update Vector Storage
-        print('\nCreating Vectors...')
-        vector_storage = PluginCollection()
-        for vectorizer_type in vectorizer_types:
-            print('vectorizer_type:', vectorizer_type)
-            vectors = create_vectors(list_of_texts, type=vectorizer_type, vectorizers=vectorizers)
-            # todo: get ES IDs
-            ES_ids = list(range(len(vectors)))  # using dummy values
-            vector_storage.apply('plugins.Vector_Storage', 'basic', 'add_update_vectors',
-                                 {'ids': ES_ids, 'vectors': vectors, 'vec_type': vectorizer_type})
+    # ==== create vectors and update Vector Storage
+    print("\nCreating Vectors...")
+    vector_storage = PluginCollection()
+    for vectorizer_type in vectorizer_types:
+        print("vectorizer_type:", vectorizer_type)
+        vectors = create_vectors(
+            list_of_texts, type=vectorizer_type, vectorizers=vectorizers
+        )
+        # TODO: get ES IDs
+        ES_ids = list(range(len(vectors)))  # using dummy values
+        vector_storage.apply(
+            "plugins.Vector_Storage",
+            "basic",
+            "add_update_vectors",
+            {"ids": ES_ids, "vectors": vectors, "vec_type": vectorizer_type},
+        )
 
-        # ==== create indexes (one or many kind for each vectorizer i.e. type of vector)
-        vector_indexes = {}
-        print('\nCreating Indexes...')
-        for vectorizer_type in vectorizer_types:
-            vectors, _ = vector_storage.apply('plugins.Vector_Storage', 'basic', 'get_all_vectors',
-                                              {'vec_type': vectorizer_type})
-            indexes = PluginCollection()
-            for index_type in index_types:
-                print('vectorizer_type:', vectorizer_type, '|| index_type:', index_type)
-                create_indexes(vectors, type=index_type, indexes=indexes, name=vectorizer_type + '_' + index_type)
-            vector_indexes[vectorizer_type] = indexes
+    # ==== create indexes (one or many kind for each vectorizer i.e. type of vector)
+    vector_indexes = {}
+    print("\nCreating Indexes...")
+    for vectorizer_type in vectorizer_types:
+        vectors, _ = vector_storage.apply(
+            "plugins.Vector_Storage",
+            "basic",
+            "get_all_vectors",
+            {"vec_type": vectorizer_type},
+        )
+        indexes = PluginCollection()
+        for index_type in index_types:
+            print("vectorizer_type:", vectorizer_type, "|| index_type:", index_type)
+            create_indexes(
+                vectors,
+                type=index_type,
+                indexes=indexes,
+                name=vectorizer_type + "_" + index_type,
+            )
+        vector_indexes[vectorizer_type] = indexes
 
-    else:  # load everything from disk into memory
 
-        # ==== load vectorizers from disk
-        vectorizers = PluginCollection()
-        print('\nLoading Vectorizers...')
-        for vectorizer_type in vectorizer_types:
-            print('vectorizer_type:', vectorizer_type)
-            train_vectorizers([], type=vectorizer_type, vectorizers=vectorizers, fresh=False)
-
-        # ==== Init Vector Storage from disk (will load from disk automatically when it is called the first time)
-        vector_storage = PluginCollection()
-        print('\nInitialized the Vector Storage.')
-
-        # ==== load indexes from disk
-        vector_indexes = {}
-        print('\nLoading Indexes...')
-        for vectorizer_type in vectorizer_types:
-            indexes = PluginCollection()
-            for index_type in index_types:
-                print('vectorizer_type:', vectorizer_type, '|| index_type:', index_type)
-                create_indexes([], type=index_type, indexes=indexes, name=vectorizer_type + '_' + index_type,
-                               fresh=False)
-            vector_indexes[vectorizer_type] = indexes
-
-    # ==== retrieve
-    print('\nRetrieving results...')
-    sow = 'this computer technology and software stuff!'
-    n = 10
+def predict(
+    sow,
+    n,
+    vectorizers,
+    vector_storage,
+    vector_indexes,
+    vectorizer_types=["tf_idf"],
+    index_types=["flat"],
+):
     for vectorizer_type in vectorizer_types:
         begin = datetime.datetime.now()
         # vectorize
         vector = create_vectors([sow], type=vectorizer_type, vectorizers=vectorizers)[0]
         for index_type in index_types:
             # retrieve
-            print('vectorizer_type:', vectorizer_type, '|| index_type:', index_type)
-            top_n_idx = get_top_n(vector, n, type=index_type, indexes=vector_indexes[vectorizer_type])
+            print("vectorizer_type:", vectorizer_type, "|| index_type:", index_type)
+            top_n_idx = get_top_n(
+                vector, n, type=index_type, indexes=vector_indexes[vectorizer_type]
+            )
             # get the ES_ids
-            top_n_ES_ids = vector_storage.apply('plugins.Vector_Storage', 'basic', 'get_vector_Ids',
-                                                {'vec_type': vectorizer_type, 'vector_indexes': top_n_idx})
-            print('|-->top_n_ES_ids:', top_n_ES_ids[:n], ', time taken:', datetime.datetime.now() - begin)
-            # todo: retrieve results from ES, for now just use the dataframe
-            iso_data = pd.read_feather('data/feather_text')
+            top_n_ES_ids = vector_storage.apply(
+                "plugins.Vector_Storage",
+                "basic",
+                "get_vector_Ids",
+                {"vec_type": vectorizer_type, "vector_indexes": top_n_idx},
+            )
+            print(
+                "|-->top_n_ES_ids:",
+                top_n_ES_ids[:n],
+                ", time taken:",
+                datetime.datetime.now() - begin,
+            )
+            # TODO: retrieve results from ES, for now just use the dataframe
+            iso_data = pd.read_feather("data/feather_text")
             for ES_id in top_n_ES_ids[:n]:
                 print(ES_id, list_of_texts[ES_id])
+    return
+
+
+# TEST CODE:
+if __name__ == "__main__":
+
+    train = False
+    index_types = ["flat", "flat_sklearn"]
+    vectorizer_types = ["tf_idf"]
+    df_file = "data/feather_text"
+
+    # read the ISO data
+    iso_data = pd.read_feather(df_file)
+    print(iso_data.columns)
+    list_of_texts = list(iso_data["title"] + ". " + iso_data["description"])
+    print("Number of Standards text to process:", len(list_of_texts))
+
+    if train:
+        train(index_types, vectorizer_types, list_of_texts)
+    else:
+        vectorizers, vector_storage, vector_indexes = load_into_memory(
+            index_types, vectorizer_types
+        )
+    # load everything from disk into memory
+
+    # ==== retrieve
+    print("\nRetrieving results...")
+    predict(
+        "Computer software and stuff!!!",
+        10,
+        vectorizers,
+        vector_storage,
+        vector_indexes,
+    )
+
 
 """
 The flow for CRUD operations:
@@ -147,7 +221,3 @@ Known issues:
     -Faiss flat index is giving a higher matching values to vectors for empty strings than some more relevant ones!
         - currently we are circumventing it by adding an extra dummy token to each text
 """
-
-
-
-
