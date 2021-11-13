@@ -49,7 +49,7 @@ def get_top_n(target_vector, n, type, indexes: PluginCollection):
     return top_n
 
 
-def load_into_memory(index_types, vector_types):
+def load_into_memory(index_types, vectorizer_types):
     # ==== load vectorizers from disk
     vectorizers = PluginCollection()
     print("\nLoading Vectorizers...")
@@ -126,6 +126,7 @@ def train(index_types, vectorizer_types, list_of_texts):
                 name=vectorizer_type + "_" + index_type,
             )
         vector_indexes[vectorizer_type] = indexes
+    return
 
 
 def predict(
@@ -134,6 +135,7 @@ def predict(
     vectorizers,
     vector_storage,
     vector_indexes,
+    list_of_texts,
     vectorizer_types=["tf_idf"],
     index_types=["flat"],
 ):
@@ -167,28 +169,29 @@ def predict(
     return
 
 
+def get_list_of_text(df_file):
+    df = pd.read_feather(df_file)
+    # print(df.columns)
+    return list(df["title"] + ". " + df["description"])
+
+
 # TEST CODE:
 if __name__ == "__main__":
-
-    train = False
+    do_training = False
     index_types = ["flat", "flat_sklearn"]
     vectorizer_types = ["tf_idf"]
     df_file = "data/feather_text"
-
-    # read the ISO data
-    iso_data = pd.read_feather(df_file)
-    print(iso_data.columns)
-    list_of_texts = list(iso_data["title"] + ". " + iso_data["description"])
+    list_of_texts = get_list_of_text(df_file)
+    # list_of_texts=['computer science', 'space science', 'global summit for dummies', 'deep neural nets', 'technology consultants',
+    #                'space science', 'global summit for dummies', 'deep neural nets', 'technology consultants',
+    #                '', '', '', '']
     print("Number of Standards text to process:", len(list_of_texts))
-
-    if train:
+    if do_training:
         train(index_types, vectorizer_types, list_of_texts)
     else:
         vectorizers, vector_storage, vector_indexes = load_into_memory(
             index_types, vectorizer_types
         )
-    # load everything from disk into memory
-
     # ==== retrieve
     print("\nRetrieving results...")
     predict(
@@ -197,6 +200,7 @@ if __name__ == "__main__":
         vectorizers,
         vector_storage,
         vector_indexes,
+        list_of_texts,
     )
 
 
