@@ -32,7 +32,10 @@ RUN chown $uid /app/data && chown $uid /app/log
 COPY . /app
 
 # Install dependencies
-RUN python -m pip install --no-cache-dir --upgrade -r requirements.txt 
+RUN python -m pip install --no-cache-dir -r requirements.txt 
+RUN python -m pip install --no-cache-dir -r ml_requirements.txt
+RUN pip install jpl.pipedreams==1.0.3
+RUN python -m spacy download en_core_web_sm
 
 USER "$uid"
 

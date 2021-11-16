@@ -1,6 +1,10 @@
 from jpl.pipedreams.plugins_ops import PluginCollection
 import pandas as pd
 import datetime
+from pandas.io.json import json_normalize
+from collections import deque
+from elasticsearch import Elasticsearch
+from elasticsearch.helpers import scan, bulk
 
 
 def train_vectorizers(
@@ -8,6 +12,8 @@ def train_vectorizers(
 ):
     if name is None:
         name = type
+    # Add path for mounted drive.
+    name = "./data/" + name
     model_exists = vectorizers.apply(
         "plugins.Vectorizer", type, "exists_on_disk", {"target_path": name}
     )
@@ -33,6 +39,8 @@ def create_vectors(list_of_texts, type, vectorizers: PluginCollection):
 def create_indexes(vectors, type, indexes: PluginCollection, fresh=False, name=None):
     if name is None:
         name = type
+    # Add path for mounted drive.
+    name = "./data/" + name
     model_exists = indexes.apply(
         "plugins.Index", type, "exists_on_disk", {"target_path": name}
     )
@@ -105,6 +113,26 @@ def train(index_types, vectorizer_types, list_of_texts):
             "add_update_vectors",
             {"ids": ES_ids, "vectors": vectors, "vec_type": vectorizer_type},
         )
+    vector_indexes = {}
+    print("\nCreating Indexes...")
+    for vectorizer_type in vectorizer_types:
+        vectors, _ = vector_storage.apply(
+            "plugins.Vector_Storage",
+            "basic",
+            "get_all_vectors",
+            {"vec_type": vectorizer_type},
+        )
+        indexes = PluginCollection()
+        for index_type in index_types:
+            print("vectorizer_type:", vectorizer_type, "|| index_type:", index_type)
+            create_indexes(
+                vectors,
+                type=index_type,
+                indexes=indexes,
+                name=vectorizer_type + "_" + index_type,
+            )
+        vector_indexes[vectorizer_type] = indexes
+    return vectorizers, vector_storage, vector_indexes
 
     # ==== create indexes (one or many kind for each vectorizer i.e. type of vector)
     vector_indexes = {}
@@ -163,7 +191,7 @@ def predict(
             #     datetime.datetime.now() - begin,
             # )
             # TODO: retrieve results from ES, for now just use the dataframe
-            iso_data = pd.read_feather("data/feather_text")
+            # iso_data = pd.read_feather("data/feather_text")
             # for ES_id in top_n_ES_ids[:n]:
             #     print(ES_id, list_of_texts[ES_id])
     print(top_n_ES_ids[:n])
@@ -171,24 +199,35 @@ def predict(
     return top_n_ES_ids[:n], scores
 
 
-def get_list_of_text(df_file):
-    df = pd.read_feather(df_file)
+def get_list_of_text():
+    df = pd.read_feather("data/feather_text")
+    # df = es_to_df
     # print(df.columns)
     return list(df["title"] + ". " + df["description"])
 
 
+def es_to_df(index="assess_remap", path="data/feather_text"):
+    es = Elasticsearch(http_compress=True)
+    res = list(scan(es, query={}, index=index))
+    output_all = deque()
+    output_all.extend([x["_source"] for x in res])
+    df = json_normalize(output_all)
+    return df
+
+
 if __name__ == "__main__":
-    do_training = False
+    do_training = True
     index_types = ["flat", "flat_sklearn"]
     vectorizer_types = ["tf_idf"]
-    df_file = "data/feather_text"
-    list_of_texts = get_list_of_text(df_file)
+    list_of_texts = get_list_of_text()
     # list_of_texts=['computer science', 'space science', 'global summit for dummies', 'deep neural nets', 'technology consultants',
     #                'space science', 'global summit for dummies', 'deep neural nets', 'technology consultants',
     #                '', '', '', '']
     print("Number of Standards text to process:", len(list_of_texts))
     if do_training:
-        train(index_types, vectorizer_types, list_of_texts)
+        vectorizers, vector_storage, vector_indexes = train(
+            index_types, vectorizer_types, list_of_texts
+        )
     else:
         vectorizers, vector_storage, vector_indexes = load_into_memory(
             index_types, vectorizer_types
