@@ -105,8 +105,6 @@ def train(index_types, vectorizer_types, list_of_texts):
             "add_update_vectors",
             {"ids": ES_ids, "vectors": vectors, "vec_type": vectorizer_type},
         )
-
-    # ==== create indexes (one or many kind for each vectorizer i.e. type of vector)
     vector_indexes = {}
     print("\nCreating Indexes...")
     for vectorizer_type in vectorizer_types:
@@ -126,7 +124,7 @@ def train(index_types, vectorizer_types, list_of_texts):
                 name=vectorizer_type + "_" + index_type,
             )
         vector_indexes[vectorizer_type] = indexes
-    return
+    return vectorizers, vector_storage, vector_indexes
 
 
 def predict(
@@ -187,7 +185,9 @@ if __name__ == "__main__":
     #                '', '', '', '']
     print("Number of Standards text to process:", len(list_of_texts))
     if do_training:
-        train(index_types, vectorizer_types, list_of_texts)
+        vectorizers, vector_storage, vector_indexes = train(
+            index_types, vectorizer_types, list_of_texts
+        )
     else:
         vectorizers, vector_storage, vector_indexes = load_into_memory(
             index_types, vectorizer_types
