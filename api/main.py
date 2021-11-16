@@ -38,6 +38,7 @@ from starlette.responses import Response
 
 from standard_extractor import find_standard_ref
 from text_analysis import extract_prep
+import extraction
 from web_utils import connect_to_es, read_logs
 
 # Define api settings.
@@ -84,7 +85,7 @@ async def startup():
         conf = yaml.safe_load(stream)
     host = os.getenv("REDIS_SERVER", conf["redis"][0])
     redis = await aioredis.create_redis_pool(f"redis://{host}")
-    FastAPILimiter.init(redis)
+    await FastAPILimiter.init(redis)
 
 
 class Sow(BaseModel):
@@ -139,6 +140,18 @@ def log_stats(request, data=None, user=None):
 #     log_stats(request, data=in_text)
 #     print(f"{time.time() - start}")
 #     return JSONResponse(content=json_compatible_item_data)
+
+
+@app.post(
+    "/train",
+    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+)
+async def train(index_types=["flat", "flat_sklearn"], vectorizer_types=["tf_idf"]):
+    # TODO Elasticsearch
+    df_file = "data/feather_text"
+    list_of_texts = get_list_of_text(df_file)
+    extraction.train(index_types, vectorizer_types, list_of_texts)
+    return True
 
 
 @app.post(
@@ -199,6 +212,103 @@ async def recommend_file(request: Request, pdf: UploadFile = File(...), size: in
     json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=pdf.filename)
     # Add line here to save file?
+    return JSONResponse(content=json_compatible_item_data)
+
+
+@app.post(
+    "/recommend_text2",
+    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+)
+async def recommend_text2(
+    request: Request,
+    sow: Sow,
+    size: int = 10,
+    index_types=["flat", "flat_sklearn"],
+    vectorizer_types=["tf_idf"],
+):
+    """Given an input of Statement of Work as text,
+    return a JSON of recommended standards.
+    """
+    start = time.time()
+    in_text = sow.text_field
+    # TODO Elasticsearch
+    df_file = "data/feather_text"
+    list_of_texts = get_list_of_text(df_file)
+    vectorizers, vector_storage, vector_indexes = extraction.load_into_memory(
+        index_types, vectorizer_types
+    )
+    list_of_predictions, scores = extraction.predict(
+        in_text,
+        size,
+        vectorizers,
+        vector_storage,
+        vector_indexes,
+        list_of_texts,
+    )
+    output = {}
+    results = {}
+    for i, prediction_id in enumerate(list_of_predictions):
+        res = es.search(
+            index=idx_main,
+            body={"size": 1, "query": {"match": {"id": prediction_id}}},
+        )
+        print(res)
+        for hit in res["hits"]["hits"]:
+            results = hit["_source"]
+        output[i] = results
+        output[i]["similarity"] = scores[i]
+    json_compatible_item_data = jsonable_encoder(output)
+    log_stats(request, data=in_text)
+    print(f"{time.time() - start}")
+    return JSONResponse(content=json_compatible_item_data)
+
+
+@app.post(
+    "/recommend_file2",
+    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+)
+async def recommend_file2(
+    request: Request,
+    pdf: UploadFile = File(...),
+    size: int = 10,
+    index_types=["flat", "flat_sklearn"],
+    vectorizer_types=["tf_idf"],
+):
+    """Given an input of a Statement of Work as a PDF,
+    return a JSON of recommended standards.
+    """
+    print("File received")
+    in_text = extract_prep.parse_text(pdf)
+    # TODO Elasticsearch
+    df_file = "data/feather_text"
+    list_of_texts = get_list_of_text(df_file)
+    vectorizers, vector_storage, vector_indexes = extraction.load_into_memory(
+        index_types, vectorizer_types
+    )
+    extraction.predict(
+        in_text,
+        size,
+        vectorizers,
+        vector_storage,
+        vector_indexes,
+        list_of_texts,
+    )
+
+    predictions = extract_prep.predict(file=pdf, size=size)
+    output = {}
+    results = {}
+    for i, prediction_id in enumerate(list_of_predictions):
+        res = es.search(
+            index=idx_main,
+            body={"size": 1, "query": {"match": {"id": prediction_id}}},
+        )
+        for hit in res["hits"]["hits"]:
+            results = hit["_source"]
+        output[i] = results
+        output[i]["similarity"] = scores[i]
+    json_compatible_item_data = jsonable_encoder(output)
+    log_stats(request, data=in_text)
+    print(f"{time.time() - start}")
     return JSONResponse(content=json_compatible_item_data)
 
 
