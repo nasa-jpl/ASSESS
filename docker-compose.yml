@@ -95,16 +95,16 @@ services:
       - redis
       - elasticsearch
 
-  # !React app currently down.
-  # react:
-  #   container_name: react
-  #   build:
-  #     context: dashboard
-  #     dockerfile: Docker-ui/Dockerfile
-  #   ports:
-  #     - "3000:3000"
-  #   networks:
-  #     - "jointops"
+  react:
+    container_name: react
+    build:
+      context: dashboard
+      dockerfile: Docker-ui/Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - "jointops"
+
 
 networks:
   jointops:

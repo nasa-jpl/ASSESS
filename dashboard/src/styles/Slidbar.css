@@ -6,7 +6,47 @@
     text-align: center;
     color: #fff;
     font-size: 4.5em;
+    padding-top: 20px;
 }
+
+.sidebar-header {
+    text-align: left;
+    color: #fff;
+    padding-top: 20px;
+}
+
+.sidebar-mode {
+    text-align: center;
+    color: #fff;
+    background-color: #343d4c;
+    border: none;
+}
+
+.sidebar-mode-selected {
+    text-align: center;
+    color: #343d4c;
+    background-color: #fff;
+    border: none;
+}
+
+.sidebar-option {
+    margin: 5px;
+    color: #fff;
+    background-color: #343d4c;
+    border: none;
+}
+
+.sidebar-option-selected {
+    margin-left: 20px;
+    color: #343d4c;
+    background-color: #fff;
+    border: none;
+}
+
+.sidebar-search-option {
+    color: #fff;
+}
+
 
 .sidebar-section {
     margin-left: 10px;

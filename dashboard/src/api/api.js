@@ -9,7 +9,7 @@ const apiValues = {
     check: {endpoint: '', method: 'get'}
 }
 
-const baseUrl = "https://assess-api.jpl.nasa.gov/";
+const baseUrl = "https://assess-api2.jpl.nasa.gov/";
 
 let username = 'portal'
 let password = '***REMOVED***'

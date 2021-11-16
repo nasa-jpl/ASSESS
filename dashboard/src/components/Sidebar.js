@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {Container, Row, Col, Button, Nav} from 'react-bootstrap';
 import './../styles/Slidbar.css'
 
@@ -49,18 +49,84 @@ const Styled = styled.div`
 
 
 const Sidebar = (props) => {
-
+    const [adminMode, setAdminMode] = useState(false);
 
     return (
         <Container style={{ width: "100%", height: "100%", backgroundColor: "#343d4c"}}>
+            <Row style={{paddingTop: "10px", paddingLeft: "20px"}}>
+                <Col>
+                    <button className={adminMode ? "sidebar-mode-selected" : "sidebar-mode"} onClick={() => setAdminMode(true)}> Admin </button>
+                </Col>
+                <Col>
+                    <button className={adminMode ? "sidebar-mode" : "sidebar-mode-selected"} onClick={() => setAdminMode(false)}> User </button>
+                </Col>
+            </Row>
             <Row>
                 <Col>
-                    <h1 className="sidebar-title" style={{paddingTop: "80px"}}> ASSESS </h1>
+                    <h1 className="sidebar-title" style={{paddingLeft: "10px"}}> ASSESS </h1>
                 </Col>
-                
             </Row>
+            <Row>
+                <Col>
+                    <h3 className="sidebar-header" style={{paddingLeft: "10px"}}> Storage </h3>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <button className="sidebar-option"> Option 1 </button>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <h3 className="sidebar-header" style={{paddingLeft: "10px"}}> Vectorizers </h3>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <button className="sidebar-option"> Option 1 </button>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <button className="sidebar-option"> Option 2</button>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <h3 className="sidebar-header" style={{paddingLeft: "10px"}}> Indexers </h3>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <button className="sidebar-option"> Option 1 </button>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <button className="sidebar-option"> Option 2</button>
+                </Col>
+            </Row>
+            { adminMode ?
+            <div>
+                <Row>
+                    <Col>
+                        <h3 className="sidebar-header" style={{paddingLeft: "10px"}}> Admin Console </h3>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <button className="sidebar-option"> Re-initialize </button>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <button className="sidebar-option"> Modify Standards</button>
+                    </Col>
+                </Row>
+            </div>
+            : null}
 
-            {props.page != 'uploader' ? 
+            {props.page == 'uploader' ? 
                 <Styled>
                     <Row style={{marginTop: "5vh"}}>
                         <div className={props.page == 'report' ? 'rect-show' : 'rect-hide'}> </div>
