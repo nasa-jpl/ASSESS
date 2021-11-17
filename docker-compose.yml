@@ -66,13 +66,14 @@ services:
     # command: ["redis-server", "--appendonly", "yes"]
 
   fastapi:
+    tty: true
     container_name: fastapi
-    user: &uid "1000:1000"
+    #user: &uid "1000:1000"
     build:
       context: api
       dockerfile: Dockerfile
-      args:
-        uid: *uid
+      #args:
+      #  uid: *uid
     environment:
       REDIS_SERVER: *redis_server
       ES_SERVER: *es_server
