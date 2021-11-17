@@ -17,7 +17,7 @@ RUN apt-get install -y build-essential python3 python3-pip libssl-dev libffi-dev
 
 # the entire magic of the tiangolo containers, without the risk
 ## START
-RUN python3 -m pip install --no-cache-dir "uvicorn[standard]" gunicorn fastapi 
+#RUN python3 -m pip install --no-cache-dir "uvicorn[standard]" gunicorn fastapi 
 
 COPY ./gunicorn_conf.py /app/gunicorn.conf.py
 
@@ -40,14 +40,16 @@ COPY . /app
 RUN apt install -y software-properties-common
 RUN add-apt-repository -y ppa:deadsnakes/ppa
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-RUN python3.8 get-pip.py
-RUN python3.8 -m pip install --no-cache-dir -r requirements.txt 
-RUN python3.8 -m pip install --no-cache-dir -r ml_requirements.txt
-RUN pip3.8 install jpl.pipedreams==1.0.3
-RUN python3.8 -m spacy download en_core_web_sm
-
+RUN apt install -y python3.8
+RUN mv /usr/bin/python3.8 /usr/local/bin/python
+RUN python get-pip.py
+RUN python -m pip install --no-cache-dir -r requirements.txt 
+RUN python -m pip install --no-cache-dir -r ml_requirements.txt
+RUN pip3 install jpl.pipedreams==1.0.3
+RUN python -m spacy download en_core_web_sm
+RUN python -m pip install --no-cache-dir "uvicorn[standard]" gunicorn fastapi
 # USER "$uid"
 
 
 # # Run FastAPI service 
-# CMD ["/start.sh"]
+CMD ["/start.sh"]
