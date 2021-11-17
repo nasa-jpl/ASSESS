@@ -147,10 +147,8 @@ def log_stats(request, data=None, user=None):
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
 async def train(index_types=["flat", "flat_sklearn"], vectorizer_types=["tf_idf"]):
-    # TODO Elasticsearch
-    df_file = "data/feather_text"
-    list_of_texts = get_list_of_text(df_file)
-    extraction.train(index_types, vectorizer_types, list_of_texts)
+    print("Starting training...")
+    extraction.train(index_types, vectorizer_types)
     return True
 
 

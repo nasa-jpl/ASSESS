@@ -89,8 +89,9 @@ def load_into_memory(index_types, vectorizer_types):
     return vectorizers, vector_storage, vector_indexes
 
 
-def train(index_types, vectorizer_types, list_of_texts):
+def train(index_types, vectorizer_types):
     # ==== train vectorizers (needs to train on all standards in the corpus)
+    list_of_texts = get_list_of_text()
     vectorizers = PluginCollection()
     print("\nTraining Vectorizers...")
     for vectorizer_type in vectorizer_types:
@@ -200,8 +201,9 @@ def predict(
 
 
 def get_list_of_text():
-    df = pd.read_feather("data/feather_text")
-    # df = es_to_df
+    # df = pd.read_feather("data/feather_text")
+    df = es_to_df()
+    print(df)
     # print(df.columns)
     return list(df["title"] + ". " + df["description"])
 
@@ -226,7 +228,7 @@ if __name__ == "__main__":
     print("Number of Standards text to process:", len(list_of_texts))
     if do_training:
         vectorizers, vector_storage, vector_indexes = train(
-            index_types, vectorizer_types, list_of_texts
+            index_types, vectorizer_types
         )
     else:
         vectorizers, vector_storage, vector_indexes = load_into_memory(
