@@ -89,9 +89,9 @@ def load_into_memory(index_types, vectorizer_types):
     return vectorizers, vector_storage, vector_indexes
 
 
-def train(index_types, vectorizer_types):
+def train(es, index_types, vectorizer_types):
     # ==== train vectorizers (needs to train on all standards in the corpus)
-    list_of_texts = get_list_of_text()
+    list_of_texts = get_list_of_text(es)
     vectorizers = PluginCollection()
     print("\nTraining Vectorizers...")
     for vectorizer_type in vectorizer_types:
@@ -200,16 +200,15 @@ def predict(
     return top_n_ES_ids[:n], scores
 
 
-def get_list_of_text():
+def get_list_of_text(es):
     # df = pd.read_feather("data/feather_text")
-    df = es_to_df()
+    df = es_to_df(es)
     print(df)
     # print(df.columns)
     return list(df["title"] + ". " + df["description"])
 
 
 def es_to_df(index="assess_remap", path="data/feather_text"):
-    es = Elasticsearch(http_compress=True)
     res = list(scan(es, query={}, index=index))
     output_all = deque()
     output_all.extend([x["_source"] for x in res])
@@ -218,17 +217,18 @@ def es_to_df(index="assess_remap", path="data/feather_text"):
 
 
 if __name__ == "__main__":
+    es = Elasticsearch(http_compress=True)
     do_training = True
     index_types = ["flat", "flat_sklearn"]
     vectorizer_types = ["tf_idf"]
-    list_of_texts = get_list_of_text()
+    list_of_texts = get_list_of_text(es)
     # list_of_texts=['computer science', 'space science', 'global summit for dummies', 'deep neural nets', 'technology consultants',
     #                'space science', 'global summit for dummies', 'deep neural nets', 'technology consultants',
     #                '', '', '', '']
     print("Number of Standards text to process:", len(list_of_texts))
     if do_training:
         vectorizers, vector_storage, vector_indexes = train(
-            index_types, vectorizer_types
+            es, index_types, vectorizer_types
         )
     else:
         vectorizers, vector_storage, vector_indexes = load_into_memory(
