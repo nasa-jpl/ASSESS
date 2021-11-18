@@ -208,7 +208,7 @@ def get_list_of_text(es):
     return list(df["title"] + ". " + df["description"])
 
 
-def es_to_df(index="assess_remap", path="data/feather_text"):
+def es_to_df(es, index="assess_remap", path="data/feather_text"):
     res = list(scan(es, query={}, index=index))
     output_all = deque()
     output_all.extend([x["_source"] for x in res])
