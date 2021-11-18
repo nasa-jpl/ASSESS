@@ -175,12 +175,10 @@ def predict(
             # iso_data = pd.read_feather("data/feather_text")
             # for ES_id in top_n_ES_ids[:n]:
             #     print(ES_id, list_of_texts[ES_id])
-    print(top_n_ES_ids[:n])
-    print(scores)
-    return top_n_ES_ids[:n], scores
+    return top_n_ES_ids[:n], scores.tolist()
 
 
-def get_list_of_text(es):
+def get_list_of_text(es=None):
     # df = pd.read_feather("data/feather_text")
     df = es_to_df(es)
     print(df)
@@ -188,16 +186,20 @@ def get_list_of_text(es):
     return list(df["title"] + ". " + df["description"])
 
 
-def es_to_df(es, index="assess_remap", path="data/feather_text"):
-    res = list(scan(es, query={}, index=index))
-    output_all = deque()
-    output_all.extend([x["_source"] for x in res])
-    df = json_normalize(output_all)
+def es_to_df(es=None, index="assess_remap", path="data/feather_text"):
+    if not es:
+        df = pd.read_feather("data/feather_text")
+    else:
+        res = list(scan(es, query={}, index=index))
+        output_all = deque()
+        output_all.extend([x["_source"] for x in res])
+        df = json_normalize(output_all)
     return df
 
 
 if __name__ == "__main__":
-    es = Elasticsearch(http_compress=True)
+    # es = Elasticsearch(http_compress=True)
+    es = None
     do_training = True
     index_types = ["flat", "flat_sklearn"]
     vectorizer_types = ["tf_idf"]
