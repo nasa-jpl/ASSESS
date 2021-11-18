@@ -114,26 +114,6 @@ def train(es, index_types, vectorizer_types):
             "add_update_vectors",
             {"ids": ES_ids, "vectors": vectors, "vec_type": vectorizer_type},
         )
-    vector_indexes = {}
-    print("\nCreating Indexes...")
-    for vectorizer_type in vectorizer_types:
-        vectors, _ = vector_storage.apply(
-            "plugins.Vector_Storage",
-            "basic",
-            "get_all_vectors",
-            {"vec_type": vectorizer_type},
-        )
-        indexes = PluginCollection()
-        for index_type in index_types:
-            print("vectorizer_type:", vectorizer_type, "|| index_type:", index_type)
-            create_indexes(
-                vectors,
-                type=index_type,
-                indexes=indexes,
-                name=vectorizer_type + "_" + index_type,
-            )
-        vector_indexes[vectorizer_type] = indexes
-    return vectorizers, vector_storage, vector_indexes
 
     # ==== create indexes (one or many kind for each vectorizer i.e. type of vector)
     vector_indexes = {}
@@ -227,20 +207,18 @@ if __name__ == "__main__":
     #                '', '', '', '']
     print("Number of Standards text to process:", len(list_of_texts))
     if do_training:
-        vectorizers, vector_storage, vector_indexes = train(
-            es, index_types, vectorizer_types
-        )
+        train(es, index_types, vectorizer_types)
     else:
         vectorizers, vector_storage, vector_indexes = load_into_memory(
             index_types, vectorizer_types
         )
-    # ==== retrieve
-    print("\nRetrieving results...")
-    predict(
-        "Computer software and stuff!!!",
-        10,
-        vectorizers,
-        vector_storage,
-        vector_indexes,
-        list_of_texts,
-    )
+        # ==== retrieve
+        print("\nRetrieving results...")
+        predict(
+            "Computer software and stuff!!!",
+            10,
+            vectorizers,
+            vector_storage,
+            vector_indexes,
+            list_of_texts,
+        )
