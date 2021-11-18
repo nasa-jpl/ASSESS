@@ -229,9 +229,8 @@ async def recommend_text2(
     """
     start = time.time()
     in_text = sow.text_field
-    # TODO Elasticsearch
-    df_file = "data/feather_text"
-    list_of_texts = get_list_of_text(df_file)
+    # df_file = "data/feather_text"
+    list_of_texts = extraction.get_list_of_text(es)
     vectorizers, vector_storage, vector_indexes = extraction.load_into_memory(
         index_types, vectorizer_types
     )
