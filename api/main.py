@@ -249,7 +249,7 @@ async def recommend_text2(
         vector_indexes,
         list_of_texts,
     )
-    print(type(list_of_predcitions))
+    print(type(list_of_predictions))
     print(type(scores))
     print("RAN PREDICT ***")
     output = {}
@@ -470,14 +470,13 @@ async def search(
     return JSONResponse(content=results)
 
 
-@app.put(
+@app.post(
     "/add_standards",
     response_class=HTMLResponse,
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
 async def add_standards(request: Request, doc: dict):
     """Add standards to the main Elasticsearch index by PUTTING a JSON request here."""
-    # TODO: Check Standard body.
     res = es.index(index=idx_main, body=json.dumps(doc))
     print(res)
     json_compatible_item_data = jsonable_encoder(doc)
@@ -492,7 +491,6 @@ async def add_standards(request: Request, doc: dict):
 )
 async def edit_standards(request: Request, doc: dict):
     """Add standards to the main Elasticsearch index by PUTTING a JSON request here."""
-    # TODO: Check Standard body. Test update.
     res = es.update(index=idx_main, body=json.dumps(doc))
     print(res)
     json_compatible_item_data = jsonable_encoder(doc)
@@ -500,14 +498,13 @@ async def edit_standards(request: Request, doc: dict):
     return JSONResponse(content=json_compatible_item_data)
 
 
-@app.put(
+@app.delete(
     "/delete_standards",
     response_class=HTMLResponse,
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
 async def delete_standards(request: Request, doc: dict):
-    """Add standards to the main Elasticsearch index by PUTTING a JSON request here."""
-    # TODO: Check Standard body. Test deletion.
+    """Delete standards to the main Elasticsearch index by PUTTING a JSON request here."""
     res = es.delete(index=idx_main, body=json.dumps(doc))
     print(res)
     json_compatible_item_data = jsonable_encoder(doc)
