@@ -32,8 +32,8 @@ accesslog_var = os.getenv("ACCESS_LOG", "-")
 use_accesslog = accesslog_var or None
 errorlog_var = os.getenv("ERROR_LOG", "-")
 use_errorlog = errorlog_var or None
-graceful_timeout_str = os.getenv("GRACEFUL_TIMEOUT", "240")
-timeout_str = os.getenv("TIMEOUT", "240")
+graceful_timeout_str = os.getenv("GRACEFUL_TIMEOUT", "1200")
+timeout_str = os.getenv("TIMEOUT", "1200")
 keepalive_str = os.getenv("KEEP_ALIVE", "10")
 
 # Gunicorn config variables
