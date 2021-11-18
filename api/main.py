@@ -151,6 +151,7 @@ async def train(index_types=["flat", "flat_sklearn"], vectorizer_types=["tf_idf"
     extraction.train(es, index_types, vectorizer_types)
     pass
 
+
 @app.post(
     "/recommend_text",
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
@@ -230,9 +231,16 @@ async def recommend_text2(
     in_text = sow.text_field
     # df_file = "data/feather_text"
     list_of_texts = extraction.get_list_of_text(es)
+    print(list_of_texts)
+    print(type(list_of_texts))
+    print("Loading into memory ***")
     vectorizers, vector_storage, vector_indexes = extraction.load_into_memory(
         index_types, vectorizer_types
     )
+    print(type(vectorizers))
+    print(type(vector_storage))
+    print(type(vector_indexes))
+    print("LOADED INTO MEMORY ***")
     list_of_predictions, scores = extraction.predict(
         in_text,
         size,
@@ -241,6 +249,9 @@ async def recommend_text2(
         vector_indexes,
         list_of_texts,
     )
+    print(type(list_of_predcitions))
+    print(type(scores))
+    print("RAN PREDICT ***")
     output = {}
     results = {}
     for i, prediction_id in enumerate(list_of_predictions):
@@ -248,11 +259,15 @@ async def recommend_text2(
             index=idx_main,
             body={"size": 1, "query": {"match": {"id": prediction_id}}},
         )
+        print(i)
         print(res)
         for hit in res["hits"]["hits"]:
             results = hit["_source"]
+            print(results)
         output[i] = results
         output[i]["similarity"] = scores[i]
+    print("Printing final output ***")
+    print(output)
     json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=in_text)
     print(f"{time.time() - start}")
