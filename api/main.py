@@ -152,11 +152,12 @@ async def train(index_types=["flat", "flat_sklearn"], vectorizer_types=["tf_idf"
     pass
 
 
+# !Deprecated
 @app.post(
-    "/recommend_text",
+    "/recommend_text_deprecated",
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
-async def recommend_text(request: Request, sow: Sow, size: int = 10):
+async def recommend_text_deprecated(request: Request, sow: Sow, size: int = 10):
     """Given an input of Statement of Work as text,
     return a JSON of recommended standards.
     """
@@ -183,11 +184,14 @@ async def recommend_text(request: Request, sow: Sow, size: int = 10):
     return JSONResponse(content=json_compatible_item_data)
 
 
+# !Deprecated
 @app.post(
-    "/recommend_file",
+    "/recommend_file_deprecated",
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
-async def recommend_file(request: Request, pdf: UploadFile = File(...), size: int = 10):
+async def recommend_file_deprecated(
+    request: Request, pdf: UploadFile = File(...), size: int = 10
+):
     """Given an input of a Statement of Work as a PDF,
     return a JSON of recommended standards.
     """
@@ -214,10 +218,10 @@ async def recommend_file(request: Request, pdf: UploadFile = File(...), size: in
 
 
 @app.post(
-    "/recommend_text2",
+    "/recommend_text",
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
-async def recommend_text2(
+async def recommend_text(
     request: Request,
     sow: Sow,
     size: int = 10,
@@ -259,10 +263,10 @@ async def recommend_text2(
 
 
 @app.post(
-    "/recommend_file2",
+    "/recommend_file",
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
-async def recommend_file2(
+async def recommend_file(
     request: Request,
     pdf: UploadFile = File(...),
     size: int = 10,

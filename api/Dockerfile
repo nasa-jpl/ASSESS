@@ -1,7 +1,6 @@
-#FROM python:3.9
-#FROM ubuntu:latest
+# FROM python:3.9
 FROM tensorflow/tensorflow:2.2.3-py3
-#ARG uid
+# ARG uid
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies
@@ -10,14 +9,12 @@ RUN apt-get update\
     # Stupid base image bug https://stackoverflow.com/a/58503437
     && mkdir -p /usr/share/man/man1\
     && apt-get -y --no-install-recommends install openjdk-11-jre-headless
-    # && apt-get clean all\
-    # && rm -rf /var/lib/apt/lists/
+# && apt-get clean all\
+# && rm -rf /var/lib/apt/lists/
 
 RUN apt-get install -y build-essential python3 python3-pip libssl-dev libffi-dev gcc 
 
-# the entire magic of the tiangolo containers, without the risk
-## START
-#RUN python3 -m pip install --no-cache-dir "uvicorn[standard]" gunicorn fastapi 
+# RUN python3 -m pip install --no-cache-dir "uvicorn[standard]" gunicorn fastapi 
 
 COPY ./gunicorn_conf.py /app/gunicorn.conf.py
 
@@ -26,7 +23,6 @@ RUN chmod +x /start.sh
 
 COPY ./start-reload.sh /start-reload.sh
 RUN chmod +x /start-reload.sh
-## END
 
 # Set working directory
 WORKDIR /app
@@ -51,5 +47,5 @@ RUN python -m pip install --no-cache-dir "uvicorn[standard]" gunicorn fastapi
 # USER "$uid"
 
 
-# # Run FastAPI service 
+# Run FastAPI service 
 CMD ["/start.sh"]
