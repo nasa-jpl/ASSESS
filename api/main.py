@@ -249,15 +249,15 @@ async def recommend_text2(
         vector_indexes,
         list_of_texts,
     )
-    print(type(list_of_predictions))
-    print(type(scores))
+    print(list_of_predictions)
+    print(scores)
     print("RAN PREDICT ***")
     output = {}
     results = {}
     for i, prediction_id in enumerate(list_of_predictions):
         res = es.search(
             index=idx_main,
-            body={"size": 1, "query": {"match": {"id": prediction_id}}},
+            body={"size": 1, "query": {"match": {"doc_number": prediction_id}}},
         )
         print(i)
         print(res)
@@ -290,13 +290,19 @@ async def recommend_file2(
     """
     print("File received")
     in_text = extract_prep.parse_text(pdf)
-    # TODO Elasticsearch
-    df_file = "data/feather_text"
-    list_of_texts = get_list_of_text(df_file)
+    # df_file = "data/feather_text"
+    list_of_texts = extraction.get_list_of_text(es)
+    print(list_of_texts)
+    print(type(list_of_texts))
+    print("Loading into memory ***")
     vectorizers, vector_storage, vector_indexes = extraction.load_into_memory(
         index_types, vectorizer_types
     )
-    extraction.predict(
+    print(type(vectorizers))
+    print(type(vector_storage))
+    print(type(vector_indexes))
+    print("LOADED INTO MEMORY ***")
+    list_of_predictions, scores = extraction.predict(
         in_text,
         size,
         vectorizers,
@@ -304,19 +310,25 @@ async def recommend_file2(
         vector_indexes,
         list_of_texts,
     )
-
-    predictions = extract_prep.predict(file=pdf, size=size)
+    print(list_of_predictions)
+    print(scores)
+    print("RAN PREDICT ***")
     output = {}
     results = {}
     for i, prediction_id in enumerate(list_of_predictions):
         res = es.search(
             index=idx_main,
-            body={"size": 1, "query": {"match": {"id": prediction_id}}},
+            body={"size": 1, "query": {"match": {"doc_number": prediction_id}}},
         )
+        print(i)
+        print(res)
         for hit in res["hits"]["hits"]:
             results = hit["_source"]
+            print(results)
         output[i] = results
         output[i]["similarity"] = scores[i]
+    print("Printing final output ***")
+    print(output)
     json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=in_text)
     print(f"{time.time() - start}")
