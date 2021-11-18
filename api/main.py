@@ -149,8 +149,7 @@ def log_stats(request, data=None, user=None):
 async def train(index_types=["flat", "flat_sklearn"], vectorizer_types=["tf_idf"]):
     print("Starting training...")
     extraction.train(es, index_types, vectorizer_types)
-    return True
-
+    pass
 
 @app.post(
     "/recommend_text",
