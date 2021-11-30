@@ -78,6 +78,14 @@ startMsg = {}
 startMsg["message"] = "*** Starting Server ***"
 fastapi_logger.info(json.dumps(startMsg))
 
+# Globally used
+index_types = ["flat", "flat_sklearn"]
+vectorizer_types = ["tf_idf"]
+list_of_texts = extraction.get_list_of_text(es)
+vectorizers, vector_storage, vector_indexes = extraction.load_into_memory(
+    index_types, vectorizer_types
+)
+
 
 @app.on_event("startup")
 async def startup():
@@ -463,10 +471,4 @@ async def set_standards(request: Request, set_standards: dict):
 
 if __name__ == "__main__":
     # read_logs()
-    index_types = ["flat", "flat_sklearn"]
-    vectorizer_types = ["tf_idf"]
-    list_of_texts = extraction.get_list_of_text(es)
-    vectorizers, vector_storage, vector_indexes = extraction.load_into_memory(
-        index_types, vectorizer_types
-    )
     uvicorn.run(app, host="0.0.0.0", port=8080)
