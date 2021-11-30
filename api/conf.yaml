@@ -2,7 +2,9 @@
 username:
 password:
 url: http://localhost:8080
-df_paths: ["data/source_1, "data/source_2"]
+df_paths:
+  - "data/source_1"
+  - "data/source_2"
 es_server:
   #- localhost
   - elasticsearch
