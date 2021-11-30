@@ -176,72 +176,6 @@ async def train(index_types=["flat", "flat_sklearn"], vectorizer_types=["tf_idf"
     extraction.train(es, index_types, vectorizer_types)
     return True
 
-
-# !Deprecated
-@app.post(
-    "/recommend_text_deprecated",
-    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
-)
-async def recommend_text_deprecated(request: Request, sow: Sow, size: int = 10):
-    """Given an input of Statement of Work as text,
-    return a JSON of recommended standards.
-    """
-    start = time.time()
-    in_text = sow.text_field
-    predictions = extract_prep.predict(in_text=in_text, size=size)
-    output = {}
-    results = {}
-    i = 0
-    for prediction in predictions["recommendations"]:
-        i += 1
-        st_id = prediction["id"]
-        res = es.search(
-            index=idx_main, body={"size": 1, "query": {"match": {"id": st_id}}}
-        )
-        for hit in res["hits"]["hits"]:
-            results = hit["_source"]
-        output[i] = results
-        output[i]["similarity"] = prediction["sim"]
-    # output["embedded_references"] = predictions["embedded_references"]
-    json_compatible_item_data = jsonable_encoder(output)
-    log_stats(request, data=in_text)
-    print(f"{time.time() - start}")
-    return JSONResponse(content=json_compatible_item_data)
-
-
-# !Deprecated
-@app.post(
-    "/recommend_file_deprecated",
-    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
-)
-async def recommend_file_deprecated(
-    request: Request, pdf: UploadFile = File(...), size: int = 10
-):
-    """Given an input of a Statement of Work as a PDF,
-    return a JSON of recommended standards.
-    """
-    print("File received")
-    predictions = extract_prep.predict(file=pdf, size=size)
-    output = {}
-    results = {}
-    i = 0
-    for prediction in predictions["recommendations"]:
-        i += 1
-        st_id = prediction["id"]
-        res = es.search(
-            index=idx_main, body={"size": 1, "query": {"match": {"id": st_id}}}
-        )
-        for hit in res["hits"]["hits"]:
-            results = hit["_source"]
-        output[i] = results
-        output[i]["similarity"] = prediction["sim"]
-    # output["embedded_references"] = predictions["embedded_references"]
-    json_compatible_item_data = jsonable_encoder(output)
-    log_stats(request, data=pdf.filename)
-    # Add line here to save file?
-    return JSONResponse(content=json_compatible_item_data)
-
-
 @app.post(
     "/recommend_text",
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
@@ -447,9 +381,9 @@ async def add_standards(request: Request, doc: dict):
     response_class=HTMLResponse,
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
-async def edit_standards(request: Request, id: str, doc: dict):
+async def edit_standards(request: Request, doc: dict):
     """Add standards to the main Elasticsearch index by PUTTING a JSON request here."""
-    res = es.update(index=idx_main, id=id, body=json.dumps(doc))
+    res = es.update(index=idx_main, id=doc["id"], body=json.dumps(doc))
     print(res)
     json_compatible_item_data = jsonable_encoder(doc)
     log_stats(request, data=doc)
@@ -461,13 +395,13 @@ async def edit_standards(request: Request, id: str, doc: dict):
     response_class=HTMLResponse,
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
-async def delete_standards(request: Request, id: str, doc: dict):
+async def delete_standards(request: Request, id: str):
     """Delete standards to the main Elasticsearch index by PUTTING a JSON request here."""
     # TODO: Once we are connected to LDAP, add line to verify auth of Admin.
     res = es.delete(index=idx_main, id=id)
     print(res)
-    json_compatible_item_data = jsonable_encoder(doc)
-    log_stats(request, data=doc)
+    json_compatible_item_data = jsonable_encoder(res)
+    log_stats(request, data=res)
     return JSONResponse(content=json_compatible_item_data)
 
 
