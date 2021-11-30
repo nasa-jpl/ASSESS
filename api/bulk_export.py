@@ -10,6 +10,7 @@ import ast
 import pyarrow.feather as feather
 from pandas.io.json import json_normalize
 from collections import deque
+import yaml
 
 
 def es_to_df(es, index, path="data/feather_text"):
@@ -159,10 +160,12 @@ def es_to_json(client, local_file, index):
     return
 
 
-def df_to_es(df_path, index, client):
+def df_to_es(df_path, index, client, overwrite=False):
     """Read dataframe and insert into index."""
-    client.indices.delete(index, ignore=[400, 404])
-    client.indices.create(index, ignore=400)
+    # !Important, this will start your index from scratch.
+    if overwrite:
+        client.indices.delete(index, ignore=[400, 404])
+        client.indices.create(index, ignore=400)
     df = feather.read_feather(df_path)
     bulk(client, doc_generator(df, index))
     return
@@ -182,11 +185,15 @@ def es_to_es(client, index, new_index):
     return
 
 
-old_index = "iso_final_clean"
-new_index = "assess_remap"
+with open("conf.yaml", "r") as stream:
+    conf = yaml.safe_load(stream)
+df_paths = conf.get("df_paths")
+new_index = conf.get("es_index_main")
 client = Elasticsearch(http_compress=True)
-df_path = "data/feather_text"
-# es_to_es(client, old_index, new_index)
 # es_to_json(client, "elasticsearch-dump.json", index)
-df_to_es(df_path, new_index, client)
+for i, df_path in enumerate(df_paths):
+    if i == 1:
+        df_to_es(df_path, new_index, client, overwrite=True)
+    else:
+        df_to_es(df_path, new_index, client)
 # es_to_df(client, new_index)
