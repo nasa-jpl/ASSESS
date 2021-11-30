@@ -194,7 +194,7 @@ client = Elasticsearch(http_compress=True)
 # es_to_json(client, "elasticsearch-dump.json", index)
 for i, df_path in enumerate(df_paths):
     if i == 0:
-        df_to_es(df_path, new_index, client, overwrite=True, normalize=True)
+        df_to_es(df_path, new_index[0], client, overwrite=True, normalize=True)
     else:
-        df_to_es(df_path, new_index, client)
+        df_to_es(df_path, new_index[0], client)
 # es_to_df(client, new_index)
