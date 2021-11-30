@@ -3,6 +3,7 @@ username:
 password:
 url: http://localhost:8080
 
+df_paths: ["data/feather.txt"]
 es_server:
   #- localhost
   - elasticsearch
