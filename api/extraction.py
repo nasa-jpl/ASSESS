@@ -106,12 +106,13 @@ def train(es, index_types, vectorizer_types):
         vectors = create_vectors(
             list_of_texts, type=vectorizer_type, vectorizers=vectorizers
         )
-        # TODO: get ES IDs
+        # TODO: remove line
         ES_ids = list(range(len(vectors)))  # using dummy values
         vector_storage.apply(
             "plugins.Vector_Storage",
             "basic",
             "add_update_vectors",
+            # TODO: Pass as a list of ES_ids
             {"ids": ES_ids, "vectors": vectors, "vec_type": vectorizer_type},
         )
 
@@ -145,8 +146,8 @@ def predict(
     vector_storage,
     vector_indexes,
     list_of_texts,
-    vectorizer_types=["tf_idf"],
-    index_types=["flat"],
+    vectorizer_types,
+    index_types,
 ):
     for vectorizer_type in vectorizer_types:
         begin = datetime.datetime.now()
@@ -183,6 +184,8 @@ def get_list_of_text(es=None):
     df = es_to_df(es)
     print(df)
     # print(df.columns)
+    # TODO: get this information from the text column.
+    # return the text and the elasticsearch ids
     return list(df["title"] + ". " + df["description"])
 
 
@@ -223,4 +226,6 @@ if __name__ == "__main__":
             vector_storage,
             vector_indexes,
             list_of_texts,
+            vectorizer_types,
+            index_types,
         )
