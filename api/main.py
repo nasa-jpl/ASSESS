@@ -110,16 +110,17 @@ def log_stats(request, data=None, user=None):
     es.index(index=idx_log, body=json.dumps(msg))
     return
 
+
 def run_predict(request, start, in_text, size, vectorizer_types, index_types):
     list_of_predictions, scores = extraction.predict(
-    in_text,
-    size,
-    vectorizers,
-    vector_storage,
-    vector_indexes,
-    list_of_texts,
-    vectorizer_types,
-    index_types,
+        in_text,
+        size,
+        vectorizers,
+        vector_storage,
+        vector_indexes,
+        list_of_texts,
+        vectorizer_types,
+        index_types,
     )
     output = {}
     for i, prediction_id in enumerate(list_of_predictions):
@@ -135,6 +136,7 @@ def run_predict(request, start, in_text, size, vectorizer_types, index_types):
     log_stats(request, data=in_text)
     print(f"{time.time() - start}")
     return JSONResponse(content=json_compatible_item_data)
+
 
 # @app.post(
 #     "/recommend_text",
@@ -175,6 +177,7 @@ async def train(index_types=["flat", "flat_sklearn"], vectorizer_types=["tf_idf"
     print("Starting training...")
     extraction.train(es, index_types, vectorizer_types)
     return True
+
 
 @app.post(
     "/recommend_text",
@@ -451,7 +454,8 @@ async def set_standards(request: Request, set_standards: dict):
 
 if __name__ == "__main__":
     # read_logs()
-    index_types=["flat", "flat_sklearn"], vectorizer_types=["tf_idf"]
+    index_types = ["flat", "flat_sklearn"]
+    vectorizer_types = ["tf_idf"]
     list_of_texts = extraction.get_list_of_text(es)
     vectorizers, vector_storage, vector_indexes = extraction.load_into_memory(
         index_types, vectorizer_types
