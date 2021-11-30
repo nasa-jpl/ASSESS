@@ -58,13 +58,14 @@ def series_to_json(doc):
     return document_out
 
 
-def doc_generator(df, index):
+def doc_generator(df, index, normalize):
     df_iter = df.iterrows()
     for i, doc in df_iter:
         print(i)
         # print(doc.to_json())
         doc = json.loads(doc.to_json())
-        doc = series_to_json(doc)
+        if normalize:
+            doc = series_to_json(doc)
         print(json.dumps(doc, indent=4))
         yield {
             "_index": index,
@@ -160,14 +161,14 @@ def es_to_json(client, local_file, index):
     return
 
 
-def df_to_es(df_path, index, client, overwrite=False):
+def df_to_es(df_path, index, client, overwrite=False, normalize=False):
     """Read dataframe and insert into index."""
     # !Important, this will start your index from scratch.
     if overwrite:
         client.indices.delete(index, ignore=[400, 404])
         client.indices.create(index, ignore=400)
     df = feather.read_feather(df_path)
-    bulk(client, doc_generator(df, index))
+    bulk(client, doc_generator(df, index, normalize))
     return
 
 
@@ -192,8 +193,8 @@ new_index = conf.get("es_index_main")
 client = Elasticsearch(http_compress=True)
 # es_to_json(client, "elasticsearch-dump.json", index)
 for i, df_path in enumerate(df_paths):
-    if i == 1:
-        df_to_es(df_path, new_index, client, overwrite=True)
+    if i == 0:
+        df_to_es(df_path, new_index, client, overwrite=True, normalize=True)
     else:
         df_to_es(df_path, new_index, client)
 # es_to_df(client, new_index)
