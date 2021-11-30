@@ -386,7 +386,15 @@ async def add_standards(request: Request, doc: dict):
 )
 async def edit_standards(request: Request, doc: dict):
     """Add standards to the main Elasticsearch index by PUTTING a JSON request here."""
-    res = es.update(index=idx_main, id=doc["id"], body=json.dumps(doc))
+    body = json.dumps(doc)
+    print("**BODY")
+    print(body)
+    id = body["id"]
+    print(id)
+    # res = es.update_by_query(
+    #     index=idx_main, body={"size": 1, "query": {"match": {"id": id}}}
+    # )
+    res = es.update(index=idx_main, id=id, body=body)
     print(res)
     json_compatible_item_data = jsonable_encoder(doc)
     log_stats(request, data=doc)
@@ -401,7 +409,10 @@ async def edit_standards(request: Request, doc: dict):
 async def delete_standards(request: Request, id: str):
     """Delete standards to the main Elasticsearch index by PUTTING a JSON request here."""
     # TODO: Once we are connected to LDAP, add line to verify auth of Admin.
-    res = es.delete(index=idx_main, id=id)
+    # res = es.delete(index=idx_main, id=id)
+    res = es.delete_by_query(
+        index=idx_main, body={"size": 1, "query": {"match": {"id": id}}}
+    )
     print(res)
     json_compatible_item_data = jsonable_encoder(res)
     log_stats(request, data=res)
