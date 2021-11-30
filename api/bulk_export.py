@@ -11,6 +11,7 @@ import pyarrow.feather as feather
 from pandas.io.json import json_normalize
 from collections import deque
 import yaml
+import requests
 
 
 def es_to_df(es, index, path="data/feather_text"):
@@ -186,6 +187,16 @@ def es_to_es(client, index, new_index):
     return
 
 
+def train():
+    # Train
+    print("Training...")
+    root = conf.get("url")
+    requests.post(
+        f"{root}/train",
+    )
+    return True
+
+
 with open("conf.yaml", "r") as stream:
     conf = yaml.safe_load(stream)
 df_paths = conf.get("df_paths")
@@ -197,4 +208,5 @@ for i, df_path in enumerate(df_paths):
         df_to_es(df_path, new_index[0], client, overwrite=True, normalize=True)
     else:
         df_to_es(df_path, new_index[0], client)
-# es_to_df(client, new_index)
+    # es_to_df(client, new_index)
+train()
