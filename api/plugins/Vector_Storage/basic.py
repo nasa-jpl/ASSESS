@@ -30,7 +30,7 @@ class Basic(Template):
     def _save_to_disk(self):
         with open("data/basic_vector_storage.pk", "wb") as storage:
             pickle.dump(self.vector_storage, storage)
-        with open("basic_sorted_ids.pk", "wb") as ids:
+        with open("data/basic_sorted_ids.pk", "wb") as ids:
             pickle.dump(self.sorted_ids, ids)
 
     def _load_from_disk(self):
