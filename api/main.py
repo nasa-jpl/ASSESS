@@ -78,6 +78,14 @@ startMsg = {}
 startMsg["message"] = "*** Starting Server ***"
 fastapi_logger.info(json.dumps(startMsg))
 
+# Globally used
+index_types = ["flat", "flat_sklearn"]
+vectorizer_types = ["tf_idf"]
+list_of_texts = extraction.get_list_of_text(es)
+vectorizers, vector_storage, vector_indexes = extraction.load_into_memory(
+    index_types, vectorizer_types
+)
+
 
 @app.on_event("startup")
 async def startup():
@@ -109,6 +117,33 @@ def log_stats(request, data=None, user=None):
     fastapi_logger.info(json.dumps(msg))
     es.index(index=idx_log, body=json.dumps(msg))
     return
+
+
+def run_predict(request, start, in_text, size, vectorizer_types, index_types):
+    list_of_predictions, scores = extraction.predict(
+        in_text,
+        size,
+        vectorizers,
+        vector_storage,
+        vector_indexes,
+        list_of_texts,
+        vectorizer_types,
+        index_types,
+    )
+    output = {}
+    for i, prediction_id in enumerate(list_of_predictions):
+        res = es.search(
+            index=idx_main,
+            body={"size": 1, "query": {"match": {"doc_number": prediction_id}}},
+        )
+        for hit in res["hits"]["hits"]:
+            results = hit["_source"]
+        output[i] = results
+        output[i]["similarity"] = scores[i]
+    json_compatible_item_data = jsonable_encoder(output)
+    log_stats(request, data=in_text)
+    print(f"{time.time() - start}")
+    return JSONResponse(content=json_compatible_item_data)
 
 
 # @app.post(
@@ -147,10 +182,8 @@ def log_stats(request, data=None, user=None):
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
 async def train(index_types=["flat", "flat_sklearn"], vectorizer_types=["tf_idf"]):
-    # TODO Elasticsearch
-    df_file = "data/feather_text"
-    list_of_texts = get_list_of_text(df_file)
-    extraction.train(index_types, vectorizer_types, list_of_texts)
+    print("Starting training...")
+    extraction.train(es, index_types, vectorizer_types)
     return True
 
 
@@ -158,158 +191,39 @@ async def train(index_types=["flat", "flat_sklearn"], vectorizer_types=["tf_idf"
     "/recommend_text",
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
-async def recommend_text(request: Request, sow: Sow, size: int = 10):
+async def recommend_text(
+    request: Request,
+    sow: Sow,
+    size: int = 10,
+    index_types=["flat"],
+    vectorizer_types=["tf_idf"],
+):
     """Given an input of Statement of Work as text,
     return a JSON of recommended standards.
     """
-    start = time.time()
     in_text = sow.text_field
-    predictions = extract_prep.predict(in_text=in_text, size=size)
-    output = {}
-    results = {}
-    i = 0
-    for prediction in predictions["recommendations"]:
-        i += 1
-        st_id = prediction["id"]
-        res = es.search(
-            index=idx_main, body={"size": 1, "query": {"match": {"id": st_id}}}
-        )
-        for hit in res["hits"]["hits"]:
-            results = hit["_source"]
-        output[i] = results
-        output[i]["similarity"] = prediction["sim"]
-    # output["embedded_references"] = predictions["embedded_references"]
-    json_compatible_item_data = jsonable_encoder(output)
-    log_stats(request, data=in_text)
-    print(f"{time.time() - start}")
-    return JSONResponse(content=json_compatible_item_data)
+    # df_file = "data/feather_text"
+    run_predict(request, time.time(), in_text, size, vectorizer_types, index_types)
 
 
 @app.post(
     "/recommend_file",
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
-async def recommend_file(request: Request, pdf: UploadFile = File(...), size: int = 10):
-    """Given an input of a Statement of Work as a PDF,
-    return a JSON of recommended standards.
-    """
-    print("File received")
-    predictions = extract_prep.predict(file=pdf, size=size)
-    output = {}
-    results = {}
-    i = 0
-    for prediction in predictions["recommendations"]:
-        i += 1
-        st_id = prediction["id"]
-        res = es.search(
-            index=idx_main, body={"size": 1, "query": {"match": {"id": st_id}}}
-        )
-        for hit in res["hits"]["hits"]:
-            results = hit["_source"]
-        output[i] = results
-        output[i]["similarity"] = prediction["sim"]
-    # output["embedded_references"] = predictions["embedded_references"]
-    json_compatible_item_data = jsonable_encoder(output)
-    log_stats(request, data=pdf.filename)
-    # Add line here to save file?
-    return JSONResponse(content=json_compatible_item_data)
-
-
-@app.post(
-    "/recommend_text2",
-    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
-)
-async def recommend_text2(
-    request: Request,
-    sow: Sow,
-    size: int = 10,
-    index_types=["flat", "flat_sklearn"],
-    vectorizer_types=["tf_idf"],
-):
-    """Given an input of Statement of Work as text,
-    return a JSON of recommended standards.
-    """
-    start = time.time()
-    in_text = sow.text_field
-    # TODO Elasticsearch
-    df_file = "data/feather_text"
-    list_of_texts = get_list_of_text(df_file)
-    vectorizers, vector_storage, vector_indexes = extraction.load_into_memory(
-        index_types, vectorizer_types
-    )
-    list_of_predictions, scores = extraction.predict(
-        in_text,
-        size,
-        vectorizers,
-        vector_storage,
-        vector_indexes,
-        list_of_texts,
-    )
-    output = {}
-    results = {}
-    for i, prediction_id in enumerate(list_of_predictions):
-        res = es.search(
-            index=idx_main,
-            body={"size": 1, "query": {"match": {"id": prediction_id}}},
-        )
-        print(res)
-        for hit in res["hits"]["hits"]:
-            results = hit["_source"]
-        output[i] = results
-        output[i]["similarity"] = scores[i]
-    json_compatible_item_data = jsonable_encoder(output)
-    log_stats(request, data=in_text)
-    print(f"{time.time() - start}")
-    return JSONResponse(content=json_compatible_item_data)
-
-
-@app.post(
-    "/recommend_file2",
-    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
-)
-async def recommend_file2(
+async def recommend_file(
     request: Request,
     pdf: UploadFile = File(...),
     size: int = 10,
-    index_types=["flat", "flat_sklearn"],
+    index_types=["flat"],
     vectorizer_types=["tf_idf"],
 ):
     """Given an input of a Statement of Work as a PDF,
     return a JSON of recommended standards.
     """
-    print("File received")
+    print("File received.")
     in_text = extract_prep.parse_text(pdf)
-    # TODO Elasticsearch
-    df_file = "data/feather_text"
-    list_of_texts = get_list_of_text(df_file)
-    vectorizers, vector_storage, vector_indexes = extraction.load_into_memory(
-        index_types, vectorizer_types
-    )
-    extraction.predict(
-        in_text,
-        size,
-        vectorizers,
-        vector_storage,
-        vector_indexes,
-        list_of_texts,
-    )
-
-    predictions = extract_prep.predict(file=pdf, size=size)
-    output = {}
-    results = {}
-    for i, prediction_id in enumerate(list_of_predictions):
-        res = es.search(
-            index=idx_main,
-            body={"size": 1, "query": {"match": {"id": prediction_id}}},
-        )
-        for hit in res["hits"]["hits"]:
-            results = hit["_source"]
-        output[i] = results
-        output[i]["similarity"] = scores[i]
-    json_compatible_item_data = jsonable_encoder(output)
-    log_stats(request, data=in_text)
-    print(f"{time.time() - start}")
-    return JSONResponse(content=json_compatible_item_data)
+    # df_file = "data/feather_text"
+    run_predict(request, time.time(), in_text, size, vectorizer_types, index_types)
 
 
 @app.post(
@@ -459,14 +373,13 @@ async def search(
     return JSONResponse(content=results)
 
 
-@app.put(
+@app.post(
     "/add_standards",
     response_class=HTMLResponse,
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
 async def add_standards(request: Request, doc: dict):
     """Add standards to the main Elasticsearch index by PUTTING a JSON request here."""
-    # TODO: Check Standard body.
     res = es.index(index=idx_main, body=json.dumps(doc))
     print(res)
     json_compatible_item_data = jsonable_encoder(doc)
@@ -481,26 +394,34 @@ async def add_standards(request: Request, doc: dict):
 )
 async def edit_standards(request: Request, doc: dict):
     """Add standards to the main Elasticsearch index by PUTTING a JSON request here."""
-    # TODO: Check Standard body. Test update.
-    res = es.update(index=idx_main, body=json.dumps(doc))
+    body = json.dumps(doc)
+    res = es.search(
+        index="assess_remap",
+        query={"match": {"id": doc["id"]}},
+    )
+    _id = res["hits"]["hits"][0]["_id"]
+    res = es.update(index=idx_main, id=_id, body=json.dumps(doc))  # body={"doc": doc})
     print(res)
     json_compatible_item_data = jsonable_encoder(doc)
     log_stats(request, data=doc)
     return JSONResponse(content=json_compatible_item_data)
 
 
-@app.put(
+@app.delete(
     "/delete_standards",
     response_class=HTMLResponse,
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
-async def delete_standards(request: Request, doc: dict):
-    """Add standards to the main Elasticsearch index by PUTTING a JSON request here."""
-    # TODO: Check Standard body. Test deletion.
-    res = es.delete(index=idx_main, body=json.dumps(doc))
+async def delete_standards(request: Request, id: str):
+    """Delete standards to the main Elasticsearch index by PUTTING a JSON request here."""
+    # TODO: Once we are connected to LDAP, add line to verify auth of Admin.
+    # res = es.delete(index=idx_main, id=id)
+    res = es.delete_by_query(
+        index=idx_main, body={"size": 1, "query": {"match": {"id": id}}}
+    )
     print(res)
-    json_compatible_item_data = jsonable_encoder(doc)
-    log_stats(request, data=doc)
+    json_compatible_item_data = jsonable_encoder(res)
+    log_stats(request, data=res)
     return JSONResponse(content=json_compatible_item_data)
 
 

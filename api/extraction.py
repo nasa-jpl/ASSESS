@@ -89,8 +89,9 @@ def load_into_memory(index_types, vectorizer_types):
     return vectorizers, vector_storage, vector_indexes
 
 
-def train(index_types, vectorizer_types, list_of_texts):
+def train(es, index_types, vectorizer_types):
     # ==== train vectorizers (needs to train on all standards in the corpus)
+    list_of_texts = get_list_of_text(es)
     vectorizers = PluginCollection()
     print("\nTraining Vectorizers...")
     for vectorizer_type in vectorizer_types:
@@ -105,34 +106,15 @@ def train(index_types, vectorizer_types, list_of_texts):
         vectors = create_vectors(
             list_of_texts, type=vectorizer_type, vectorizers=vectorizers
         )
-        # TODO: get ES IDs
+        # TODO: remove line
         ES_ids = list(range(len(vectors)))  # using dummy values
         vector_storage.apply(
             "plugins.Vector_Storage",
             "basic",
             "add_update_vectors",
+            # TODO: Pass as a list of ES_ids
             {"ids": ES_ids, "vectors": vectors, "vec_type": vectorizer_type},
         )
-    vector_indexes = {}
-    print("\nCreating Indexes...")
-    for vectorizer_type in vectorizer_types:
-        vectors, _ = vector_storage.apply(
-            "plugins.Vector_Storage",
-            "basic",
-            "get_all_vectors",
-            {"vec_type": vectorizer_type},
-        )
-        indexes = PluginCollection()
-        for index_type in index_types:
-            print("vectorizer_type:", vectorizer_type, "|| index_type:", index_type)
-            create_indexes(
-                vectors,
-                type=index_type,
-                indexes=indexes,
-                name=vectorizer_type + "_" + index_type,
-            )
-        vector_indexes[vectorizer_type] = indexes
-    return vectorizers, vector_storage, vector_indexes
 
     # ==== create indexes (one or many kind for each vectorizer i.e. type of vector)
     vector_indexes = {}
@@ -164,8 +146,8 @@ def predict(
     vector_storage,
     vector_indexes,
     list_of_texts,
-    vectorizer_types=["tf_idf"],
-    index_types=["flat"],
+    vectorizer_types,
+    index_types,
 ):
     for vectorizer_type in vectorizer_types:
         begin = datetime.datetime.now()
@@ -194,51 +176,56 @@ def predict(
             # iso_data = pd.read_feather("data/feather_text")
             # for ES_id in top_n_ES_ids[:n]:
             #     print(ES_id, list_of_texts[ES_id])
-    print(top_n_ES_ids[:n])
-    print(scores)
-    return top_n_ES_ids[:n], scores
+    return top_n_ES_ids[:n], scores.tolist()
 
 
-def get_list_of_text():
-    df = pd.read_feather("data/feather_text")
-    # df = es_to_df
+def get_list_of_text(es=None):
+    # df = pd.read_feather("data/feather_text")
+    df = es_to_df(es)
+    print(df)
     # print(df.columns)
+    # TODO: get this information from the text column.
+    # return the text and the elasticsearch ids
     return list(df["title"] + ". " + df["description"])
 
 
-def es_to_df(index="assess_remap", path="data/feather_text"):
-    es = Elasticsearch(http_compress=True)
-    res = list(scan(es, query={}, index=index))
-    output_all = deque()
-    output_all.extend([x["_source"] for x in res])
-    df = json_normalize(output_all)
+def es_to_df(es=None, index="assess_remap", path="data/feather_text"):
+    if not es:
+        df = pd.read_feather("data/feather_text")
+    else:
+        res = list(scan(es, query={}, index=index))
+        output_all = deque()
+        output_all.extend([x["_source"] for x in res])
+        df = json_normalize(output_all)
     return df
 
 
 if __name__ == "__main__":
+    # es = Elasticsearch(http_compress=True)
+    es = None
     do_training = True
     index_types = ["flat", "flat_sklearn"]
     vectorizer_types = ["tf_idf"]
-    list_of_texts = get_list_of_text()
+    list_of_texts = get_list_of_text(es)
     # list_of_texts=['computer science', 'space science', 'global summit for dummies', 'deep neural nets', 'technology consultants',
     #                'space science', 'global summit for dummies', 'deep neural nets', 'technology consultants',
     #                '', '', '', '']
     print("Number of Standards text to process:", len(list_of_texts))
     if do_training:
-        vectorizers, vector_storage, vector_indexes = train(
-            index_types, vectorizer_types, list_of_texts
-        )
+        train(es, index_types, vectorizer_types)
     else:
         vectorizers, vector_storage, vector_indexes = load_into_memory(
             index_types, vectorizer_types
         )
-    # ==== retrieve
-    print("\nRetrieving results...")
-    predict(
-        "Computer software and stuff!!!",
-        10,
-        vectorizers,
-        vector_storage,
-        vector_indexes,
-        list_of_texts,
-    )
+        # ==== retrieve
+        print("\nRetrieving results...")
+        predict(
+            "Computer software and stuff!!!",
+            10,
+            vectorizers,
+            vector_storage,
+            vector_indexes,
+            list_of_texts,
+            vectorizer_types,
+            index_types,
+        )

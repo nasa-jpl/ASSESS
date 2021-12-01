@@ -60,28 +60,28 @@ services:
       - "redis-1-data:/data"
     networks:
       - "jointops"
-
     # If data integrity is important leave the following,
     # if not, remove it.
     # command: ["redis-server", "--appendonly", "yes"]
 
   fastapi:
+    # tty: true
     container_name: fastapi
-    user: &uid "1000:1000"
+    # user: &uid "1000:1000"
     build:
       context: api
       dockerfile: Dockerfile
-      args:
-        uid: *uid
+      # args:
+      #  uid: *uid
     environment:
       REDIS_SERVER: *redis_server
       ES_SERVER: *es_server
       ES_INDEX_MAIN: "assess_remap"
       ES_INDEX_LOGS: "sys_logs"
       ES_INDEX_STATS: "user_stats"
-    read_only: true
-    cap_drop:
-      - ALL
+    # read_only: true
+    # cap_drop:
+    # - ALL
     ports:
       - "8080:8080"
     networks:
@@ -111,7 +111,7 @@ networks:
 
 volumes:
   # fastapi-data:
-  fastapi-log:
-  redis-1-data:
-  elasticsearch-1-data:
-  elasticsearch-1-logs:
+  fastapi-log: null
+  redis-1-data: null
+  elasticsearch-1-data: null
+  elasticsearch-1-logs: null
