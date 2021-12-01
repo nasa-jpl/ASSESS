@@ -78,14 +78,6 @@ startMsg = {}
 startMsg["message"] = "*** Starting Server ***"
 fastapi_logger.info(json.dumps(startMsg))
 
-# Globally used
-index_types = ["flat", "flat_sklearn"]
-vectorizer_types = ["tf_idf"]
-list_of_texts = extraction.get_list_of_text(es)
-vectorizers, vector_storage, vector_indexes = extraction.load_into_memory(
-    index_types, vectorizer_types
-)
-
 
 @app.on_event("startup")
 async def startup():
@@ -120,6 +112,14 @@ def log_stats(request, data=None, user=None):
 
 
 def run_predict(request, start, in_text, size, vectorizer_types, index_types):
+
+    # Globally used
+    index_types = ["flat", "flat_sklearn"]
+    vectorizer_types = ["tf_idf"]
+    list_of_texts = extraction.get_list_of_text(es)
+    vectorizers, vector_storage, vector_indexes = extraction.load_into_memory(
+        index_types, vectorizer_types
+    )
     list_of_predictions, scores = extraction.predict(
         in_text,
         size,
