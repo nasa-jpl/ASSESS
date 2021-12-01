@@ -3,23 +3,23 @@ import pickle
 import os
 import numpy as np
 
+
 class Basic(Template):
     def __init__(self):
         super().__init__()
-        self.description = 'for storing Dense Vectors'
+        self.description = "for storing Dense Vectors"
         if self._exists_on_disk():
             self._load_from_disk()
         else:
             self.sorted_ids = {}
             self.vector_storage = {}
 
-
     def _add_update_vector(self, id, vector, vec_type):
         if vec_type not in self.vector_storage.keys():
-            self.vector_storage[vec_type]={}
+            self.vector_storage[vec_type] = {}
         self.vector_storage[vec_type][id] = vector
         if vec_type not in self.sorted_ids.keys():
-            self.sorted_ids[vec_type]=[]
+            self.sorted_ids[vec_type] = []
         if id not in self.sorted_ids[vec_type]:
             self.sorted_ids[vec_type].append(id)
 
@@ -28,26 +28,27 @@ class Basic(Template):
         self.sorted_ids[vec_type].remove(id)
 
     def _save_to_disk(self):
-        with open('basic_vector_storage.pk', 'wb') as storage:
+        with open("data/basic_vector_storage.pk", "wb") as storage:
             pickle.dump(self.vector_storage, storage)
-        with open('basic_sorted_ids.pk', 'wb') as ids:
+        with open("basic_sorted_ids.pk", "wb") as ids:
             pickle.dump(self.sorted_ids, ids)
 
     def _load_from_disk(self):
-        self.vector_storage = pickle.load(open('basic_vector_storage.pk', 'rb'))
-        self.sorted_ids = pickle.load(open('basic_sorted_ids.pk', 'rb'))
+        self.vector_storage = pickle.load(open("data/basic_vector_storage.pk", "rb"))
+        self.sorted_ids = pickle.load(open("data/basic_sorted_ids.pk", "rb"))
 
     def _exists_on_disk(self):
-        if os.path.exists('basic_vector_storage.pk') and os.path.exists(
-                'basic_sorted_ids.pk'):
+        if os.path.exists("data/basic_vector_storage.pk") and os.path.exists(
+            "data/basic_sorted_ids.pk"
+        ):
             return True
         return False
 
     def clean_storage(self):
         self.sorted_ids = {}
         self.vector_storage = {}
-        os.remove('basic_vector_storage.pk')
-        os.remove('basic_sorted_ids.pk')
+        os.remove("data/basic_vector_storage.pk")
+        os.remove("data/basic_sorted_ids.pk")
 
     def add_update_vectors(self, ids, vectors, vec_type):
         for id, vector in zip(ids, vectors.tolist()):
@@ -60,15 +61,13 @@ class Basic(Template):
         self._save_to_disk()
 
     def get_all_vectors(self, vec_type):
-        vectors=[]
+        vectors = []
         for id in self.sorted_ids[vec_type]:
             vectors.append(self.vector_storage[vec_type][id])
         return np.array(vectors), self.sorted_ids[vec_type]
 
     def get_vector_Ids(self, vector_indexes, vec_type):
-        Ids=[]
+        Ids = []
         for idx in vector_indexes:
-          Ids.append(self.sorted_ids[vec_type][idx])
+            Ids.append(self.sorted_ids[vec_type][idx])
         return Ids
-
-
