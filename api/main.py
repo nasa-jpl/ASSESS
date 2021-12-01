@@ -114,8 +114,8 @@ def log_stats(request, data=None, user=None):
 def run_predict(request, start, in_text, size, vectorizer_types, index_types):
 
     # Globally used
-    index_types = ["flat", "flat_sklearn"]
-    vectorizer_types = ["tf_idf"]
+    # vectorizer_types = ["tf_idf"]
+    # index_types = ["flat"]
     list_of_texts = extraction.get_list_of_text(es)
     vectorizers, vector_storage, vector_indexes = extraction.load_into_memory(
         index_types, vectorizer_types
@@ -195,8 +195,8 @@ async def recommend_text(
     request: Request,
     sow: Sow,
     size: int = 10,
-    index_types=["flat"],
     vectorizer_types=["tf_idf"],
+    index_types=["flat"],
 ):
     """Given an input of Statement of Work as text,
     return a JSON of recommended standards.
@@ -216,8 +216,8 @@ async def recommend_file(
     request: Request,
     pdf: UploadFile = File(...),
     size: int = 10,
-    index_types=["flat"],
     vectorizer_types=["tf_idf"],
+    index_types=["flat"],
 ):
     """Given an input of a Statement of Work as a PDF,
     return a JSON of recommended standards.
