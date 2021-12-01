@@ -203,7 +203,9 @@ async def recommend_text(
     """
     in_text = sow.text_field
     # df_file = "data/feather_text"
-    run_predict(request, time.time(), in_text, size, vectorizer_types, index_types)
+    return run_predict(
+        request, time.time(), in_text, size, vectorizer_types, index_types
+    )
 
 
 @app.post(
@@ -223,7 +225,9 @@ async def recommend_file(
     print("File received.")
     in_text = extract_prep.parse_text(pdf)
     # df_file = "data/feather_text"
-    run_predict(request, time.time(), in_text, size, vectorizer_types, index_types)
+    return run_predict(
+        request, time.time(), in_text, size, vectorizer_types, index_types
+    )
 
 
 @app.post(
