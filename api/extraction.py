@@ -219,7 +219,7 @@ if __name__ == "__main__":
         )
         # ==== retrieve
         print("\nRetrieving results...")
-        predict(
+        r = predict(
             "Computer software and stuff!!!",
             10,
             vectorizers,
@@ -229,3 +229,4 @@ if __name__ == "__main__":
             vectorizer_types,
             index_types,
         )
+        print(r)
