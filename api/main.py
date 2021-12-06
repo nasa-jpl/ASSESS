@@ -78,14 +78,6 @@ startMsg = {}
 startMsg["message"] = "*** Starting Server ***"
 fastapi_logger.info(json.dumps(startMsg))
 
-# Globally used
-index_types = ["flat", "flat_sklearn"]
-vectorizer_types = ["tf_idf"]
-list_of_texts = extraction.get_list_of_text(es)
-vectorizers, vector_storage, vector_indexes = extraction.load_into_memory(
-    index_types, vectorizer_types
-)
-
 
 @app.on_event("startup")
 async def startup():
@@ -120,6 +112,14 @@ def log_stats(request, data=None, user=None):
 
 
 def run_predict(request, start, in_text, size, vectorizer_types, index_types):
+
+    # Globally used
+    # vectorizer_types = ["tf_idf"]
+    # index_types = ["flat"]
+    list_of_texts = extraction.get_list_of_text(es)
+    vectorizers, vector_storage, vector_indexes = extraction.load_into_memory(
+        index_types, vectorizer_types
+    )
     list_of_predictions, scores = extraction.predict(
         in_text,
         size,
@@ -195,15 +195,17 @@ async def recommend_text(
     request: Request,
     sow: Sow,
     size: int = 10,
-    index_types=["flat"],
     vectorizer_types=["tf_idf"],
+    index_types=["flat"],
 ):
     """Given an input of Statement of Work as text,
     return a JSON of recommended standards.
     """
     in_text = sow.text_field
     # df_file = "data/feather_text"
-    run_predict(request, time.time(), in_text, size, vectorizer_types, index_types)
+    return run_predict(
+        request, time.time(), in_text, size, vectorizer_types, index_types
+    )
 
 
 @app.post(
@@ -214,8 +216,8 @@ async def recommend_file(
     request: Request,
     pdf: UploadFile = File(...),
     size: int = 10,
-    index_types=["flat"],
     vectorizer_types=["tf_idf"],
+    index_types=["flat"],
 ):
     """Given an input of a Statement of Work as a PDF,
     return a JSON of recommended standards.
@@ -223,7 +225,9 @@ async def recommend_file(
     print("File received.")
     in_text = extract_prep.parse_text(pdf)
     # df_file = "data/feather_text"
-    run_predict(request, time.time(), in_text, size, vectorizer_types, index_types)
+    return run_predict(
+        request, time.time(), in_text, size, vectorizer_types, index_types
+    )
 
 
 @app.post(
@@ -394,13 +398,12 @@ async def add_standards(request: Request, doc: dict):
 )
 async def edit_standards(request: Request, doc: dict):
     """Add standards to the main Elasticsearch index by PUTTING a JSON request here."""
-    body = json.dumps(doc)
     res = es.search(
         index="assess_remap",
         query={"match": {"id": doc["id"]}},
     )
     _id = res["hits"]["hits"][0]["_id"]
-    res = es.update(index=idx_main, id=_id, body=json.dumps(doc))  # body={"doc": doc})
+    res = es.update(index=idx_main, id=_id, body={"doc": doc})
     print(res)
     json_compatible_item_data = jsonable_encoder(doc)
     log_stats(request, data=doc)
