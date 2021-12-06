@@ -398,13 +398,12 @@ async def add_standards(request: Request, doc: dict):
 )
 async def edit_standards(request: Request, doc: dict):
     """Add standards to the main Elasticsearch index by PUTTING a JSON request here."""
-    body = json.dumps(doc)
     res = es.search(
         index="assess_remap",
         query={"match": {"id": doc["id"]}},
     )
     _id = res["hits"]["hits"][0]["_id"]
-    res = es.update(index=idx_main, id=_id, body=json.dumps(doc))  # body={"doc": doc})
+    res = es.update(index=idx_main, id=_id, body={"doc": doc})
     print(res)
     json_compatible_item_data = jsonable_encoder(doc)
     log_stats(request, data=doc)
