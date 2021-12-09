@@ -1,5 +1,6 @@
 # FROM python:3.9
-FROM tensorflow/tensorflow:2.2.3-py3
+#FROM tensorflow/tensorflow:2.2.3-py3
+FROM tensorflow/tensorflow:latest-py3
 # ARG uid
 ARG DEBIAN_FRONTEND=noninteractive
 
