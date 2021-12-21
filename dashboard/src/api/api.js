@@ -30,7 +30,8 @@ export const fetchData = async (selection, data, size = 10) => {
     url += "/" + searchText + "size=" + size;
   }
 
-  if (selection == "recText") uploadData = JSON.stringify({ text_field: data });
+  //if (selection == "recText") uploadData = JSON.stringify({ text_field: data });
+  if (selection == "recText") uploadData = { text_field: data };
   else if (selection == "recFile") {
     uploadData = new FormData();
     uploadData.append("pdf", data);
