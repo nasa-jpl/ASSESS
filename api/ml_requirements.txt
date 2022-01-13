@@ -6,7 +6,7 @@ transformers==4.15.0
 elasticsearch==7.15.1
 pandas==1.3.4
 pyarrow==5.0.0
-datasets==1.14.0
+datasets==1.17.0
 spacy==3.2.0
 
 # install the below manually (jpl.pipedreams has some dependency conflicts with others.)
