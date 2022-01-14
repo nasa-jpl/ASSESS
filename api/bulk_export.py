@@ -169,6 +169,7 @@ def df_to_es(df_path, index, client, overwrite=False, normalize=False):
         client.indices.delete(index, ignore=[400, 404])
         client.indices.create(index, ignore=400)
     df = feather.read_feather(df_path)
+    df.fillna("", inplace=True)
     bulk(client, doc_generator(df, index, normalize))
     return
 
