@@ -79,8 +79,8 @@ def preprocessor(text):
 
 def spacy_tokenize_lemmatize_punc_remove(text, nlp):
     is_there_digit = re.compile("\d")
-    print("******* THIS IS TEXT DEBUG *******")
-    print(text, type(text))
+    #print("******* THIS IS TEXT DEBUG *******")
+    #print(text, type(text))
     processed = nlp(text)
     lemma_list = []
     for token in processed:
