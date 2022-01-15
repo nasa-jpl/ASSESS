@@ -3,14 +3,10 @@ import logging
 import os
 import os.path
 import shutil
-import subprocess
 import time
 from logging.handlers import RotatingFileHandler
 from typing import Optional
 import yaml
-import dill
-import pandas as pd
-import requests
 import uvicorn
 from elasticsearch import Elasticsearch
 from fastapi import (
@@ -40,6 +36,7 @@ from standard_extractor import find_standard_ref
 from text_analysis import extract_prep
 import extraction
 from web_utils import connect_to_es, read_logs
+import ast
 
 # Define api settings.
 app = FastAPI()
@@ -77,7 +74,26 @@ logging.getLogger().setLevel(logging.DEBUG)
 startMsg = {}
 startMsg["message"] = "*** Starting Server ***"
 fastapi_logger.info(json.dumps(startMsg))
-
+data_schema = {
+    "type": "object",
+    "properties": {
+            "doc_number": {"type": ["string", "null"]},
+            "id": {"type": ["string", "null"]},
+            "raw_id": {"type": ["string", "null"]},
+            "description": {"type": ["string", "null"]},
+            "ingestion_date": {"type": "string"},
+            "hash": {"type": ["string", "null"]},
+            "published_date": {"type": ["string", "null"]},
+            "isbn": {"type": ["string", "null"]},
+            "text": {"type": ["array", "null"]},
+            "status": {"type": ["string", "null"]},
+            "technical_committee": {"type": ["string", "null"]},
+            "title": {"type": ["string", "null"]},
+            "url": {"type": ["string", "null"]},
+            "category": {"type": ["object", "null"]},
+            "sdo": {"type": ["object", "null"]},
+    },
+}
 
 @app.on_event("startup")
 async def startup():
@@ -110,9 +126,12 @@ def log_stats(request, data=None, user=None):
     es.index(index=idx_log, body=json.dumps(msg))
     return
 
+def str_to_ls(s):
+    if type(s) is str:
+        s = ast.literal_eval(s)
+    return s
 
 def run_predict(request, start, in_text, size, vectorizer_types, index_types):
-
     # Globally used
     # vectorizer_types = ["tf_idf"]
     # index_types = ["flat"]
@@ -146,45 +165,18 @@ def run_predict(request, start, in_text, size, vectorizer_types, index_types):
     return JSONResponse(content=json_compatible_item_data)
 
 
-# @app.post(
-#     "/recommend_text",
-#     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
-# )
-# async def recommend_text(request: Request, sow: Sow, size: int = 10):
-#     """Given an input of Statement of Work as text,
-#     return a JSON of recommended standards.
-#     """
-#     start = time.time()
-#     in_text = sow.text_field
-#     predictions = old_extract_prep.predict(in_text=in_text, size=size)
-#     output = {}
-#     results = {}
-#     i = 0
-#     for prediction in predictions["recommendations"]:
-#         i += 1
-#         raw_id = prediction["raw_id"]
-#         res = es.search(
-#             index=idx_main, body={"size": 1, "query": {"match": {"raw_id": raw_id}}}
-#         )
-#         for hit in res["hits"]["hits"]:
-#             results = hit["_source"]
-#         output[i] = results
-#         output[i]["similarity"] = prediction["sim"]
-#     # output["embedded_references"] = predictions["embedded_references"]
-#     json_compatible_item_data = jsonable_encoder(output)
-#     log_stats(request, data=in_text)
-#     print(f"{time.time() - start}")
-#     return JSONResponse(content=json_compatible_item_data)
-
-
 @app.post(
     "/train",
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
 async def train(index_types=["flat", "flat_sklearn"], vectorizer_types=["tf_idf"]):
-    print("Starting training...")
-    extraction.train(es, index_types, vectorizer_types)
-    return True
+    vectorizer_types = str_to_ls(vectorizer_types)
+    index_types = str_to_ls(index_types)
+    try:
+        print("Starting training... Will return True and run training in background for 20+ minutes...")
+        return True
+    finally:
+        extraction.train(es, index_types, vectorizer_types)
 
 
 @app.post(
@@ -198,6 +190,8 @@ async def recommend_text(
     vectorizer_types=["tf_idf"],
     index_types=["flat"],
 ):
+    vectorizer_types = str_to_ls(vectorizer_types)
+    index_types = str_to_ls(index_types)
     """Given an input of Statement of Work as text,
     return a JSON of recommended standards.
     """
@@ -219,6 +213,8 @@ async def recommend_file(
     vectorizer_types=["tf_idf"],
     index_types=["flat"],
 ):
+    vectorizer_types = str_to_ls(vectorizer_types)
+    index_types = str_to_ls(index_types)
     """Given an input of a Statement of Work as a PDF,
     return a JSON of recommended standards.
     """
@@ -384,6 +380,7 @@ async def search(
 )
 async def add_standards(request: Request, doc: dict):
     """Add standards to the main Elasticsearch index by PUTTING a JSON request here."""
+    validate(instance=doc, schema=data_schema)
     res = es.index(index=idx_main, body=json.dumps(doc))
     print(res)
     json_compatible_item_data = jsonable_encoder(doc)
@@ -398,6 +395,7 @@ async def add_standards(request: Request, doc: dict):
 )
 async def edit_standards(request: Request, doc: dict):
     """Add standards to the main Elasticsearch index by PUTTING a JSON request here."""
+    validate(instance=doc, schema=data_schema)
     res = es.search(
         index="assess_remap",
         query={"match": {"id": doc["id"]}},
