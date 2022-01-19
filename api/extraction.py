@@ -192,24 +192,25 @@ def get_list_of_text(es=None):
 
 def es_to_df(es=None, index="assess_remap", path="data/feather_text"):
     if not es:
+        # ADD FILES YOU WANT TO READ HERE:
         df = pd.read_feather("data/feather_text")
     else:
         res = list(scan(es, query={}, index=index))
         output_all = deque()
-        output_all.extend([x["_source"] for x in res])
-        #TODO: fix for _id
+        output_all.extend([((x["_source"]['description']), (x["_source"]['title']), (x["_id"])) for x in res])
+        output_all = [{'description': t[0], 'title': t[1], '_id': t[2]} for t in output_all]
         df = json_normalize(output_all)
         df = df[["_id", "title", "description"]]
     return df
 
 
 if __name__ == "__main__":
-    # es = Elasticsearch(http_compress=True)
-    es = None
+    es = Elasticsearch(http_compress=True)
+    #es = None
     do_training = True
     index_types = ["flat", "flat_sklearn"]
     vectorizer_types = ["tf_idf"]
-    list_of_texts = get_list_of_text(es)
+    ES_ids, list_of_texts = get_list_of_text(es)
     # list_of_texts=['computer science', 'space science', 'global summit for dummies', 'deep neural nets', 'technology consultants',
     #                'space science', 'global summit for dummies', 'deep neural nets', 'technology consultants',
     #                '', '', '', '']
