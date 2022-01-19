@@ -131,7 +131,7 @@ def str_to_ls(s):
         s = ast.literal_eval(s)
     return s
 
-def run_predict(request, start, in_text, size, vectorizer_types, index_types):
+def run_predict(request, start, in_text, size, start_from, vectorizer_types, index_types):
     # Globally used
     # vectorizer_types = ["tf_idf"]
     # index_types = ["flat"]
@@ -142,6 +142,7 @@ def run_predict(request, start, in_text, size, vectorizer_types, index_types):
     list_of_predictions, scores = extraction.predict(
         in_text,
         size,
+        start_from,
         vectorizers,
         vector_storage,
         vector_indexes,
@@ -153,7 +154,7 @@ def run_predict(request, start, in_text, size, vectorizer_types, index_types):
     for i, prediction_id in enumerate(list_of_predictions):
         res = es.search(
             index=idx_main,
-            body={"size": 1, "query": {"match": {"doc_number": prediction_id}}},
+            body={"size": 1, "query": {"match": {"_id": prediction_id}}},
         )
         for hit in res["hits"]["hits"]:
             results = hit["_source"]
@@ -187,6 +188,7 @@ async def recommend_text(
     request: Request,
     sow: Sow,
     size: int = 10,
+    start_from: int = 0,
     vectorizer_types=["tf_idf"],
     index_types=["flat"],
 ):
@@ -198,7 +200,7 @@ async def recommend_text(
     in_text = sow.text_field
     # df_file = "data/feather_text"
     return run_predict(
-        request, time.time(), in_text, size, vectorizer_types, index_types
+        request, time.time(), in_text, size, start_from, vectorizer_types, index_types, 
     )
 
 
@@ -210,6 +212,7 @@ async def recommend_file(
     request: Request,
     pdf: UploadFile = File(...),
     size: int = 10,
+    start_from: int = 0,
     vectorizer_types=["tf_idf"],
     index_types=["flat"],
 ):
@@ -222,7 +225,7 @@ async def recommend_file(
     in_text = extract_prep.parse_text(pdf)
     # df_file = "data/feather_text"
     return run_predict(
-        request, time.time(), in_text, size, vectorizer_types, index_types
+        request, time.time(), in_text, size, start_from, vectorizer_types, index_types
     )
 
 
@@ -270,34 +273,36 @@ async def standard_info(
     url: Optional[str] = None,
     hash: Optional[str] = None,
     size: int = 1,
+    start_from: int = 0,
 ):
     """Given a standard ID, get standard information from Elasticsearch."""
     if id:
         res = es.search(
-            index=idx_main, body={"size": size, "query": {"match": {"id": id}}}
+            index=idx_main, body={"from": start_from, "size": size, "query": {"match": {"id": id}}}
         )
     elif raw_id:
         res = es.search(
-            index=idx_main, body={"size": size, "query": {"match": {"raw_id": raw_id}}}
+            index=idx_main, body={"from": start_from, "size": size, "query": {"match": {"raw_id": raw_id}}}
         )
     elif isbn:
         res = es.search(
-            index=idx_main, body={"size": size, "query": {"match": {"isbn": isbn}}}
+            index=idx_main, body={"from": start_from, "size": size, "query": {"match": {"isbn": isbn}}}
         )
     elif doc_number:
         res = es.search(
             index=idx_main,
-            body={"size": size, "query": {"match": {"doc_number": doc_number}}},
+            body={"from": start_from, "size": size, "query": {"match": {"doc_number": doc_number}}},
         )
     elif status:
         res = es.search(
             index=idx_main,
-            body={"size": size, "query": {"match": {"status": status}}},
+            body={"from": start_from, "size": size, "query": {"match": {"status": status}}},
         )
     elif technical_committee:
         res = es.search(
             index=idx_main,
             body={
+                "from": start_from, 
                 "size": size,
                 "query": {"match": {"technical_committee": technical_committee}},
             },
@@ -305,43 +310,43 @@ async def standard_info(
     elif published_date:
         res = es.search(
             index=idx_main,
-            body={"size": size, "query": {"match": {"published_date": published_date}}},
+            body={"from": start_from, "size": size, "query": {"match": {"published_date": published_date}}},
         )
     elif ingestion_date:
         res = es.search(
             index=idx_main,
-            body={"size": size, "query": {"match": {"ingestion_date": ingestion_date}}},
+            body={"from": start_from, "size": size, "query": {"match": {"ingestion_date": ingestion_date}}},
         )
     elif title:
         res = es.search(
             index=idx_main,
-            body={"size": size, "query": {"match": {"title": title}}},
+            body={"from": start_from, "size": size, "query": {"match": {"title": title}}},
         )
     elif sdo:
         # res = es.search(index=idx_main, body={"query": {"exists": {"field": sdo_key}}})
         res = es.search(
             index=idx_main,
-            body={"size": size, "query": {"match": {"sdo.abbreviation": sdo}}},
+            body={"from": start_from, "size": size, "query": {"match": {"sdo.abbreviation": sdo}}},
         )
     elif category:
         res = es.search(
             index=idx_main,
-            body={"size": size, "query": {"match": {"category": category}}},
+            body={"from": start_from, "size": size, "query": {"match": {"category": category}}},
         )
     elif text:
         res = es.search(
             index=idx_main,
-            body={"size": size, "query": {"match": {"text": text}}},
+            body={"from": start_from, "size": size, "query": {"match": {"text": text}}},
         )
     elif url:
         res = es.search(
             index=idx_main,
-            body={"size": size, "query": {"match": {"url": url}}},
+            body={"from": start_from, "size": size, "query": {"match": {"url": url}}},
         )
     elif hash:
         res = es.search(
             index=idx_main,
-            body={"size": size, "query": {"match": {"hash": hash}}},
+            body={"from": start_from, "size": size, "query": {"match": {"hash": hash}}},
         )
     # print("Got %d Hits:" % res['hits']['total']['value'])
     results = {}
@@ -358,12 +363,12 @@ async def standard_info(
     dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
 async def search(
-    request: Request, searchq: str = Field(example="Airplanes"), size: int = 10
+    request: Request, searchq: str = Field(example="Airplanes"), size: int = 10, start_from: int = 0, 
 ):
     """Search elasticsearch using text."""
     res = es.search(
         index=idx_main,
-        body={"size": size, "query": {"match": {"description": searchq}}},
+        body={"from": start_from, "size": size, "query": {"match": {"description": searchq}}},
     )
     # print("Got %d Hits:" % res['hits']['total']['value'])
     results = {}
