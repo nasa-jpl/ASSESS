@@ -193,7 +193,9 @@ def get_list_of_text(es=None):
 def es_to_df(es=None, index="assess_remap", path="data/feather_text"):
     if not es:
         # ADD FILES YOU WANT TO READ HERE:
-        df = pd.read_feather("data/feather_text")
+        df1 = pd.read_feather("data/source_1")
+        df2 = pd.read_feather("data/source_1")
+        df = pd.concat([df1, df2])
     else:
         res = list(scan(es, query={}, index=index))
         output_all = deque()

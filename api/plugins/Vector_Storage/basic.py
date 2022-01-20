@@ -3,7 +3,7 @@ import pickle
 import os
 import numpy as np
 from tqdm import tqdm
-
+import gc
 
 class Basic(Template):
     def __init__(self):
@@ -31,6 +31,7 @@ class Basic(Template):
     def _save_to_disk(self):
         with open("data/basic_vector_storage.pk", "wb") as storage:
             pickle.dump(self.vector_storage, storage)
+        gc.collect()
         with open("data/basic_sorted_ids.pk", "wb") as ids:
             pickle.dump(self.sorted_ids, ids)
 
