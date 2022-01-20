@@ -37,7 +37,7 @@ def recommend_text():
 def recommend_file():
     # Recommend an SoW given a PDF.
     # Specify file location of an SOW.
-    location = "data/example.pdf"
+    location = "data/sow.pdf"
     file = {"pdf": open(location, "rb")}
     print("Sending GET request to `/recommend_file` with a PDF.")
     r = requests.post(
