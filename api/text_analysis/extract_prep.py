@@ -32,6 +32,9 @@ def parse_text(pdf):
         # file = open(filepath + "_parsed.txt", "wb")
         # file.write(output)
         # file.close()
+        # Returns bytestring with lots of tabs and spaces.
+        if type(output)==bytes:
+            output = output.decode("utf-8").replace("\t", " ").replace("\n", " ")
     except subprocess.CalledProcessError as e:
         print(e.output)
     return str(output)
