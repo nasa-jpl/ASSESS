@@ -223,7 +223,7 @@ async def recommend_file(
     print(pdf.content_type)
     print(pdf.filename)
     in_text = extract_prep.parse_text(pdf)
-    # df_file = "data/feather_text"
+    print(in_text)
     return run_predict(
         request, time.time(), in_text, size, start_from, vectorizer_types, index_types
     )
