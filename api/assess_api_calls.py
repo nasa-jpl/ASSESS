@@ -15,7 +15,7 @@ def format_json(jsonText):
 
 
 def train():
-    print("Sending GET request to `/train`.")
+    print("Sending POST request to `/train`.")
     r = requests.post(
         f"{root}/train",
     )
@@ -27,7 +27,7 @@ def recommend_text():
     print("Sending GET request to `/recommend_text`.")
     jsonLoad = {"text_field": "Example text about airplanes"}
     r = requests.post(
-        f"{root}/recommend_text?size=10",
+        f"{root}/recommend_text?size=10&start_from=5",
         json=jsonLoad,
         # auth=HTTPBasicAuth(username, password),
     )

@@ -81,7 +81,7 @@ data_schema = {
             "id": {"type": ["string", "null"]},
             "raw_id": {"type": ["string", "null"]},
             "description": {"type": ["string", "null"]},
-            "ingestion_date": {"type": "string"},
+            "ingestion_date": {"type": ["string", "null"]},
             "hash": {"type": ["string", "null"]},
             "published_date": {"type": ["string", "null"]},
             "isbn": {"type": ["string", "null"]},
@@ -158,8 +158,9 @@ def run_predict(request, start, in_text, size, start_from, vectorizer_types, ind
         )
         for hit in res["hits"]["hits"]:
             results = hit["_source"]
-        output[i] = results
-        output[i]["similarity"] = scores[i]
+        j = start_from + i
+        output[j] = results
+        output[j]["similarity"] = scores[j]
     json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=in_text)
     print(f"{time.time() - start}")
@@ -173,11 +174,8 @@ def run_predict(request, start, in_text, size, start_from, vectorizer_types, ind
 async def train(index_types=["flat", "flat_sklearn"], vectorizer_types=["tf_idf"]):
     vectorizer_types = str_to_ls(vectorizer_types)
     index_types = str_to_ls(index_types)
-    try:
-        print("Starting training... Will return True and run training in background for 20+ minutes...")
-        return True
-    finally:
-        extraction.train(es, index_types, vectorizer_types)
+    extraction.train(es, index_types, vectorizer_types)
+    return True
 
 
 @app.post(
@@ -222,6 +220,8 @@ async def recommend_file(
     return a JSON of recommended standards.
     """
     print("File received.")
+    print(pdf.content_type)
+    print(pdf.filename)
     in_text = extract_prep.parse_text(pdf)
     # df_file = "data/feather_text"
     return run_predict(
