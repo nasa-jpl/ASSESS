@@ -13,7 +13,7 @@ class TF_IDF(Template):
     def __init__(self):
         super().__init__()
         self.description = 'Implements the TF-IDF vectorizer'
-        self.vectorizer=TfidfVectorizer(tokenizer=identity_func, lowercase=False, max_features=20000)
+        self.vectorizer=TfidfVectorizer(tokenizer=identity_func, lowercase=False, max_features=5000)
         self.nlp = en_core_web_sm.load()
 
     def train(self, list_of_texts):
