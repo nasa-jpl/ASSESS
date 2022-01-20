@@ -223,6 +223,8 @@ async def recommend_file(
     print(pdf.content_type)
     print(pdf.filename)
     in_text = extract_prep.parse_text(pdf)
+    # Returns bytestring with lots of tabs and spaces.
+    in_text = in_text.decode("utf-8").replace("\t", " ").replace("\n", " ")
     print(in_text)
     return run_predict(
         request, time.time(), in_text, size, start_from, vectorizer_types, index_types

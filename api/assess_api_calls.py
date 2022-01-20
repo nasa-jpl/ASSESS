@@ -39,7 +39,7 @@ def recommend_file():
     # Specify file location of an SOW.
     location = "data/sow.pdf"
     file = {"pdf": open(location, "rb")}
-    print("Sending GET request to `/recommend_file` with a PDF.")
+    print("Sending POST request to `/recommend_file` with a PDF.")
     r = requests.post(
         f"{root}/recommend_file", files=file, auth=HTTPBasicAuth(username, password)
     )
