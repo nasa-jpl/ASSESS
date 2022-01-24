@@ -1,18 +1,21 @@
-FROM python:3.8-slim
-ARG uid
+# FROM python:3.9
+#FROM tensorflow/tensorflow:2.2.3-py3
+FROM tensorflow/tensorflow:latest-py3
+# ARG uid
 ARG DEBIAN_FRONTEND=noninteractive
+
 # Install dependencies
 RUN apt-get update\
     && apt-get -y upgrade\
     # Stupid base image bug https://stackoverflow.com/a/58503437
     && mkdir -p /usr/share/man/man1\
-    && apt-get -y --no-install-recommends install openjdk-11-jre-headless\
-    && apt-get clean all\
-    && rm -rf /var/lib/apt/lists/
+    && apt-get -y --no-install-recommends install openjdk-11-jre-headless
+# && apt-get clean all\
+# && rm -rf /var/lib/apt/lists/
 
-# the entire magic of the tiangolo containers, without the risk
-## START
-RUN python -m pip install --no-cache-dir "uvicorn[standard]" gunicorn fastapi
+RUN apt-get install -y build-essential python3 python3-pip libssl-dev libffi-dev gcc 
+
+# RUN python3 -m pip install --no-cache-dir "uvicorn[standard]" gunicorn fastapi 
 
 COPY ./gunicorn_conf.py /app/gunicorn.conf.py
 
@@ -21,21 +24,29 @@ RUN chmod +x /start.sh
 
 COPY ./start-reload.sh /start-reload.sh
 RUN chmod +x /start-reload.sh
-## END
 
 # Set working directory
 WORKDIR /app
 RUN mkdir /app/data && mkdir /app/log
-RUN chown $uid /app/data && chown $uid /app/log
+# RUN chown $uid /app/data && chown $uid /app/log
 
 # Add app to Docker
 COPY . /app
 
 # Install dependencies
-RUN python -m pip install --no-cache-dir --upgrade -r requirements.txt 
+RUN apt install -y software-properties-common
+RUN add-apt-repository -y ppa:deadsnakes/ppa
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+RUN apt install -y python3.8
+RUN mv /usr/bin/python3.8 /usr/local/bin/python
+RUN python get-pip.py
+RUN python -m pip install --no-cache-dir -r requirements.txt 
+RUN python -m pip install --no-cache-dir -r ml_requirements.txt
+RUN pip3 install jpl.pipedreams==1.0.3
+RUN python -m spacy download en_core_web_sm
+RUN python -m pip install --no-cache-dir "uvicorn[standard]" gunicorn fastapi
+# USER "$uid"
 
-USER "$uid"
 
-
-# Run FastAPI service
+# Run FastAPI service 
 CMD ["/start.sh"]
