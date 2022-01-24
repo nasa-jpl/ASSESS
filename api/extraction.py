@@ -91,7 +91,7 @@ def load_into_memory(index_types, vectorizer_types):
 
 def train(es, index_types, vectorizer_types):
     # ==== train vectorizers (needs to train on all standards in the corpus)
-    list_of_texts = get_list_of_text(es)
+    ES_ids, list_of_texts = get_list_of_text(es)
     vectorizers = PluginCollection()
     print("\nTraining Vectorizers...")
     for vectorizer_type in vectorizer_types:
@@ -107,7 +107,7 @@ def train(es, index_types, vectorizer_types):
             list_of_texts, type=vectorizer_type, vectorizers=vectorizers
         )
         # TODO: remove line
-        ES_ids = list(range(len(vectors)))  # using dummy values
+        # ES_ids = list(range(len(vectors)))  # using dummy values
         vector_storage.apply(
             "plugins.Vector_Storage",
             "basic",
@@ -142,6 +142,7 @@ def train(es, index_types, vectorizer_types):
 def predict(
     sow,
     n,
+    start_from,
     vectorizers,
     vector_storage,
     vector_indexes,
@@ -176,7 +177,7 @@ def predict(
             # iso_data = pd.read_feather("data/feather_text")
             # for ES_id in top_n_ES_ids[:n]:
             #     print(ES_id, list_of_texts[ES_id])
-    return top_n_ES_ids[:n], scores.tolist()
+    return top_n_ES_ids[start_from:n], scores.tolist()
 
 
 def get_list_of_text(es=None):
@@ -186,27 +187,32 @@ def get_list_of_text(es=None):
     # print(df.columns)
     # TODO: get this information from the text column.
     # return the text and the elasticsearch ids
-    return list(df["title"] + ". " + df["description"])
+    return list(df["_id"]), list(df["title"] + ". " + df["description"])
 
 
 def es_to_df(es=None, index="assess_remap", path="data/feather_text"):
     if not es:
-        df = pd.read_feather("data/feather_text")
+        # ADD FILES YOU WANT TO READ HERE:
+        df1 = pd.read_feather("data/source_1")
+        df2 = pd.read_feather("data/source_1")
+        df = pd.concat([df1, df2])
     else:
         res = list(scan(es, query={}, index=index))
         output_all = deque()
-        output_all.extend([x["_source"] for x in res])
+        output_all.extend([((x["_source"]['description']), (x["_source"]['title']), (x["_id"])) for x in res])
+        output_all = [{'description': t[0], 'title': t[1], '_id': t[2]} for t in output_all]
         df = json_normalize(output_all)
+        df = df[["_id", "title", "description"]]
     return df
 
 
 if __name__ == "__main__":
-    # es = Elasticsearch(http_compress=True)
-    es = None
+    es = Elasticsearch(http_compress=True)
+    #es = None
     do_training = True
     index_types = ["flat", "flat_sklearn"]
     vectorizer_types = ["tf_idf"]
-    list_of_texts = get_list_of_text(es)
+    ES_ids, list_of_texts = get_list_of_text(es)
     # list_of_texts=['computer science', 'space science', 'global summit for dummies', 'deep neural nets', 'technology consultants',
     #                'space science', 'global summit for dummies', 'deep neural nets', 'technology consultants',
     #                '', '', '', '']
@@ -222,6 +228,7 @@ if __name__ == "__main__":
         r = predict(
             "Computer software and stuff!!!",
             10,
+            0,
             vectorizers,
             vector_storage,
             vector_indexes,

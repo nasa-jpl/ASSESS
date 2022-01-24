@@ -17,7 +17,7 @@ class Flat(Template):
             # assuming numpy array
             vectors_ = vectors
         self.index = NearestNeighbors(
-            n_neighbors=vectors_.shape[1], algorithm="brute", metric="cosine"
+            n_neighbors=vectors_.shape[0], algorithm="brute", metric="cosine"
         )
         self.index.fit(vectors_)
 
