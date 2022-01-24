@@ -1,5 +1,5 @@
 # python 3.9.5
-tensorflow==2.6.0
+tensorflow==2.6.1
 faiss-cpu==1.7.1post2
 scikit-learn==0.24.2 # gives memory segmentation with faiss error when version 1.0
 transformers==4.10.0
