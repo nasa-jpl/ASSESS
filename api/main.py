@@ -135,7 +135,6 @@ def run_predict(request, start, in_text, size, start_from, vectorizer_types, ind
     # Globally used
     # vectorizer_types = ["tf_idf"]
     # index_types = ["flat"]
-    list_of_texts = extraction.get_list_of_text(es)
     vectorizers, vector_storage, vector_indexes = extraction.load_into_memory(
         index_types, vectorizer_types
     )
@@ -146,11 +145,16 @@ def run_predict(request, start, in_text, size, start_from, vectorizer_types, ind
         vectorizers,
         vector_storage,
         vector_indexes,
-        list_of_texts,
         vectorizer_types,
         index_types,
     )
     output = {}
+    # Add mget request here
+    """
+    res = es.mget(index = idx_main, body = {'ids': list_of_predictions})
+    results = [hit["_source"] for hit in res["hits"]["hits"]]
+    """
+    # TODO: Refactor 
     for i, prediction_id in enumerate(list_of_predictions):
         res = es.search(
             index=idx_main,
@@ -161,6 +165,7 @@ def run_predict(request, start, in_text, size, start_from, vectorizer_types, ind
         j = start_from + i
         output[j] = results
         output[j]["similarity"] = scores[j]
+    # End Refactor  
     json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=in_text)
     print(f"{time.time() - start}")
