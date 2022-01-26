@@ -146,7 +146,6 @@ def predict(
     vectorizers,
     vector_storage,
     vector_indexes,
-    list_of_texts,
     vectorizer_types,
     index_types,
 ):
@@ -232,7 +231,6 @@ if __name__ == "__main__":
             vectorizers,
             vector_storage,
             vector_indexes,
-            list_of_texts,
             vectorizer_types,
             index_types,
         )
