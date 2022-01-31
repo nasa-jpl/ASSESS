@@ -40,8 +40,8 @@ RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 RUN apt install -y python3.8
 RUN mv /usr/bin/python3.8 /usr/local/bin/python
 RUN python get-pip.py
-RUN python -m pip install --no-cache-dir -r requirements.txt 
-RUN python -m pip install --no-cache-dir -r ml_requirements.txt
+RUN python -m pip install --no-cache-dir -r requirements/requirements.txt 
+RUN python -m pip install --no-cache-dir -r requirements/ml_requirements.txt
 RUN pip3 install jpl.pipedreams==1.0.3
 RUN python -m spacy download en_core_web_sm
 RUN python -m pip install --no-cache-dir "uvicorn[standard]" gunicorn fastapi

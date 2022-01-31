@@ -106,9 +106,7 @@ services:
   #     - "jointops"
 
 networks:
-  jointops:
-
-    null
+  jointops: null
 volumes:
   # fastapi-data:
   fastapi-log: null
