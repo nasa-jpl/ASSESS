@@ -28,15 +28,13 @@ def tika_parse(pdf):
     return str(output)
 
 
-standard_orgs = {}
-for line in io.open("standards_extraction/data/standard_orgs.txt", mode="r", encoding="utf-8").readlines():
-    line = line.strip()
-    abbr = line.split(' — ')[0]
-    name = line.split(' — ')[1]
-    standard_orgs[abbr] = name
-
-
 def find_standard_ref(text):
+    standard_orgs = {}
+    for line in io.open("standards_extraction/data/standard_orgs.txt", mode="r", encoding="utf-8").readlines():
+        line = line.strip()
+        abbr = line.split(' — ')[0]
+        name = line.split(' — ')[1]
+        standard_orgs[abbr] = name
     refs = []
     # match abbreviations in upper case
     words = text.split()
