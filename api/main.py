@@ -8,14 +8,11 @@ from logging.handlers import RotatingFileHandler
 from typing import Optional
 import yaml
 import uvicorn
-from elasticsearch import Elasticsearch
 from fastapi import (
-    Body,
+    BackgroundTasks,
     Depends,
     FastAPI,
     File,
-    Form,
-    HTTPException,
     Request,
     UploadFile,
 )
@@ -32,10 +29,10 @@ from pydantic import BaseModel, Field
 from starlette.requests import Request
 from starlette.responses import Response
 
-from standard_extractor import find_standard_ref
-from text_analysis import extract_prep
-import extraction
-from web_utils import connect_to_es, read_logs
+from standards_extraction.parse import find_standard_ref
+from standards_extraction import extract_prep
+import ml_core
+from utils import connect_to_es
 import ast
 
 # Define api settings.
@@ -95,6 +92,7 @@ data_schema = {
     },
 }
 
+
 @app.on_event("startup")
 async def startup():
     with open("conf.yaml", "r") as stream:
@@ -126,19 +124,21 @@ def log_stats(request, data=None, user=None):
     es.index(index=idx_log, body=json.dumps(msg))
     return
 
+
 def str_to_ls(s):
     if type(s) is str:
         s = ast.literal_eval(s)
     return s
 
+
 def run_predict(request, start, in_text, size, start_from, vectorizer_types, index_types):
     # Globally used
     # vectorizer_types = ["tf_idf"]
     # index_types = ["flat"]
-    vectorizers, vector_storage, vector_indexes = extraction.load_into_memory(
+    vectorizers, vector_storage, vector_indexes = ml_core.load_into_memory(
         index_types, vectorizer_types
     )
-    list_of_predictions, scores = extraction.predict(
+    list_of_predictions, scores = ml_core.predict(
         in_text,
         size,
         start_from,
@@ -154,7 +154,7 @@ def run_predict(request, start, in_text, size, start_from, vectorizer_types, ind
     res = es.mget(index = idx_main, body = {'ids': list_of_predictions})
     results = [hit["_source"] for hit in res["hits"]["hits"]]
     """
-    # TODO: Refactor 
+    # TODO: Refactor
     for i, prediction_id in enumerate(list_of_predictions):
         res = es.search(
             index=idx_main,
@@ -165,27 +165,35 @@ def run_predict(request, start, in_text, size, start_from, vectorizer_types, ind
         j = start_from + i
         output[j] = results
         output[j]["similarity"] = scores[j]
-    # End Refactor  
+    # End Refactor
     json_compatible_item_data = jsonable_encoder(output)
     log_stats(request, data=in_text)
     print(f"{time.time() - start}")
     return JSONResponse(content=json_compatible_item_data)
 
 
+# def background_train(es, index_types, vectorizer_types):
+#     ml_core.train(es, index_types, vectorizer_types)
+
 @app.post(
     "/train",
-    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+    dependencies=[
+        Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
-async def train(index_types=["flat", "flat_sklearn"], vectorizer_types=["tf_idf"]):
+async def train(request: Request, background_tasks: BackgroundTasks, index_types=["flat", "flat_sklearn"], vectorizer_types=["tf_idf"]):
     vectorizer_types = str_to_ls(vectorizer_types)
     index_types = str_to_ls(index_types)
-    extraction.train(es, index_types, vectorizer_types)
+    background_tasks.add_task(ml_core.train, es,
+                              index_types, vectorizer_types)
+    log_stats(request, data=None)
+    print("Training task created and sent to the background...")
     return True
 
 
 @app.post(
     "/recommend_text",
-    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+    dependencies=[
+        Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
 async def recommend_text(
     request: Request,
@@ -203,13 +211,14 @@ async def recommend_text(
     in_text = sow.text_field
     # df_file = "data/feather_text"
     return run_predict(
-        request, time.time(), in_text, size, start_from, vectorizer_types, index_types, 
+        request, time.time(), in_text, size, start_from, vectorizer_types, index_types,
     )
 
 
 @app.post(
     "/recommend_file",
-    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+    dependencies=[
+        Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
 async def recommend_file(
     request: Request,
@@ -236,7 +245,8 @@ async def recommend_file(
 
 @app.post(
     "/extract",
-    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+    dependencies=[
+        Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
 async def extract(request: Request, pdf: UploadFile = File(...)):
     """Given an input of a Statement of Work (SoW) as a PDF,
@@ -259,7 +269,8 @@ async def extract(request: Request, pdf: UploadFile = File(...)):
 @app.get(
     "/standard_info/",
     response_class=ORJSONResponse,
-    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+    dependencies=[
+        Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
 async def standard_info(
     request: Request,
@@ -283,31 +294,36 @@ async def standard_info(
     """Given a standard ID, get standard information from Elasticsearch."""
     if id:
         res = es.search(
-            index=idx_main, body={"from": start_from, "size": size, "query": {"match": {"id": id}}}
+            index=idx_main, body={"from": start_from,
+                                  "size": size, "query": {"match": {"id": id}}}
         )
     elif raw_id:
         res = es.search(
-            index=idx_main, body={"from": start_from, "size": size, "query": {"match": {"raw_id": raw_id}}}
+            index=idx_main, body={"from": start_from, "size": size, "query": {
+                "match": {"raw_id": raw_id}}}
         )
     elif isbn:
         res = es.search(
-            index=idx_main, body={"from": start_from, "size": size, "query": {"match": {"isbn": isbn}}}
+            index=idx_main, body={"from": start_from,
+                                  "size": size, "query": {"match": {"isbn": isbn}}}
         )
     elif doc_number:
         res = es.search(
             index=idx_main,
-            body={"from": start_from, "size": size, "query": {"match": {"doc_number": doc_number}}},
+            body={"from": start_from, "size": size, "query": {
+                "match": {"doc_number": doc_number}}},
         )
     elif status:
         res = es.search(
             index=idx_main,
-            body={"from": start_from, "size": size, "query": {"match": {"status": status}}},
+            body={"from": start_from, "size": size,
+                  "query": {"match": {"status": status}}},
         )
     elif technical_committee:
         res = es.search(
             index=idx_main,
             body={
-                "from": start_from, 
+                "from": start_from,
                 "size": size,
                 "query": {"match": {"technical_committee": technical_committee}},
             },
@@ -315,43 +331,51 @@ async def standard_info(
     elif published_date:
         res = es.search(
             index=idx_main,
-            body={"from": start_from, "size": size, "query": {"match": {"published_date": published_date}}},
+            body={"from": start_from, "size": size, "query": {
+                "match": {"published_date": published_date}}},
         )
     elif ingestion_date:
         res = es.search(
             index=idx_main,
-            body={"from": start_from, "size": size, "query": {"match": {"ingestion_date": ingestion_date}}},
+            body={"from": start_from, "size": size, "query": {
+                "match": {"ingestion_date": ingestion_date}}},
         )
     elif title:
         res = es.search(
             index=idx_main,
-            body={"from": start_from, "size": size, "query": {"match": {"title": title}}},
+            body={"from": start_from, "size": size,
+                  "query": {"match": {"title": title}}},
         )
     elif sdo:
         # res = es.search(index=idx_main, body={"query": {"exists": {"field": sdo_key}}})
         res = es.search(
             index=idx_main,
-            body={"from": start_from, "size": size, "query": {"match": {"sdo.abbreviation": sdo}}},
+            body={"from": start_from, "size": size, "query": {
+                "match": {"sdo.abbreviation": sdo}}},
         )
     elif category:
         res = es.search(
             index=idx_main,
-            body={"from": start_from, "size": size, "query": {"match": {"category": category}}},
+            body={"from": start_from, "size": size,
+                  "query": {"match": {"category": category}}},
         )
     elif text:
         res = es.search(
             index=idx_main,
-            body={"from": start_from, "size": size, "query": {"match": {"text": text}}},
+            body={"from": start_from, "size": size,
+                  "query": {"match": {"text": text}}},
         )
     elif url:
         res = es.search(
             index=idx_main,
-            body={"from": start_from, "size": size, "query": {"match": {"url": url}}},
+            body={"from": start_from, "size": size,
+                  "query": {"match": {"url": url}}},
         )
     elif hash:
         res = es.search(
             index=idx_main,
-            body={"from": start_from, "size": size, "query": {"match": {"hash": hash}}},
+            body={"from": start_from, "size": size,
+                  "query": {"match": {"hash": hash}}},
         )
     # print("Got %d Hits:" % res['hits']['total']['value'])
     results = {}
@@ -365,15 +389,17 @@ async def standard_info(
 
 @app.get(
     "/search/{searchq}",
-    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+    dependencies=[
+        Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
 async def search(
-    request: Request, searchq: str = Field(example="Airplanes"), size: int = 10, start_from: int = 0, 
+    request: Request, searchq: str = Field(example="Airplanes"), size: int = 10, start_from: int = 0,
 ):
     """Search elasticsearch using text."""
     res = es.search(
         index=idx_main,
-        body={"from": start_from, "size": size, "query": {"match": {"description": searchq}}},
+        body={"from": start_from, "size": size, "query": {
+            "match": {"description": searchq}}},
     )
     # print("Got %d Hits:" % res['hits']['total']['value'])
     results = {}
@@ -386,7 +412,8 @@ async def search(
 @app.post(
     "/add_standards",
     response_class=HTMLResponse,
-    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+    dependencies=[
+        Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
 async def add_standards(request: Request, doc: dict):
     """Add standards to the main Elasticsearch index by PUTTING a JSON request here."""
@@ -401,7 +428,8 @@ async def add_standards(request: Request, doc: dict):
 @app.put(
     "/edit_standards",
     response_class=HTMLResponse,
-    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+    dependencies=[
+        Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
 async def edit_standards(request: Request, doc: dict):
     """Add standards to the main Elasticsearch index by PUTTING a JSON request here."""
@@ -421,7 +449,8 @@ async def edit_standards(request: Request, doc: dict):
 @app.delete(
     "/delete_standards",
     response_class=HTMLResponse,
-    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+    dependencies=[
+        Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
 async def delete_standards(request: Request, id: str):
     """Delete standards to the main Elasticsearch index by PUTTING a JSON request here."""
@@ -438,7 +467,8 @@ async def delete_standards(request: Request, id: str):
 
 @app.post(
     "/select_standards",
-    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+    dependencies=[
+        Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
 async def select_standards(request: Request, selected: dict):
     """After a use likes a standard, this endpoint captures the selected standards into the database."""
@@ -460,7 +490,8 @@ async def select_standards(request: Request, selected: dict):
 
 @app.put(
     "/set_standards",
-    dependencies=[Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
+    dependencies=[
+        Depends(RateLimiter(times=rate_times, seconds=rate_seconds))],
 )
 async def set_standards(request: Request, set_standards: dict):
     """Validate and set preference of standards (done by Admin)."""
