@@ -2,9 +2,10 @@
 
 ASSESS allows you to run an API server that performs document similarity for large troves of text documents as well as manage an application pipeline that allows for ingestion, search, inspection, deletion, training, logging, and editing documents. 
 
-The problem: Given an SoW, the goal is to produce standards that may be related to that SoW. 
+**The problem**: Given an SoW, the goal is to produce standards that may be related to that SoW. 
 
 To understand the backend code, view the API in [main.py](https://github.com/nasa-jpl/ASSESS/blob/master/api/main.py)
+
 To understand the ML code, view [ml-core.py](https://github.com/nasa-jpl/ASSESS/blob/master/api/ml-core.py)
 
 ## Getting Started
