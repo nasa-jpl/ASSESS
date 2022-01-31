@@ -29,8 +29,7 @@ from pydantic import BaseModel, Field
 from starlette.requests import Request
 from starlette.responses import Response
 
-from standards_extraction.parse import find_standard_ref
-from standards_extraction import extract_prep
+from standards_extraction import parse
 import ml_core
 from utils import connect_to_es
 import ast
@@ -236,7 +235,7 @@ async def recommend_file(
     print("File received.")
     print(pdf.content_type)
     print(pdf.filename)
-    in_text = extract_prep.parse_text(pdf)
+    in_text = parse.tika_parse.parse_text(pdf)
     print(in_text)
     return run_predict(
         request, time.time(), in_text, size, start_from, vectorizer_types, index_types
@@ -256,8 +255,8 @@ async def extract(request: Request, pdf: UploadFile = File(...)):
     # with open(file_location, "wb+") as file_object:
     #    shutil.copyfileobj(pdf.file, file_object)
     print({"info": f"file '{pdf.filename}' saved at '{file_location}'"})
-    text = extract_prep.parse_text(file_location)
-    refs = find_standard_ref(text)
+    text = parse.tika_parse(file_location)
+    refs = parse.find_standard_ref(text)
     out = {}
     out["embedded_references"] = refs
     out["filename"] = pdf.filename
