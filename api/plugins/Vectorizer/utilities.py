@@ -24,7 +24,8 @@ def get_BERT_vectors(list_of_texts, model, tokenizer, layers=None, batch_size=10
     # when we say paragraph we mean any length of text.
     paragraph_idx_to_sentence_idxs = []
     all_sentences = []
-    for text in list_of_texts:
+    print('creating sentences...')
+    for text in tqdm(list_of_texts):
         sentences = list(get_sentences(text, 20))
         all_sentences_next_id = len(all_sentences)
         paragraph_idx_to_sentence_idxs.append(
@@ -55,6 +56,7 @@ def get_BERT_vectors(list_of_texts, model, tokenizer, layers=None, batch_size=10
     # chunk list of sentences into smaller batches to improve memory and can be parallelized in future.
     # WARNING: currently, the Hugginface Model class does not lend itself to parallelization, due to some picklization error!
     all_sent_vectors = []
+    print('creating vectors for num sentences (will process in a batch size of ' + str(batch_size) + '):', len(all_sentences))
     for chunked_sentences in tqdm(list(divide_chunks(all_sentences, batch_size))):
         chunk_of_vector = get_activations(chunked_sentences)
         all_sent_vectors.extend(chunk_of_vector)
@@ -76,13 +78,15 @@ def preprocessor(text):
     return text
 
 def spacy_tokenize_lemmatize_punc_remove(text, nlp):
-
+    is_there_digit = re.compile("\d")
+    #print("******* THIS IS TEXT DEBUG *******")
+    #print(text, type(text))
     processed = nlp(text)
     lemma_list = []
     for token in processed:
         if token.is_stop is False:
             token_preprocessed = preprocessor(token.lemma_.lower())
-            if token_preprocessed != '':
+            if token_preprocessed != '' and is_there_digit.search(token_preprocessed) is None:
                 lemma_list.append(token_preprocessed)
     return lemma_list
 

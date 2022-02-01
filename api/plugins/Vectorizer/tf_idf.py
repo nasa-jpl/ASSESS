@@ -13,17 +13,18 @@ class TF_IDF(Template):
     def __init__(self):
         super().__init__()
         self.description = 'Implements the TF-IDF vectorizer'
-        self.vectorizer=TfidfVectorizer(tokenizer=identity_func, lowercase=False)
+        self.vectorizer=TfidfVectorizer(tokenizer=identity_func, lowercase=False, max_features=5000)
         self.nlp = en_core_web_sm.load()
 
     def train(self, list_of_texts):
-        print('Preprocessing text (tokenize, lemmatize and punctuation removal)..')
+        print('Preprocessing text for training (tokenize, lemmatize and punctuation removal)..')
         # we add a dummy token 'lemma_lemma' Faiss flat index is giving a higher matching values to vectors for empty strings than some more relevant ones!
         list_of_texts= [spacy_tokenize_lemmatize_punc_remove(item, self.nlp)+['lemma_lemma'] for item in tqdm(list_of_texts)]
         self.vectorizer.fit(list_of_texts)
 
     def vectorize(self, list_of_texts):
         # we add a dummy token 'lemma_lemma' Faiss flat index is giving a higher matching values to vectors for empty strings than some more relevant ones!
+        print('Preprocessing for vectorization (tokenize, lemmatize and punctuation removal)..')
         list_of_texts= [spacy_tokenize_lemmatize_punc_remove(item, self.nlp)+['lemma_lemma'] for item in tqdm(list_of_texts)]
         return self.vectorizer.transform(list_of_texts).todense()
 

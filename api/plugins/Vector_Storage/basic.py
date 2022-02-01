@@ -2,7 +2,8 @@ from .template import Template
 import pickle
 import os
 import numpy as np
-
+from tqdm import tqdm
+import gc
 
 class Basic(Template):
     def __init__(self):
@@ -30,6 +31,7 @@ class Basic(Template):
     def _save_to_disk(self):
         with open("data/basic_vector_storage.pk", "wb") as storage:
             pickle.dump(self.vector_storage, storage)
+        gc.collect()
         with open("data/basic_sorted_ids.pk", "wb") as ids:
             pickle.dump(self.sorted_ids, ids)
 
@@ -51,9 +53,12 @@ class Basic(Template):
         os.remove("data/basic_sorted_ids.pk")
 
     def add_update_vectors(self, ids, vectors, vec_type):
-        for id, vector in zip(ids, vectors.tolist()):
-            self._add_update_vector(id, np.array(vector), vec_type)
+        vectors = np.asarray(vectors)
+        for id, vector in tqdm(zip(ids, vectors), total=len(ids)):
+            self._add_update_vector(id, vector, vec_type)
+        print('writing to disk..')
         self._save_to_disk()
+        print('writing complete!')
 
     def remove_vectors(self, ids, vec_type):
         for id, vector in zip(ids):
