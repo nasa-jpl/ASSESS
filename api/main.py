@@ -240,7 +240,7 @@ async def recommend_file(
     print("File received.")
     print(pdf.content_type)
     print(pdf.filename)
-    in_text = parse.tika_parse.parse_text(pdf)
+    in_text = parse.tika_parse(pdf)
     print(in_text)
     return run_predict(
         request, time.time(), in_text, size, start_from, vectorizer_types, index_types
