@@ -208,4 +208,4 @@ if __name__ == "__main__":
     edit()
     delete()
     set_standard()
-    train()
+    # train()

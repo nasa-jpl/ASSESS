@@ -185,8 +185,13 @@ async def train(request: Request, background_tasks: BackgroundTasks, index_types
     background_tasks.add_task(ml_core.train, es,
                               index_types, vectorizer_types)
     log_stats(request, data=None)
+    #message = {}
+    # if in_progress:
     print("Training task created and sent to the background...")
-    return True
+    # message = {'status': 'training'}
+    # else:
+    message = {'status': 'in_progress'}
+    return JSONResponse(message)
 
 
 @app.post(
