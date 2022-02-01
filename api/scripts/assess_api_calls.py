@@ -8,6 +8,8 @@ import requests
 import yaml
 from requests.auth import HTTPBasicAuth
 
+from api.main import set_standards
+
 
 def format_json(jsonText):
     parsed = json.loads(jsonText)
@@ -37,7 +39,7 @@ def recommend_text():
 def recommend_file():
     # Recommend an SoW given a PDF.
     # Specify file location of an SOW.
-    location = "data/sow.pdf"
+    location = "../data/sow.pdf"
     file = {"pdf": open(location, "rb")}
     print("Sending POST request to `/recommend_file` with a PDF.")
     r = requests.post(
@@ -135,7 +137,7 @@ def select():
     print(format_json(r.text))
 
 
-def set():
+def set_standard():
     set_standards = {
         "username": "test_user",
         "standard_id": "x0288b9ed144439f8ad8fa017d604eac",
@@ -191,7 +193,7 @@ if __name__ == "__main__":
         },
     }
     # Insert username, password, and ASSESS root url into `conf.yaml`
-    with open("conf.yaml", "r") as stream:
+    with open("../conf.yaml", "r") as stream:
         conf = yaml.safe_load(stream)
     username = conf.get("username")
     password = conf.get("password")
@@ -202,7 +204,10 @@ if __name__ == "__main__":
         % (username, password, root)
     )
     recommend_text()
+    # recommend_file()
     add()
     standard_info()
     edit()
     delete()
+    set_standard()
+    train()
