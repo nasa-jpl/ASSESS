@@ -12,7 +12,7 @@ def tika_parse(pdf):
         # todo: remove this. Caches the parsed text.
         return str(open(filepath + "_parsed.txt", "r").read())
     pdf.write(filepath)
-    bashCommand = "java -jar standards_extraction/lib/tika-app-1.16.jar -t " + filepath
+    bashCommand = "java -jar standards_extraction/tika-app-1.16.jar -t " + filepath
     output = ""
     try:
         output = subprocess.check_output(["bash", "-c", bashCommand])
@@ -30,7 +30,7 @@ def tika_parse(pdf):
 
 def find_standard_ref(text):
     standard_orgs = {}
-    for line in io.open("standards_extraction/data/standard_orgs.txt", mode="r", encoding="utf-8").readlines():
+    for line in io.open("standards_extraction/standard_orgs.txt", mode="r", encoding="utf-8").readlines():
         line = line.strip()
         abbr = line.split(' — ')[0]
         name = line.split(' — ')[1]
