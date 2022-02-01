@@ -8,8 +8,6 @@ import requests
 import yaml
 from requests.auth import HTTPBasicAuth
 
-from api.main import set_standards
-
 
 def format_json(jsonText):
     parsed = json.loads(jsonText)
