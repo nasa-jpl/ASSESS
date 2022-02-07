@@ -136,6 +136,15 @@ def train(es, index_types, vectorizer_types):
                 name=vectorizer_type + "_" + index_type,
             )
         vector_indexes[vectorizer_type] = indexes
+
+    # remove all the vectors from memory in vector storage:
+    # TODO: loading and unloading can be done based on per type of vectors. For this the Vector_Storage/basic.py code needs to be changed!
+    vector_storage.apply(
+            "plugins.Vector_Storage",
+            "basic",
+            "unload_only_vectors_from_memory",
+            {},
+        )
     return
 
 

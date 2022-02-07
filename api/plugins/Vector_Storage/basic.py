@@ -71,6 +71,14 @@ class Basic(Template):
             vectors.append(self.vector_storage[vec_type][id])
         return np.array(vectors), self.sorted_ids[vec_type]
 
+    def load_only_vectors_to_memory(self):
+        if len(self.vector_storage)==0:
+            self.vector_storage = pickle.load(open("data/basic_vector_storage.pk", "rb"))
+
+    def unload_only_vectors_from_memory(self):
+        self.vector_storage = {}
+        gc.collect()
+
     def get_vector_Ids(self, vector_indexes, vec_type):
         Ids = []
         for idx in vector_indexes:
