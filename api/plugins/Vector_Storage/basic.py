@@ -32,12 +32,19 @@ class Basic(Template):
         with open("data/basic_sorted_ids.pk", "wb") as ids:
             pickle.dump(self.sorted_ids, ids)
 
-    def load_from_disk(self):
-        if os.path.exists("data/basic_vector_storage.pk") and os.path.exists(
+    def load_vectors_from_disk(self):
+        if os.path.exists("data/basic_vector_storage.pk"):
+            self.vector_storage = pickle.load(open("data/basic_vector_storage.pk", "rb"))
+
+    def load_mapping_from_disk(self):
+        if os.path.exists(
                 "data/basic_sorted_ids.pk"
         ):
-            self.vector_storage = pickle.load(open("data/basic_vector_storage.pk", "rb"))
             self.sorted_ids = pickle.load(open("data/basic_sorted_ids.pk", "rb"))
+
+    def unload_vectors_from_memory(self):
+        self.vector_storage = {}
+        gc.collect()
 
     def clean_storage(self):
         self.sorted_ids = {}
@@ -64,9 +71,6 @@ class Basic(Template):
             vectors.append(self.vector_storage[vec_type][id])
         return np.array(vectors), self.sorted_ids[vec_type]
 
-    def unload_only_vectors_from_memory(self):
-        self.vector_storage = {}
-        gc.collect()
 
     def get_vector_Ids(self, vector_indexes, vec_type):
         Ids = []

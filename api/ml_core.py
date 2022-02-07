@@ -72,7 +72,7 @@ def load_into_memory(index_types, vectorizer_types):
     vector_storage.apply(
         "plugins.Vector_Storage",
         "basic",
-        "load_from_disk",
+        "load_mapping_from_disk",
         {},
     )
     print("\nInitialized the Vector Storage.")
@@ -107,6 +107,12 @@ def train(es, index_types, vectorizer_types):
     # ==== create vectors and update Vector Storage
     print("\nCreating Vectors...")
     vector_storage = PluginCollection()
+    vector_storage.apply(
+        "plugins.Vector_Storage",
+        "basic",
+        "load_vectors_from_disk",
+        {},
+    )
     for vectorizer_type in vectorizer_types:
         print("vectorizer_type:", vectorizer_type)
         vectors = create_vectors(
@@ -145,7 +151,7 @@ def train(es, index_types, vectorizer_types):
     vector_storage.apply(
             "plugins.Vector_Storage",
             "basic",
-            "unload_only_vectors_from_memory",
+            "unload_vectors_from_memory",
             {},
         )
     return
