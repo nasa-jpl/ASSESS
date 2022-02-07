@@ -69,6 +69,12 @@ def load_into_memory(index_types, vectorizer_types):
 
     # ==== Init Vector Storage from disk (will load from disk automatically when it is called the first time)
     vector_storage = PluginCollection()
+    vector_storage.apply(
+        "plugins.Vector_Storage",
+        "basic",
+        "load_from_disk",
+        {},
+    )
     print("\nInitialized the Vector Storage.")
 
     # ==== load indexes from disk
@@ -106,13 +112,10 @@ def train(es, index_types, vectorizer_types):
         vectors = create_vectors(
             list_of_texts, type=vectorizer_type, vectorizers=vectorizers
         )
-        # TODO: remove line
-        # ES_ids = list(range(len(vectors)))  # using dummy values
         vector_storage.apply(
             "plugins.Vector_Storage",
             "basic",
             "add_update_vectors",
-            # TODO: Pass as a list of ES_ids
             {"ids": ES_ids, "vectors": vectors, "vec_type": vectorizer_type},
         )
 

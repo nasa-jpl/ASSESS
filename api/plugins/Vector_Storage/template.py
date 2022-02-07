@@ -9,6 +9,9 @@ class Template(Plugin):
     def clean_storage(self, *args, **kwargs):
         raise NotImplementedError
 
+    def load_from_disk(self, *args, **kwargs):
+        raise NotImplementedError
+
     def add_update_vectors(self, ids, vectors, vec_type):
         raise NotImplementedError
 
