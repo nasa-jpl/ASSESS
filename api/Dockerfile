@@ -5,9 +5,9 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update\
     && apt-get -y upgrade\
     && mkdir -p /usr/share/man/man1\
-    && apt-get -y --no-install-recommends install openjdk-11-jre-headless\
-    && apt-get clean all\
-    && rm -rf /var/lib/apt/lists/
+    && apt-get -y --no-install-recommends install openjdk-11-jre-headless
+    #&& apt-get clean all\
+    #&& rm -rf /var/lib/apt/lists/
 
 RUN apt-get install -y build-essential python3 python3-pip libssl-dev libffi-dev gcc 
 
