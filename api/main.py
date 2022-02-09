@@ -105,6 +105,13 @@ class Sow(BaseModel):
     text_field: str = Field(example="Airplanes are complex.")
 
 
+def load_into_memory(vectorizer_types, index_types):
+    vectorizers, vector_storage, vector_indexes = ml_core.load_into_memory(
+        index_types, vectorizer_types
+    )
+    return vectorizers, vector_storage, vector_indexes
+
+
 def log_stats(request, data=None, user=None):
     """Log detailed data in JSON for incoming/outgoing API request."""
     client_host = request.client.host
@@ -131,12 +138,7 @@ def str_to_ls(s):
 
 
 def run_predict(request, start, in_text, size, start_from, vectorizer_types, index_types):
-    # Globally used
-    # vectorizer_types = ["tf_idf"]
-    # index_types = ["flat"]
-    vectorizers, vector_storage, vector_indexes = ml_core.load_into_memory(
-        index_types, vectorizer_types
-    )
+
     list_of_predictions, scores = ml_core.predict(
         in_text,
         size,
@@ -517,4 +519,6 @@ async def set_standards(request: Request, set_standards: dict):
 
 if __name__ == "__main__":
     # read_logs()
+    # Globally used
+
     uvicorn.run(app, host="0.0.0.0", port=8080)
