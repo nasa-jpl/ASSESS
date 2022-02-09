@@ -90,6 +90,9 @@ data_schema = {
             "sdo": {"type": ["object", "null"]},
     },
 }
+vectorizers, vector_storage, vector_indexes = ml_core.load_into_memory(
+    index_types=["flat"], vectorizer_types=["tf_idf"]
+)
 
 
 @app.on_event("startup")
@@ -511,7 +514,5 @@ async def set_standards(request: Request, set_standards: dict):
 
 if __name__ == "__main__":
     # read_logs()
-    vectorizers, vector_storage, vector_indexes = ml_core.load_into_memory(
-    index_types=["flat"], vectorizer_types=["tf_idf"]
-    )
+
     uvicorn.run(app, host="0.0.0.0", port=8080)
