@@ -1,7 +1,7 @@
 FROM tensorflow/tensorflow:latest-py3
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install \
+RUN apt-get update && apt-get install -y \
     build-essential \
     libssl-dev \  
     libffi-dev \ 
