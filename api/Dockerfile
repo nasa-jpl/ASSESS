@@ -12,7 +12,8 @@ RUN apt-get update && apt-get install -y \
 RUN add-apt-repository -y ppa:deadsnakes/ppa
 RUN apt-get update && apt-get install -y \
     python3.9 \
-    python3-distuils 
+    python-setuptools \ 
+    python-distutils-extra
 RUN mv /usr/bin/python3.9 /usr/local/bin/python
 COPY . /app
 WORKDIR /app
