@@ -1,15 +1,17 @@
 FROM tensorflow/tensorflow:latest-py3
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN add-apt-repository -y ppa:deadsnakes/ppa
 RUN apt-get update && apt-get install \
     build-essential \
-    python3.9 \
     libssl-dev \  
     libffi-dev \ 
     gcc \
     software-properties-common
 
+# software-propertoes-common needed before this
+RUN add-apt-repository -y ppa:deadsnakes/ppa
+RUN apt-get install python3.9 
+RUN mv /usr/bin/python3.9 /usr/local/bin/python
 COPY . /app
 WORKDIR /app
 RUN chmod +x /app/start.sh && chmod +x /app/start-reload.sh
@@ -18,7 +20,6 @@ RUN mkdir /app/data && mkdir /app/log
 
 # Install dependencies
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-RUN mv /usr/bin/python3.9 /usr/local/bin/python
 RUN python get-pip.py
 RUN python -m pip install --no-cache-dir -r requirements.txt 
 RUN pip3 install jpl.pipedreams==1.0.3
