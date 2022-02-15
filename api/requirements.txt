@@ -13,8 +13,7 @@ pydantic==1.9.0
 PyYAML==6.0
 requests==2.26.0
 scikit_learn==0.24.2
-six==1.16.0
-starlette==0.18.0
+starlette==0.17.1
 tqdm==4.62.3
 transformers==4.16.2
 #tensorflow==2.7.0
