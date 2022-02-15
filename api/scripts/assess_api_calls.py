@@ -202,7 +202,7 @@ if __name__ == "__main__":
         % (username, password, root)
     )
     recommend_text()
-    # recommend_file()
+    recommend_file()
     add()
     standard_info()
     edit()
