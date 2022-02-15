@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
 
 # software-properties-common needed before this
 RUN add-apt-repository -y ppa:deadsnakes/ppa
-RUN apt-get install python3.9 
+RUN apt-get install -y python3.9 
 RUN mv /usr/bin/python3.9 /usr/local/bin/python
 COPY . /app
 WORKDIR /app
