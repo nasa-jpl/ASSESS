@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install \
     gcc \
     software-properties-common
 
-# software-propertoes-common needed before this
+# software-properties-common needed before this
 RUN add-apt-repository -y ppa:deadsnakes/ppa
 RUN apt-get install python3.9 
 RUN mv /usr/bin/python3.9 /usr/local/bin/python
