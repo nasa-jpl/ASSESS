@@ -11,9 +11,9 @@ RUN apt-get update && apt-get install -y \
 # software-properties-common needed before this
 RUN add-apt-repository -y ppa:deadsnakes/ppa
 RUN apt-get update && apt-get install -y \
-    python3.9 \
-    python-setuptools \ 
-    python3.9-distutils
+    python3.9 \ 
+    python3.9-distutils \
+    python-six
 RUN mv /usr/bin/python3.9 /usr/local/bin/python
 COPY . /app
 WORKDIR /app
@@ -25,6 +25,7 @@ RUN mkdir /app/data && mkdir /app/log
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 RUN python get-pip.py
 RUN python -m pip install --no-cache-dir -r requirements.txt 
+RUN pip3 install --upgrade setuptools distlib
 RUN pip3 install jpl.pipedreams==1.0.3
 RUN python -m pip install --no-cache-dir "uvicorn[standard]" gunicorn fastapi
 
