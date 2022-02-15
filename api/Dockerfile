@@ -26,6 +26,7 @@ RUN mkdir /app/data && mkdir /app/log
 # Install dependencies
 #RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 #RUN python get-pip.py
+RUN pip3 install --upgrade pip
 RUN pip3 install --no-cache-dir -r requirements.txt 
 RUN pip3 install --upgrade setuptools distlib
 RUN pip3 install jpl.pipedreams==1.0.3
