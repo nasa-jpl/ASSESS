@@ -14,7 +14,6 @@ RUN add-apt-repository -y ppa:deadsnakes/ppa
 RUN apt-get update && apt-get install -y \
     python3.8 \ 
     python3.8-distutils \
-    python3-six \
     python3-pip
 RUN mv /usr/bin/python3.8 /usr/local/bin/python
 COPY . /app
@@ -24,6 +23,7 @@ RUN mkdir /app/data && mkdir /app/log
 # RUN chown $uid /app/data && chown $uid /app/log
 
 # Install dependencies
+RUN pip3 install --upgrade keyrings.alt six
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 RUN python get-pip.py
 RUN python -m pip install --no-cache-dir -r requirements.txt 
