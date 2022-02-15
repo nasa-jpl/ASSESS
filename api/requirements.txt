@@ -14,7 +14,7 @@ PyYAML==6.0
 requests==2.26.0
 scikit_learn==0.24.2
 spacy==3.0.3
-starlette==0.17.1
+starlette==0.13.6
 tqdm==4.62.3
 transformers==4.15.0
 #tensorflow==2.7.0
