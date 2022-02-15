@@ -1,5 +1,5 @@
 aioredis==2.0.1
-elasticsearch==8.0.0
+elasticsearch==7.15.1
 datasets==1.17.0
 faiss-cpu==1.7.1post2
 fastapi==0.73.0
