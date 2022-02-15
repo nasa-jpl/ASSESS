@@ -6,7 +6,8 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \  
     libffi-dev \ 
     gcc \
-    software-properties-common
+    software-properties-common \
+    python3-pip
 
 # software-properties-common needed before this
 RUN add-apt-repository -y ppa:deadsnakes/ppa
