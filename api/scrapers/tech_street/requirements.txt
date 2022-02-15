@@ -1,0 +1,5 @@
+# Get Splash Running in your local: https://splash.readthedocs.io/en/stable/install.html#os-x-docker
+# Python 3.9.0
+bs4==0.0.1
+requests==2.24.0
+tqdm==4.60.0
