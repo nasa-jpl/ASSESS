@@ -1,6 +1,7 @@
 FROM tensorflow/tensorflow:latest-py3
 ARG DEBIAN_FRONTEND=noninteractive
 
+RUN add-apt-repository -y ppa:deadsnakes/ppa
 RUN apt-get update && apt-get install \
     build-essential \
     python3.9 \
@@ -16,7 +17,6 @@ RUN mkdir /app/data && mkdir /app/log
 # RUN chown $uid /app/data && chown $uid /app/log
 
 # Install dependencies
-RUN add-apt-repository -y ppa:deadsnakes/ppa
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 RUN mv /usr/bin/python3.9 /usr/local/bin/python
 RUN python get-pip.py
