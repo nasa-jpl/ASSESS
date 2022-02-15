@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
     libffi-dev \ 
     gcc \
     software-properties-common \
-    python3-pip
+    python3.9-apt
 
 # software-properties-common needed before this
 RUN add-apt-repository -y ppa:deadsnakes/ppa
