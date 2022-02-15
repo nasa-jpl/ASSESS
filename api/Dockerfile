@@ -7,11 +7,13 @@ RUN apt-get update && apt-get install -y \
     libffi-dev \ 
     gcc \
     software-properties-common \
-    python3.9-apt
+
 
 # software-properties-common needed before this
 RUN add-apt-repository -y ppa:deadsnakes/ppa
-RUN apt-get install -y python3.9 
+RUN apt-get install -y \
+    python3.9 \
+    python3.9-apt 
 RUN mv /usr/bin/python3.9 /usr/local/bin/python
 COPY . /app
 WORKDIR /app
