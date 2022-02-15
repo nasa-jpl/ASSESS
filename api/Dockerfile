@@ -6,15 +6,16 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \  
     libffi-dev \ 
     gcc \
+    python3-pip \
     software-properties-common
 
 # software-properties-common needed before this
 RUN add-apt-repository -y ppa:deadsnakes/ppa
 RUN apt-get update && apt-get install -y \
-    python3.9 \ 
-    python3.9-distutils \
-    python-six
-RUN mv /usr/bin/python3.9 /usr/local/bin/python
+    python3.8 \ 
+    python3.8-distutils \
+    python3-six
+RUN mv /usr/bin/python3.8 /usr/local/bin/python
 COPY . /app
 WORKDIR /app
 RUN chmod +x /app/start.sh && chmod +x /app/start-reload.sh
@@ -24,7 +25,7 @@ RUN mkdir /app/data && mkdir /app/log
 # Install dependencies
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 RUN python get-pip.py
-RUN python -m pip install --no-cache-dir -r requirements.txt 
+RUN python -m pip install --no-cache-dir -r requirements.txt --ignore-installed six
 RUN pip3 install --upgrade setuptools distlib
 RUN pip3 install jpl.pipedreams==1.0.3
 RUN python -m pip install --no-cache-dir "uvicorn[standard]" gunicorn fastapi
