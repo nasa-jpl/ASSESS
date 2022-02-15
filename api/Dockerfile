@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y \
     python3.9 \
     python-setuptools \ 
     python-distutils-extra
+RUN apt-get install python3.9-distutils
 RUN mv /usr/bin/python3.9 /usr/local/bin/python
 COPY . /app
 WORKDIR /app
