@@ -11,11 +11,11 @@ def parse_pdf(pdf, cache=False):
     if cache and os.path.exists(filepath + "_parsed.txt"):
         return str(open(filepath + "_parsed.txt", "r").read())
     # Below should throw an "PDFSyntaxError" error if this is an invalid pdf. FastAPI should already catch this.
-    with pdfplumber.open(pdf) as pdf:
+    pdf.write(filepath)
+    with pdfplumber.open(filepath) as pdf:
         text = [page.extract_text() for page in pdf.pages]
         full_str = (" ".join(text))
     if cache:
-        pdf.write(filepath)
         file = open(filepath + "_parsed.txt", "wb")
         file.write(full_str)
         file.close()
