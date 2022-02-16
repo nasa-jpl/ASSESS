@@ -3,29 +3,23 @@
 import re
 import io
 import os
-import subprocess
+import pdfplumber
 
 
-def tika_parse(pdf):
+def parse_pdf(pdf, cache=False):
     filepath = "./data/" + pdf.filename
-    if os.path.exists(filepath + "_parsed.txt"):
-        # todo: remove this. Caches the parsed text.
+    if cache and os.path.exists(filepath + "_parsed.txt"):
         return str(open(filepath + "_parsed.txt", "r").read())
+    # Below should throw an "PDFSyntaxError" error if this is an invalid pdf. FastAPI should already catch this.
     pdf.write(filepath)
-    bashCommand = "java -jar standards_extraction/tika-app-1.16.jar -t " + filepath
-    output = ""
-    try:
-        output = subprocess.check_output(["bash", "-c", bashCommand])
-        # file = open(filepath + "_parsed.txt", "wb")
-        # file.write(output)
-        # file.close()
-        # Returns bytestring with lots of tabs and spaces.
-        if type(output) == bytes:
-            output = output.decode("utf-8").replace("\t",
-                                                    " ").replace("\n", " ")
-    except subprocess.CalledProcessError as e:
-        print(e.output)
-    return str(output)
+    with pdfplumber.open(filepath) as pdf:
+        text = [page.extract_text() for page in pdf.pages]
+        full_str = (" ".join(text))
+    if cache:
+        file = open(filepath + "_parsed.txt", "wb")
+        file.write(full_str)
+        file.close()
+    return(full_str)
 
 
 def find_standard_ref(text):
