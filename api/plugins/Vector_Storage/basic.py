@@ -9,11 +9,8 @@ class Basic(Template):
     def __init__(self):
         super().__init__()
         self.description = "for storing Dense Vectors"
-        if self._exists_on_disk():
-            self._load_from_disk()
-        else:
-            self.sorted_ids = {}
-            self.vector_storage = {}
+        self.sorted_ids = {}
+        self.vector_storage = {}
 
     def _add_update_vector(self, id, vector, vec_type):
         if vec_type not in self.vector_storage.keys():
@@ -35,16 +32,19 @@ class Basic(Template):
         with open("data/basic_sorted_ids.pk", "wb") as ids:
             pickle.dump(self.sorted_ids, ids)
 
-    def _load_from_disk(self):
-        self.vector_storage = pickle.load(open("data/basic_vector_storage.pk", "rb"))
-        self.sorted_ids = pickle.load(open("data/basic_sorted_ids.pk", "rb"))
+    def load_vectors_from_disk(self):
+        if os.path.exists("data/basic_vector_storage.pk"):
+            self.vector_storage = pickle.load(open("data/basic_vector_storage.pk", "rb"))
 
-    def _exists_on_disk(self):
-        if os.path.exists("data/basic_vector_storage.pk") and os.path.exists(
-            "data/basic_sorted_ids.pk"
+    def load_mapping_from_disk(self):
+        if os.path.exists(
+                "data/basic_sorted_ids.pk"
         ):
-            return True
-        return False
+            self.sorted_ids = pickle.load(open("data/basic_sorted_ids.pk", "rb"))
+
+    def unload_vectors_from_memory(self):
+        self.vector_storage = {}
+        gc.collect()
 
     def clean_storage(self):
         self.sorted_ids = {}
@@ -70,6 +70,7 @@ class Basic(Template):
         for id in self.sorted_ids[vec_type]:
             vectors.append(self.vector_storage[vec_type][id])
         return np.array(vectors), self.sorted_ids[vec_type]
+
 
     def get_vector_Ids(self, vector_indexes, vec_type):
         Ids = []
