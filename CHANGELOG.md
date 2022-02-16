@@ -5,7 +5,7 @@
 - Improve repository organization
 - Improve ML
 - Fix training bug
--
+
 ## [v1.2.0](https://github.com/nasa-jpl/ASSESS/tree/v1.2.0) (2022-01-31)
 - Refactor codebase entirely, removing old code from dashboard, outdated ML, outdated extractors, and consolidate the code that's being used.
 - Add increased API capabilities, allow for ML training, and new FAIS vector library.
