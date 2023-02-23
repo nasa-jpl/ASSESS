@@ -1,10 +1,10 @@
 version: "3.8"
 
 services:
-  # https://www.elastic.co/guide/en/elasticsearch/reference/7.12/docker.html
+  # https://www.elastic.co/guide/en/elasticsearch/reference/7.17/docker.html
   elasticsearch:
     container_name: &es_server elasticsearch
-    image: "docker.elastic.co/elasticsearch/elasticsearch:7.15.2"
+    image: "docker.elastic.co/elasticsearch/elasticsearch:7.17.9"
     cap_drop:
       - ALL
     cap_add:
@@ -29,10 +29,10 @@ services:
       - "elasticsearch-1-data:/usr/share/elasticsearch/data"
       - "elasticsearch-1-logs:/usr/share/elasticsearch/logs"
 
-  # https://www.elastic.co/guide/en/kibana/7.12/docker.html
+  # https://www.elastic.co/guide/en/kibana/7.17/docker.html
   kibana:
     container_name: &kibana_server kibana
-    image: "docker.elastic.co/kibana/kibana:7.12.1"
+    image: "docker.elastic.co/kibana/kibana:7.17.9"
     environment:
       SERVER_NAME: *kibana_server
       # ELASTICSEARCH_HOSTS: *es_server
@@ -48,7 +48,7 @@ services:
   # https://hub.docker.com/_/redis
   redis:
     container_name: &redis_server redis-1
-    image: "redis:6.2-alpine"
+    image: "redis:6.2.10-alpine"
     read_only: true
     cap_drop:
       - ALL
