@@ -1,7 +1,7 @@
 # python 3.9.5
 tensorflow==2.7.0
 faiss-cpu==1.7.1post2
-scikit-learn==0.24.2 # gives memory segmentation with faiss error when version 1.0
+scikit-learn==1.0.1 # gives memory segmentation with faiss error when version 1.0
 transformers==4.15.0
 elasticsearch==7.15.1
 pandas==1.3.4
